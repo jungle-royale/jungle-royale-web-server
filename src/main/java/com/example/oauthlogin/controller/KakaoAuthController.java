@@ -55,8 +55,8 @@ public class KakaoAuthController {
 //        params.add("client_id", "9b5e1f47241e82beb559d44bd2a25377");
         params.add("client_id", "e8304b2a6b5aeb5020ef6abeb405115b");
 //        params.add("redirect_uri", "http://192.168.1.241:8080/api/auth/kakao/callback");
-        params.add("redirect_uri", "http://localhost:5173/social-kakao");
-//        params.add("redirect_uri", "http://192.168.1.136:5173/social-kakao");
+        params.add("redirect_uri", "http://localhost:5173");
+//        params.add("redirect_uri", "http://192.168.1.136:5173");
         params.add("code", code);
 
 
