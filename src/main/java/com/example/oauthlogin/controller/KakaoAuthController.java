@@ -3,6 +3,12 @@ package com.example.oauthlogin.controller;
 import com.example.oauthlogin.domain.OAuthToken;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.jose.JWSObject;
+import com.nimbusds.jose.JWSVerifier;
+import com.nimbusds.jose.crypto.RSASSAVerifier;
+import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jose.jwk.RSAKey;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -14,10 +20,12 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.crypto.SecretKey;
+import java.net.URL;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/auth")
@@ -143,6 +151,40 @@ public class KakaoAuthController {
         responseBody.put("jwt_token", jwtToken);
         responseBody.put("token_type", oAuthToken.getToken_type());
         responseBody.put("expires_in", String.valueOf(oAuthToken.getExpires_in()));
+
+        // 회원번호 뽑아내기
+        try {
+            // 1. 카카오 공개 키 가져오기
+            URL jwksURL = new URL("https://kauth.kakao.com/.well-known/jwks.json");
+            JWKSet jwkSet = JWKSet.load(jwksURL);
+
+            // 2. id_token 파싱
+            JWSObject jwsObject = JWSObject.parse(oAuthToken.getId_token());
+            RSAKey rsaKey = (RSAKey) jwkSet.getKeyByKeyId(jwsObject.getHeader().getKeyID());
+
+            // 3. 서명 검증
+            JWSVerifier verifier = new RSASSAVerifier(rsaKey);
+            if (!jwsObject.verify(verifier)) {
+                throw new RuntimeException("Invalid ID token signature");
+            }
+
+            // 4. 페이로드 추출
+            String payload2 = jwsObject.getPayload().toString();
+            System.out.println("Decoded Payload: " + payload2);
+
+            // 5. 회원 번호 추출
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, Object> claims = mapper.readValue(payload2, Map.class);
+            String userId = (String) claims.get("sub");
+            String nickname = (String) claims.get("nickname");
+            System.out.println("회원 번호 (sub): " + userId);
+            System.out.println("nickname = " + nickname);
+            // 클라이언트로 반환 데이터 추가
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to parse or verify id_token", "details", e.getMessage()));
+        }
 
         return ResponseEntity.ok(responseBody);
     }
