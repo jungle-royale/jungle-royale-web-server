@@ -9,8 +9,10 @@ import java.time.LocalDateTime;
 @Builder
 public class UserDto {
     private Long id;
+    private String kakaoId;
     private String username;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private LocalDateTime lastLoginAt;
 
 }
