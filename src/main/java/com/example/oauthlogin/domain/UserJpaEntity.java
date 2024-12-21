@@ -1,6 +1,7 @@
 package com.example.oauthlogin.domain;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 
@@ -19,4 +20,7 @@ public class UserJpaEntity {
 
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Column(nullable = false)
+    private LocalDateTime updatedAt = LocalDateTime.now();
 }
