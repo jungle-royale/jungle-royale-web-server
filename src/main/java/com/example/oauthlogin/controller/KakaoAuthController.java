@@ -35,7 +35,6 @@ public class KakaoAuthController {
 
     @PostMapping("/kakao/callback")
     public ResponseEntity<Map<String, String>> kakaoCallback(@RequestBody Map<String, String> payload) {
-        System.out.println("ㅎㅇㅎㅇ");
         String code = payload.get("code"); // 클라이언트에서 전송한 인가코드 추출
         System.out.println("code = " + code);
 
@@ -48,17 +47,15 @@ public class KakaoAuthController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
-        System.out.println("토큰 요청 전");
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
 //        params.add("client_id", "9b5e1f47241e82beb559d44bd2a25377");
         params.add("client_id", "e8304b2a6b5aeb5020ef6abeb405115b");
 //        params.add("redirect_uri", "http://192.168.1.241:8080/api/auth/kakao/callback");
-        params.add("redirect_uri", "http://localhost:5173");
+        params.add("redirect_uri", "http://localhost:5173/social-kakao");
 //        params.add("redirect_uri", "http://192.168.1.136:5173");
         params.add("code", code);
-
 
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(params, headers);
 
@@ -87,7 +84,6 @@ public class KakaoAuthController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "500에러 발생 Error communicating with Kakao API"));
         }
 
-        System.out.println("오브젝트 매퍼 전 ");
         ObjectMapper objectMapper = new ObjectMapper();
         OAuthToken oAuthToken;
         try {
@@ -109,31 +105,24 @@ public class KakaoAuthController {
                     .body(Map.of("error", "Unexpected error while parsing response"));
         }
 
-        System.out.println("오브젝트 매퍼 후");
-
         System.out.println("OAuthToken" + oAuthToken.getAccess_token());
 
-        // POST 방식으로 key=value 데이터를 요청 (카카오쪽으로)
-        // 이 때 필요한 라이브러리가 RestTemplate, 얘를 쓰면 http 요청을 편하게 할 수 있다.
-//        RestTemplate rt2 = new RestTemplate();
-//
-//        System.out.println(":::::::: 전달받은 엑세스 토큰 oAuthToken = " + oAuthToken.getAccess_token());
-//        // HTTP POST를 요청할 때 보내는 데이터(body)를 설명해주는 헤더도 만들어 같이 보내줘야 한다.
-//        HttpHeaders headers2 = new HttpHeaders();
-//        headers2.add("Authorization", "Bearer "+oAuthToken.getAccess_token());
-//        headers2.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
+        // HTTP POST를 요청할 때 보내는 데이터(body)를 설명해주는 헤더도 만들어 같이 보내줘야 한다.
+        HttpHeaders headers2 = new HttpHeaders();
+        headers2.add("Authorization", "Bearer "+oAuthToken.getAccess_token());
+        headers2.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
 
-//        HttpEntity<MultiValueMap<String, String>> kakaoProfileRequest= new HttpEntity<>(headers2);
+        HttpEntity<MultiValueMap<String, String>> kakaoProfileRequest= new HttpEntity<>(headers2);
 
-//        // POST 방식으로 Http 요청한다. 그리고 response 변수의 응답 받는다.
-//        ResponseEntity<String> response2 = rt2.exchange(
-//                "https://kapi.kakao.com/v2/user/me", // https://{요청할 서버 주소}
-//                HttpMethod.POST, // 요청할 방식
-//                kakaoProfileRequest, // 요청할 때 보낼 데이터
-//                String.class // 요청 시 반환되는 데이터 타입
-//        );
+        // POST 방식으로 Http 요청한다. 그리고 response 변수의 응답 받는다.
+        ResponseEntity<String> response2 = rt.exchange(
+                "https://kapi.kakao.com/v2/user/me", // https://{요청할 서버 주소}
+                HttpMethod.POST, // 요청할 방식
+                kakaoProfileRequest, // 요청할 때 보낼 데이터
+                String.class // 요청 시 반환되는 데이터 타입
+        );
 
-//        System.out.println(":::::::: 카카오로부터 전달받은 개인정보 : " + response2.getBody());
+        System.out.println(":::::::: 카카오로부터 전달받은 개인정보 : " + response2.getBody());
 
         // JWT 생성
         String jwtToken = Jwts.builder()
@@ -152,39 +141,39 @@ public class KakaoAuthController {
         responseBody.put("token_type", oAuthToken.getToken_type());
         responseBody.put("expires_in", String.valueOf(oAuthToken.getExpires_in()));
 
-        // 회원번호 뽑아내기
-        try {
-            // 1. 카카오 공개 키 가져오기
-            URL jwksURL = new URL("https://kauth.kakao.com/.well-known/jwks.json");
-            JWKSet jwkSet = JWKSet.load(jwksURL);
-
-            // 2. id_token 파싱
-            JWSObject jwsObject = JWSObject.parse(oAuthToken.getId_token());
-            RSAKey rsaKey = (RSAKey) jwkSet.getKeyByKeyId(jwsObject.getHeader().getKeyID());
-
-            // 3. 서명 검증
-            JWSVerifier verifier = new RSASSAVerifier(rsaKey);
-            if (!jwsObject.verify(verifier)) {
-                throw new RuntimeException("Invalid ID token signature");
-            }
-
-            // 4. 페이로드 추출
-            String payload2 = jwsObject.getPayload().toString();
-            System.out.println("Decoded Payload: " + payload2);
-
-            // 5. 회원 번호 추출
-            ObjectMapper mapper = new ObjectMapper();
-            Map<String, Object> claims = mapper.readValue(payload2, Map.class);
-            String userId = (String) claims.get("sub");
-            String nickname = (String) claims.get("nickname");
-            System.out.println("회원 번호 (sub): " + userId);
-            System.out.println("nickname = " + nickname);
-            // 클라이언트로 반환 데이터 추가
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Failed to parse or verify id_token", "details", e.getMessage()));
-        }
+//        // 회원번호 뽑아내기
+//        try {
+//            // 1. 카카오 공개 키 가져오기
+//            URL jwksURL = new URL("https://kauth.kakao.com/.well-known/jwks.json");
+//            JWKSet jwkSet = JWKSet.load(jwksURL);
+//
+//            // 2. id_token 파싱
+//            JWSObject jwsObject = JWSObject.parse(oAuthToken.getId_token());
+//            RSAKey rsaKey = (RSAKey) jwkSet.getKeyByKeyId(jwsObject.getHeader().getKeyID());
+//
+//            // 3. 서명 검증
+//            JWSVerifier verifier = new RSASSAVerifier(rsaKey);
+//            if (!jwsObject.verify(verifier)) {
+//                throw new RuntimeException("Invalid ID token signature");
+//            }
+//
+//            // 4. 페이로드 추출
+//            String payload2 = jwsObject.getPayload().toString();
+//            System.out.println("Decoded Payload: " + payload2);
+//
+//            // 5. 회원 번호 추출
+//            ObjectMapper mapper = new ObjectMapper();
+//            Map<String, Object> claims = mapper.readValue(payload2, Map.class);
+//            String userId = (String) claims.get("sub");
+//            String nickname = (String) claims.get("nickname");
+//            System.out.println("회원 번호 (sub): " + userId);
+//            System.out.println("nickname = " + nickname);
+//            // 클라이언트로 반환 데이터 추가
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(Map.of("error", "Failed to parse or verify id_token", "details", e.getMessage()));
+//        }
 
         return ResponseEntity.ok(responseBody);
     }
