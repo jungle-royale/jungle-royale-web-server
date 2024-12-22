@@ -7,9 +7,11 @@ import com.example.oauthlogin.repository.UserRepository;
 import com.example.oauthlogin.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -37,4 +39,17 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    /**
+     * 현재 사용자 추출
+     */
+    @GetMapping("/current-user")
+    public ResponseEntity<Map<String, Object>> getCurrentUser() {
+        String userId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Map<String, Object> response = new HashMap<>();
+
+        System.out.println("userId = " + userId);
+        response.put("userId", userId);
+        return ResponseEntity.ok(response);
+    }
 }

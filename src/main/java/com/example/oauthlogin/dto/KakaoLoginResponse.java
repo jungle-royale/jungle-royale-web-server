@@ -16,5 +16,4 @@ public class KakaoLoginResponse {
     private String refreshToken;
     private String expiresIn;
     private boolean isGuest;
-
 }

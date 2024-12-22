@@ -10,6 +10,8 @@ import com.example.oauthlogin.service.UserService;
 import com.example.oauthlogin.util.AuthTokensGenerator;
 import com.example.oauthlogin.util.JwtTokenProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
@@ -45,10 +47,15 @@ public class LoginController {
         return ResponseEntity.ok(kakaoLoginResponse);
     }
 
-//    @PostMapping("/verify-jwt")
-//    public ResponseEntity<Map<String, Object>> verifyJwt(@RequestBody Map<String, String> payload) {
-//        String jwtToken = payload.get("jwt_token");
-//        String refreshToken = payload.get("refresh_token");
+    @PostMapping("/verify-jwt")
+    public ResponseEntity<Map<String, Object>> verifyJwt(@RequestBody Map<String, String> payload) {
+        String jwtToken = payload.get("jwt_token");
+
+        System.out.println("여기가 jwt 검증구간입니다.");
+        jwtTokenProvider.isValidToken(jwtToken);
+        Map<String, Object> responseBody = new HashMap<>();
+
+        return ResponseEntity.ok(responseBody);
 //        if (jwtToken == null || jwtToken.isEmpty()) {
 //            return ResponseEntity.badRequest().body(Map.of("error", "JWT token is missing"));
 //        }
@@ -73,6 +80,7 @@ public class LoginController {
 //        } catch (io.jsonwebtoken.ExpiredJwtException e) {
 //            System.out.println("Access token has expired. Attempting to refresh...");
 //
+//            System.out.println("jwt 만료시 여기 호출!!!!");
 //            // 2. 액세스 토큰 만료 시 리프레시 토큰 사용
 //            if (refreshToken == null || refreshToken.isEmpty()) {
 //                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Access token expired and refresh token is missing"));
@@ -119,8 +127,8 @@ public class LoginController {
 //        } catch (Exception e) {
 //            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Invalid JWT token"));
 //        }
-//    }
-//
+    }
+
     /**
      * RefreshToken 발급
      * @param refreshToken
@@ -128,12 +136,9 @@ public class LoginController {
      */
     @PostMapping("/kakao/refresh-token")
     public ResponseEntity<Map<String, String>> refreshAccessToken(@RequestHeader("authorization_refresh") String refreshToken) {
-        System.out.println("refreshToken = " + refreshToken);
         if (refreshToken == null || refreshToken.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("error", "Refresh token is missing"));
         }
-
-        System.out.println("리프레시 요청 왔음!");
 
         // 블랙리스트에 있는 토큰인지 확인하고 예외 발생
         if (blackListService.isBlackListToken(refreshToken)) {
@@ -141,12 +146,10 @@ public class LoginController {
         }
 
         String realRefreshToken = refreshToken.substring(7);
-        System.out.println("realRefreshToken = " + realRefreshToken);
         // 리프레시 토큰 발급
         OAuthKakaoToken oAuthKakaoToken = kakaoAuthService.getKakaoRefreshToken(realRefreshToken);
 
-        System.out.println("여기까지 옴???");
-
+        // Todo : 리프레시 토큰 재발급을 위한 객체 생성 후 이용하기
         Map<String, String> responseBody = new HashMap<>();
 
         responseBody.put("expires_in", String.valueOf(oAuthKakaoToken.getExpires_in()));

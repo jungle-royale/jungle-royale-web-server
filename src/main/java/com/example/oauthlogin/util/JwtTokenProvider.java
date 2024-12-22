@@ -41,12 +41,12 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public boolean isValidToken(String accessToken) {
+    public boolean isValidToken(String jwt) {
         try {
             Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
-                    .parseClaimsJws(accessToken);
+                    .parseClaimsJws(jwt);
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             log.info("Invalid JWT Token", e);
@@ -71,5 +71,16 @@ public class JwtTokenProvider {
                 .build()
                 .parseClaimsJws(accessToken)
                 .getBody();
+    }
+    public String generateToken(String subject, long expirationMillis) {
+        Date now = new Date();
+        Date expiration = new Date(now.getTime() + expirationMillis);
+
+        return Jwts.builder()
+                .setSubject(subject)
+                .setIssuedAt(now)
+                .setExpiration(expiration)
+                .signWith(key, SignatureAlgorithm.HS512)
+                .compact();
     }
 }

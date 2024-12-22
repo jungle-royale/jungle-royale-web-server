@@ -14,7 +14,6 @@ import java.security.Key;
 @RequiredArgsConstructor
 public class JwtService {
     private final BlackListRepository blackListRepository;
-
     public void invalidateToken(String accessToken) {
         if (isTokenValid(accessToken)) {
             // 블랙리스트에 토큰 저장

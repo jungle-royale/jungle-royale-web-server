@@ -109,9 +109,9 @@ public class KakaoAuthService {
 
     public OAuthKakaoToken getKakaoRefreshToken(String refreshToken) {
         return authKakaoTokenGenerator.generateRefreshToken(refreshToken);
-
     }
 
+    // TODO: login 관련 추상화 필요
     public KakaoLoginResponse loginWithKakao(String code) {
         OAuthKakaoToken oAuthKakaoToken = getKakaoTokenUsingAccessCode(code);
 
@@ -119,10 +119,12 @@ public class KakaoAuthService {
 
         userService.join(kakaoId, oAuthKakaoToken);
 
+        // 카카오회원 번호를 이용해서 jwt 생성
         UserDto userByKakaoId = userService.getUserByKakaoId(kakaoId);
         long userId = userByKakaoId.getId();
 
         String jwtToken = jwtTokenProvider.generateKakaoJwt(String.valueOf(userId), oAuthKakaoToken);
+
         return getKakaoLoginResponse(jwtToken, oAuthKakaoToken);
     }
 }
