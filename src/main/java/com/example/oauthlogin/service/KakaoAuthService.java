@@ -1,7 +1,10 @@
 package com.example.oauthlogin.service;
 
 import com.example.oauthlogin.domain.OAuthKakaoToken;
+import com.example.oauthlogin.domain.UserDto;
+import com.example.oauthlogin.dto.KakaoLoginResponse;
 import com.example.oauthlogin.util.AuthKakaoTokenGenerator;
+import com.example.oauthlogin.util.JwtTokenProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.JWSVerifier;
@@ -11,9 +14,6 @@ import com.nimbusds.jose.jwk.RSAKey;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URL;
@@ -23,6 +23,22 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class KakaoAuthService {
     private final AuthKakaoTokenGenerator authKakaoTokenGenerator;
+
+    private final RestTemplate restTemplate;
+    private final UserService userService;
+    private final JwtTokenProvider jwtTokenProvider;
+
+    public KakaoLoginResponse getKakaoLoginResponse(String jwtToken, OAuthKakaoToken oAuthKakaoToken){
+        KakaoLoginResponse response = KakaoLoginResponse.builder()
+                .jwtToken(jwtToken)
+                .accessToken(oAuthKakaoToken.getAccess_token())
+                .refreshToken(oAuthKakaoToken.getRefresh_token())
+                .expiresIn(String.valueOf(oAuthKakaoToken.getExpires_in()))
+                .isGuest(false)
+                .build();
+        return response;
+    }
+
     public OAuthKakaoToken getKakaoTokenUsingAccessCode(String accessCode){
         // REST API 호출로 카카오 토큰 요청 처리 (생략된 기존 코드 추가)
         return authKakaoTokenGenerator.generate(accessCode);
@@ -69,5 +85,44 @@ public class KakaoAuthService {
         System.out.println("kakaoId = " + kakaoId);
 
         return kakaoId;
+    }
+
+    public void logoutFromKakao(String accessToken) {
+        String kakaoLogoutUrl = "https://kapi.kakao.com/v1/user/logout";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + accessToken);
+
+        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+
+        try {
+            restTemplate.exchange(
+                    kakaoLogoutUrl,
+                    HttpMethod.POST,
+                    requestEntity,
+                    Void.class
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to logout from Kakao: " + e.getMessage(), e);
+        }
+    }
+
+    public OAuthKakaoToken getKakaoRefreshToken(String refreshToken) {
+        return authKakaoTokenGenerator.generateRefreshToken(refreshToken);
+
+    }
+
+    public KakaoLoginResponse loginWithKakao(String code) {
+        OAuthKakaoToken oAuthKakaoToken = getKakaoTokenUsingAccessCode(code);
+
+        String kakaoId = getKakaoId(oAuthKakaoToken);
+
+        userService.join(kakaoId, oAuthKakaoToken);
+
+        UserDto userByKakaoId = userService.getUserByKakaoId(kakaoId);
+        long userId = userByKakaoId.getId();
+
+        String jwtToken = jwtTokenProvider.generateKakaoJwt(String.valueOf(userId), oAuthKakaoToken);
+        return getKakaoLoginResponse(jwtToken, oAuthKakaoToken);
     }
 }

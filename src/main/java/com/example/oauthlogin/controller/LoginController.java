@@ -1,17 +1,25 @@
 package com.example.oauthlogin.controller;
 
 import com.example.oauthlogin.domain.OAuthKakaoToken;
+import com.example.oauthlogin.domain.UserDto;
+import com.example.oauthlogin.dto.KakaoLoginResponse;
+import com.example.oauthlogin.repository.BlackListRepository;
+import com.example.oauthlogin.service.BlackListService;
 import com.example.oauthlogin.service.KakaoAuthService;
 import com.example.oauthlogin.service.UserService;
+import com.example.oauthlogin.util.AuthTokensGenerator;
 import com.example.oauthlogin.util.JwtTokenProvider;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-
 
 @RestController
 @RequestMapping("/api/auth")
@@ -21,40 +29,22 @@ public class LoginController {
     private final UserService userService;
     private final KakaoAuthService kakaoAuthService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final BlackListService blackListService;
 
     @PostMapping("/kakao/login")
-    public ResponseEntity<Map<String, String>> kakaoCallback(@RequestBody Map<String, String> payload) {
+    public ResponseEntity<KakaoLoginResponse> kakaoCallback(@RequestBody Map<String, String> payload) {
+
         String code = payload.get("code"); // 클라이언트에서 전송한 인가코드 추출
         System.out.println("code = " + code);
 
         if (code == null || code.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Authorization code is missing"));
+            throw new IllegalArgumentException("Authorization code is missing");
         }
-        OAuthKakaoToken oAuthKakaoToken = kakaoAuthService.getKakaoTokenUsingAccessCode(code);
+        KakaoLoginResponse kakaoLoginResponse = kakaoAuthService.loginWithKakao(code);
 
-        String jwtToken = jwtTokenProvider.generateKakaoJwt("user", oAuthKakaoToken);
-
-
-
-
-        String kakaoId = kakaoAuthService.getKakaoId(oAuthKakaoToken);
-
-        // 유저가 이미 존재하는 경우 리프레시 토큰만 업데이트
-        if (!userService.isUserExistsByKakaoId(kakaoId)) {
-            userService.updateRefreshTokenByKakaoId(kakaoId, oAuthKakaoToken.getRefresh_token(), oAuthKakaoToken.getRefresh_token_expires_in());
-        }
-
-        // 클라이언트로 JWT와 추가 정보 반환
-        Map<String, String> responseBody = new HashMap<>();
-
-        responseBody.put("jwt_token", jwtToken);
-        responseBody.put("token_type", oAuthKakaoToken.getToken_type());
-        responseBody.put("expires_in", String.valueOf(oAuthKakaoToken.getExpires_in()));
-        responseBody.put("refresh_token", oAuthKakaoToken.getRefresh_token());
-        responseBody.put("is_guest", "false");
-        return ResponseEntity.ok(responseBody);
+        return ResponseEntity.ok(kakaoLoginResponse);
     }
-}
+
 //    @PostMapping("/verify-jwt")
 //    public ResponseEntity<Map<String, Object>> verifyJwt(@RequestBody Map<String, String> payload) {
 //        String jwtToken = payload.get("jwt_token");
@@ -131,59 +121,40 @@ public class LoginController {
 //        }
 //    }
 //
-//    /**
-//     * RefreshToken 발급
-//     * @param payload
-//     * @return access_token , refresh_token, expires_in
-//     */
-//    @PostMapping("/kakao/refresh-token")
-//    public ResponseEntity<Map<String, String>> refreshAccessToken(@RequestBody Map<String, String> payload) {
-//        String refreshToken = payload.get("refresh_token"); // 클라이언트에서 전달된 리프레시 토큰
-//        if (refreshToken == null || refreshToken.isEmpty()) {
-//            return ResponseEntity.badRequest().body(Map.of("error", "Refresh token is missing"));
-//        }
-//
-//        RestTemplate rt = new RestTemplate();
-//
-//        // HTTP 요청 헤더 설정
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
-//
-//        // 요청 파라미터 설정
-//        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-//        params.add("grant_type", "refresh_token");
-//        params.add("client_id", clientId);
-//        params.add("refresh_token", refreshToken);
-//
-//        // 요청 생성
-//        HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(params, headers);
-//
-//        try {
-//            // 카카오 API에 POST 요청
-//            ResponseEntity<String> response = rt.exchange(
-//                    "https://kauth.kakao.com/oauth/token",
-//                    HttpMethod.POST,
-//                    kakaoTokenRequest,
-//                    String.class
-//            );
-//
-//            // 응답 JSON 파싱
-//            ObjectMapper objectMapper = new ObjectMapper();
-//            OAuthToken newToken = objectMapper.readValue(response.getBody(), OAuthToken.class);
-//
-//            // 새로운 토큰 반환
-//            Map<String, String> responseBody = new HashMap<>();
-//            responseBody.put("access_token", newToken.getAccess_token());
-//            responseBody.put("refresh_token", newToken.getRefresh_token()); // 만약 리프레시 토큰이 갱신되었다면 반환
-//            responseBody.put("expires_in", String.valueOf(newToken.getExpires_in()));
-//
-//            return ResponseEntity.ok(responseBody);
-//        } catch (HttpClientErrorException e) {
-//            // 카카오 API 요청 실패 처리
-//            return ResponseEntity.status(e.getStatusCode())
-//                    .body(Map.of("error", "Failed to refresh token", "details", e.getResponseBodyAsString()));
-//        } catch (Exception e) {
-//            // 기타 예외 처리
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(Map.of("error", "Unexpected error occurred", "details", e.getMessage()));
-//        }
+    /**
+     * RefreshToken 발급
+     * @param refreshToken
+     * @return access_token , refresh_token, expires_in
+     */
+    @PostMapping("/kakao/refresh-token")
+    public ResponseEntity<Map<String, String>> refreshAccessToken(@RequestHeader("authorization_refresh") String refreshToken) {
+        System.out.println("refreshToken = " + refreshToken);
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Refresh token is missing"));
+        }
+
+        System.out.println("리프레시 요청 왔음!");
+
+        // 블랙리스트에 있는 토큰인지 확인하고 예외 발생
+        if (blackListService.isBlackListToken(refreshToken)) {
+            throw new IllegalArgumentException("[ERROR] 해당 Refresh Token은 블랙리스트에 등록되어 사용이 불가능합니다.");
+        }
+
+        String realRefreshToken = refreshToken.substring(7);
+        System.out.println("realRefreshToken = " + realRefreshToken);
+        // 리프레시 토큰 발급
+        OAuthKakaoToken oAuthKakaoToken = kakaoAuthService.getKakaoRefreshToken(realRefreshToken);
+
+        System.out.println("여기까지 옴???");
+
+        Map<String, String> responseBody = new HashMap<>();
+
+        responseBody.put("expires_in", String.valueOf(oAuthKakaoToken.getExpires_in()));
+        responseBody.put("refresh_token", oAuthKakaoToken.getRefresh_token());
+        responseBody.put("access_token", oAuthKakaoToken.getAccess_token());
+        responseBody.put("is_guest", "false");
+        responseBody.put("success", "true");
+
+        return ResponseEntity.ok(responseBody);
+    }
+}

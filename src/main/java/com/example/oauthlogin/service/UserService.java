@@ -1,5 +1,6 @@
 package com.example.oauthlogin.service;
 
+import com.example.oauthlogin.domain.OAuthKakaoToken;
 import com.example.oauthlogin.domain.RefreshToken;
 import com.example.oauthlogin.domain.User;
 import com.example.oauthlogin.domain.UserDto;
@@ -17,12 +18,11 @@ public class UserService {
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
 
-
     public boolean isUserExistsByKakaoId(String kakaoId) {
         return userRepository.findByKakaoId(kakaoId).isPresent();
     }
 
-    public UserDto saveOrUpdateUser(String kakaoId, String username, String refreshToken, Integer refreshTokenExpiry) {
+    public User saveUser(String kakaoId, String username) {
         User user = userRepository.findByKakaoId(kakaoId)
                 .orElse(new User());
 
@@ -33,18 +33,7 @@ public class UserService {
         if (user.getCreatedAt() == null) {
             user.setCreatedAt(LocalDateTime.now());
         }
-        User savedUser = userRepository.save(user);
-
-        saveRefreshToken(savedUser, refreshToken, refreshTokenExpiry);
-
-        return UserDto.builder()
-                .id(savedUser.getId())
-                .kakaoId(savedUser.getKakaoId())
-                .username(savedUser.getUsername())
-                .createdAt(savedUser.getCreatedAt())
-                .updatedAt(savedUser.getUpdatedAt())
-                .lastLoginAt(savedUser.getLastLoginAt())
-                .build();
+        return userRepository.save(user);
     }
 
     private void saveRefreshToken(User user, String token, Integer expiresAt) {
@@ -54,30 +43,6 @@ public class UserService {
         refreshToken.setExpiresAt(expiresAt);
 
         refreshTokenRepository.save(refreshToken);
-    }
-
-    public void updateRefreshTokenByKakaoId(String kakaoId, String newRefreshToken, Integer newExpiry) {
-        // 유저 확인
-        User user = userRepository.findByKakaoId(kakaoId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with Kakao ID: " + kakaoId));
-
-        // 리프레시 토큰 존재 여부 확인
-        Optional<RefreshToken> existingTokenOpt = refreshTokenRepository.findByUserId(user.getId());
-
-        if (existingTokenOpt.isPresent()) {
-            // 토큰이 존재하면 수정
-            RefreshToken existingToken = existingTokenOpt.get();
-            existingToken.setToken(newRefreshToken);
-            existingToken.setExpiresAt(newExpiry);
-            refreshTokenRepository.save(existingToken);
-        } else {
-            // 토큰이 없으면 새로 추가
-            RefreshToken newToken = new RefreshToken();
-            newToken.setUser(user);
-            newToken.setToken(newRefreshToken);
-            newToken.setExpiresAt(newExpiry);
-            refreshTokenRepository.save(newToken);
-        }
     }
 
     public UserDto getUserByKakaoId(String kakaoId) {
@@ -93,5 +58,23 @@ public class UserService {
                 .lastLoginAt(user.getLastLoginAt())
                 .build();
     }
+
+    public void join(String kakaoId, OAuthKakaoToken oAuthKakaoToken) {
+        // 유저가 존재하지않으면 회원, 리프레시 토큰 저장
+        if (!isUserExistsByKakaoId(kakaoId)) {
+            User savedUser = saveUser(kakaoId, "테스터1");
+            saveRefreshToken(savedUser, oAuthKakaoToken.getRefresh_token(), oAuthKakaoToken.getRefresh_token_expires_in());
+            // 유저 등록 및 refreshtoken 등록
+        } else {
+            // 유저가 존재해 그럼 리프레시 토큰만 저장
+            // refreshtoken 등록
+            User user = userRepository.findByKakaoId(kakaoId)
+                    .orElse(new User());
+            saveRefreshToken(user, oAuthKakaoToken.getRefresh_token(), oAuthKakaoToken.getRefresh_token_expires_in());
+        }
+
+
+    }
+
 
 }

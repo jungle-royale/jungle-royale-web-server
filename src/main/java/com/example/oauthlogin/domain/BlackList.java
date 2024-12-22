@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class BlackList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

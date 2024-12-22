@@ -8,10 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.SecretKey;
 import java.security.Key;
 import java.time.Instant;
-import java.util.Base64;
 import java.util.Date;
 
 @Slf4j
@@ -67,7 +65,7 @@ public class JwtTokenProvider {
         return claims.getSubject();
     }
 
-    private Claims parseClaims(String accessToken) {
+    public Claims parseClaims(String accessToken) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
