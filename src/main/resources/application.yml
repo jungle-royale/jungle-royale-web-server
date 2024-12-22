@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: oauthlogin
+
+  datasource:
+    url: jdbc:mysql://jungle-royal-mysql.c9geowaym6y3.us-east-2.rds.amazonaws.com:3306/jungleroyal
+    username: admin
+    password: jungleroyal4
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+## 비밀키 생성 방법 : io.jsonwebtoken.security.Keys.secretKeyFor() 사용하여 HS512에 맞는 키 생성
+jwt:
+  secret-key: j5ZeFFn6lVIEnpuLFNa8aao/nLy1ZRLFppPB98cBvowj8RDNepK+Swe33cHLOVWeM7VZkb2HqCdU2CBOk11b4A==

@@ -3,7 +3,7 @@ package com.example.oauthlogin.domain;
 import lombok.Data;
 
 @Data
-public class OAuthToken {
+public class OAuthKakaoToken {
     private String access_token;
     private String token_type;
     private String refresh_token;

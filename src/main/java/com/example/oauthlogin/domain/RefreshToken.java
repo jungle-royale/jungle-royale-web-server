@@ -13,8 +13,8 @@ public class RefreshToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne // User와 다대일 관계
+    @JoinColumn(name = "user_id", nullable = false) // 외래키
     private User user;
 
     @Column(nullable = false)

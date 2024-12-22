@@ -1,0 +1,83 @@
+package com.example.oauthlogin.util;
+
+
+import com.example.oauthlogin.domain.OAuthKakaoToken;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.*;
+import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.Map;
+
+@Component
+@RequiredArgsConstructor
+public class AuthKakaoTokenGenerator {
+    private static final String BEARER_TYPE = "Bearer";
+
+//        private final String clientId = "9b5e1f47241e82beb559d44bd2a25377"; // 카카오 REST API 키 - 서버
+    private final String clientId = "e8304b2a6b5aeb5020ef6abeb405115b"; // 카카오 REST API 키 - 프론트엔드
+//        private final String redirectUri = "http://192.168.1.241:8080/api/auth/kakao/callback"; // 카카오 redirect_uri - 백엔드
+    private final String redirectUri = "http://localhost:5173/login"; // 카카오 redirect_uri - 프론트엔드
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24;       // 24시간
+    private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;  // 7일
+
+    private final JwtTokenProvider jwtTokenProvider;
+
+    public OAuthKakaoToken generate(String accessCode){
+        RestTemplate rt = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "authorization_code");
+        params.add("client_id", clientId);
+        params.add("redirect_uri", redirectUri);
+        params.add("code", accessCode);
+
+        HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(params, headers);
+
+        ResponseEntity<String> response = null;
+        try {
+            response = rt.exchange(
+                    "https://kauth.kakao.com/oauth/token",
+                    HttpMethod.POST,
+                    kakaoTokenRequest,
+                    String.class
+            );
+            System.out.println("정상 토큰 출력 : Response from Kakao: " + response.getBody());
+        } catch (HttpClientErrorException e) {
+            System.out.println("400 에러 발생 Error response from Kakao: " + e.getResponseBodyAsString());
+            throw new RuntimeException("Kakao API Error: " + e.getResponseBodyAsString());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Unexpected error while communicating with Kakao API", e);
+        }
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        OAuthKakaoToken oAuthToken;
+        try {
+            // 응답 본문 출력 (디버깅)
+            System.out.println("Raw response body: " + response.getBody());
+
+            // JSON 파싱
+            oAuthToken = objectMapper.readValue(response.getBody(), OAuthKakaoToken.class);
+        } catch (JsonProcessingException e) {
+            // JSON 파싱 실패 시 원인 출력
+            System.err.println("Failed to parse JSON: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Failed to parse OAuth token", e);
+        } catch (Exception e) {
+            // 기타 예외 처리
+            e.printStackTrace();
+            throw new RuntimeException("Unexpected error while parsing response", e);
+        }
+
+        return oAuthToken;
+    }
+}
