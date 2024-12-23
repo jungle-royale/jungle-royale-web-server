@@ -12,6 +12,7 @@
 - **Library & Framework** : SpringBoot 3.3.7
 - **Database** : AWS RDS (MySQL)
 - **ORM** : JPA
+- **IDE** : IntellJ
 - **Deploy**: AWS EC2
 
 
