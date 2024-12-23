@@ -38,7 +38,7 @@ public class GameRoomServiceTest {
                 .minPlayers(2)
                 .maxPlayers(10)
                 .maxGameTime(30)
-                .mapInfo("Desert Map")
+                .map("Desert Map")
                 .currentPlayers(0)
                 .status(RoomStatus.WAITING)
                 .build();
@@ -71,7 +71,7 @@ public class GameRoomServiceTest {
                 .minPlayers(3)
                 .maxPlayers(15)
                 .maxGameTime(40)
-                .mapInfo("Updated Map")
+                .map("Updated Map")
                 .currentPlayers(5)
                 .status(RoomStatus.IN_PROGRESS)
                 .build();

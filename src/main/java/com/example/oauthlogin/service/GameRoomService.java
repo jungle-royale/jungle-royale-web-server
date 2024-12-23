@@ -4,6 +4,7 @@ package com.example.oauthlogin.service;
 import com.example.oauthlogin.domain.GameRoom;
 import com.example.oauthlogin.common.types.RoomStatus;
 import com.example.oauthlogin.domain.dto.GameRoomDto;
+import com.example.oauthlogin.domain.dto.GameRoomRequest;
 import com.example.oauthlogin.repository.GameRoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,8 +18,8 @@ public class GameRoomService implements RoomService{
     private final GameRoomRepository gameRoomRepository;
 
     @Override
-    public GameRoomDto createRoom(GameRoomDto roomDto) {
-        GameRoom room = GameRoom.fromDto(roomDto);
+    public GameRoomDto createRoom(GameRoomDto gameRoomDto) {
+        GameRoom room = GameRoom.fromDto(gameRoomDto);
         System.out.println("room = " + room);
         GameRoom savedRoom = gameRoomRepository.save(room);
         return savedRoom.toDto();

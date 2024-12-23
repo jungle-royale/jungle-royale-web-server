@@ -1,7 +1,9 @@
 package com.example.oauthlogin.controller;
 
 import com.example.oauthlogin.common.types.RoomStatus;
+import com.example.oauthlogin.common.util.JwtTokenProvider;
 import com.example.oauthlogin.domain.dto.GameRoomDto;
+import com.example.oauthlogin.domain.dto.GameRoomRequest;
 import com.example.oauthlogin.service.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,12 +16,23 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GameRoomController {
     private final RoomService roomService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/create")
-    public ResponseEntity<GameRoomDto> createRoom(@RequestBody GameRoomDto roomDto) {
+    public ResponseEntity<String> createRoom(
+            @RequestBody GameRoomRequest gameRoomRequest,
+            @RequestHeader("Authorization") String authorization) {
         System.out.println("방 생성 로직 호출 ");
-        GameRoomDto createdRoom = roomService.createRoom(roomDto);
-        return ResponseEntity.ok(createdRoom);
+        System.out.println("gameRoomRequest = " + gameRoomRequest);
+
+        String jwtToken = authorization.substring(7);
+
+        System.out.println("jwtToken = " + jwtToken);
+        Long userId = jwtTokenProvider.extractSubject(jwtToken);
+
+        GameRoomDto createdRoom = roomService.createRoom(GameRoomDto.fromRequest(gameRoomRequest, userId));
+
+        return ResponseEntity.ok("ok");
     }
 
     @PutMapping("/update/{roomId}")

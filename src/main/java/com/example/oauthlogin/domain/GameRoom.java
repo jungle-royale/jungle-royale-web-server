@@ -26,10 +26,16 @@ public class GameRoom {
     private int maxGameTime; // in minutes
 
     @Column(nullable = false)
-    private String mapInfo;
+    private String map;
 
     @Column(nullable = false)
-    private int currentPlayers = 0; // New field for tracking connected players
+    private boolean secret;
+
+    @Column(nullable = false)
+    private int currentPlayers; // New field for tracking connected players
+
+    @Column(nullable = false)
+    private Long hostId; // New field for tracking connected players
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -42,9 +48,11 @@ public class GameRoom {
                 .minPlayers(minPlayers)
                 .maxPlayers(maxPlayers)
                 .maxGameTime(maxGameTime)
-                .mapInfo(mapInfo)
+                .map(map)
                 .currentPlayers(currentPlayers)
+                .secret(secret)
                 .status(status)
+                .hostId(hostId)
                 .build();
     }
 
@@ -54,9 +62,12 @@ public class GameRoom {
         room.setMinPlayers(dto.getMinPlayers());
         room.setMaxPlayers(dto.getMaxPlayers());
         room.setMaxGameTime(dto.getMaxGameTime());
-        room.setMapInfo(dto.getMapInfo());
+        room.setMap(dto.getMap());
         room.setCurrentPlayers(dto.getCurrentPlayers());
+        room.setSecret(dto.isSecret());
+//        room.setSecret(dto.getSecret());
         room.setStatus(dto.getStatus());
+        room.setHostId(dto.getHostId());
         return room;
     }
 
@@ -65,7 +76,8 @@ public class GameRoom {
         this.minPlayers = dto.getMinPlayers();
         this.maxPlayers = dto.getMaxPlayers();
         this.maxGameTime = dto.getMaxGameTime();
-        this.mapInfo = dto.getMapInfo();
+        this.map = dto.getMap();
+        this.secret = dto.isSecret();
         this.currentPlayers = dto.getCurrentPlayers();
         this.status = dto.getStatus();
     }
