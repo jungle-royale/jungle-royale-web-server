@@ -1,6 +1,6 @@
 package com.example.oauthlogin.domain.dto;
 
-import com.example.oauthlogin.domain.RoomStatus;
+import com.example.oauthlogin.common.types.RoomStatus;
 import lombok.Builder;
 import lombok.Data;
 

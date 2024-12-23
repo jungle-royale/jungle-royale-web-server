@@ -1,7 +1,6 @@
 package com.example.oauthlogin.domain.dto;
 
-import com.example.oauthlogin.domain.UserRole;
-import com.example.oauthlogin.service.KakaoAuthService;
+import com.example.oauthlogin.common.types.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -25,14 +25,8 @@ public class ManagerLogoutController {
             @RequestHeader("authorization_refresh") String refreshToken
     ) {
         // Authorization 헤더에서 Bearer 제거
-        System.out.println("accessToken = " + accessToken);
-        System.out.println("refreshToken = " + refreshToken);
-
         String realAccessToken = accessToken.substring(7);
         String realRefreshToken = refreshToken.substring(7);
-
-        System.out.println("realRefreshToken = " + realRefreshToken);
-        System.out.println("realAccessToken = " + realAccessToken);
 
         // 2. JWT 토큰 무효화 처리
 //        jwtService.invalidateToken(jwtToken);

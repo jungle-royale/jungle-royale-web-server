@@ -1,4 +1,4 @@
-package com.example.oauthlogin.domain;
+package com.example.oauthlogin.common.types;
 
 public enum RoomStatus {
     WAITING, // Waiting for players

@@ -1,13 +1,11 @@
 package com.example.oauthlogin.service;
 
 import com.example.oauthlogin.domain.*;
+import com.example.oauthlogin.domain.dto.UserDto;
 import com.example.oauthlogin.repository.RefreshTokenRepository;
 import com.example.oauthlogin.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,19 +17,16 @@ public class UserService {
         return userRepository.findByKakaoId(kakaoId).isPresent();
     }
 
+    public String getKakaoIdByUserId(Long userId){
+        User user = userRepository.findById(userId).orElse(new User());
+        return user.getKakaoId();
+
+    }
+
     public User saveKakaoUser(String kakaoId, String username) {
         User user = userRepository.findByKakaoId(kakaoId)
                 .orElse(new User());
-
-        user.setKakaoId(kakaoId);
-        user.setUsername(username);
-        user.setRole(UserRole.MEMBER);
-        user.setLastLoginAt(LocalDateTime.now());
-        user.setUpdatedAt(LocalDateTime.now());
-        if (user.getCreatedAt() == null) {
-            user.setCreatedAt(LocalDateTime.now());
-        }
-        return userRepository.save(user);
+        return userRepository.save(user.createKakaoUser(kakaoId, username));
     }
 
     private void saveRefreshToken(User user, String token, Integer expiresAt) {
@@ -84,7 +79,7 @@ public class UserService {
     /**
      * 회원인지 비회원인지 판단
      * @param kakaoId
-     * @return
+     * @return 회원 - 기존 유저 정보 호출, 비회원 - 임시 회원 정보 생성
      */
     public User findOrRegisterGuest(String kakaoId) {
         if (kakaoId == null || kakaoId.isEmpty()) {

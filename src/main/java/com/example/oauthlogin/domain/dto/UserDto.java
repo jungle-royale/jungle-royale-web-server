@@ -1,4 +1,4 @@
-package com.example.oauthlogin.domain;
+package com.example.oauthlogin.domain.dto;
 
 import lombok.Builder;
 import lombok.Data;

@@ -33,11 +33,12 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String generateKakaoJwt(String subject, OAuthKakaoToken oAuthKakaoToken) {
+    public String generateKakaoJwt(String userId, String kakaoId, OAuthKakaoToken oAuthKakaoToken) {
         Date expirationDate = new Date(System.currentTimeMillis() + oAuthKakaoToken.getExpires_in() * 1000L);
 
         return Jwts.builder()
-                .setSubject(subject)
+                .setSubject(userId)
+                .claim("kakaoId", kakaoId)
                 .setExpiration(expirationDate)
                 .setIssuedAt(Date.from(Instant.now())) // 발행 시간
                 .signWith(key, SignatureAlgorithm.HS512)
@@ -63,10 +64,18 @@ public class JwtTokenProvider {
         return false;
     }
 
-    public String extractSubject(String accessToken) {
-        Claims claims = parseClaims(accessToken);
-        return claims.getSubject();
+    // user ID 추출
+    public Long extractSubject(String jwt) {
+        Claims claims = parseClaims(jwt);
+        return Long.parseLong(claims.getSubject());
     }
+
+    // Kakao ID 추출
+    public String extractKakaoId(String token) {
+        Claims claims = parseClaims(token);
+        return claims.get("kakaoId", String.class);
+    }
+
 
     public Claims parseClaims(String accessToken) {
         return Jwts.parserBuilder()
@@ -75,6 +84,7 @@ public class JwtTokenProvider {
                 .parseClaimsJws(accessToken)
                 .getBody();
     }
+
     public String generateToken(String subject, long expirationMillis) {
         Date now = new Date();
         Date expiration = new Date(now.getTime() + expirationMillis);

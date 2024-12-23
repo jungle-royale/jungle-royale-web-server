@@ -27,7 +27,10 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable()) // CSRF 비활성화
             .authorizeHttpRequests(auth -> auth
+//                    .requestMatchers("/api/").permitAll() // 인증 필요 없는 경로
+                    .requestMatchers("/api/users").authenticated()  // 인증이 필요한 경로
                     .anyRequest().permitAll() // 모든 요청 인증 없이 허용
+//                    .anyRequest().authenticated()  // 인증 필요
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // 필터 추가;
 

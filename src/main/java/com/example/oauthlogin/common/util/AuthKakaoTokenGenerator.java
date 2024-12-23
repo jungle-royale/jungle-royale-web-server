@@ -27,10 +27,6 @@ public class AuthKakaoTokenGenerator {
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 5;       // 5분
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;  // 7일
 
-    private final JwtTokenProvider jwtTokenProvider;
-
-    private final BlackListRepository blackListRepository;
-
     public OAuthKakaoToken generate(String accessCode){
         RestTemplate rt = new RestTemplate();
 
@@ -53,10 +49,8 @@ public class AuthKakaoTokenGenerator {
                     kakaoTokenRequest,
                     String.class
             );
-            System.out.println("정상 토큰 출력 : Response from Kakao: " + response.getBody());
         } catch (HttpClientErrorException e) {
-            System.out.println("400 에러 발생 Error response from Kakao: " + e.getResponseBodyAsString());
-            throw new RuntimeException("Kakao API Error: " + e.getResponseBodyAsString());
+            throw new RuntimeException("400에러 Error response from Kakao" + e.getResponseBodyAsString());
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Unexpected error while communicating with Kakao API", e);
@@ -72,7 +66,6 @@ public class AuthKakaoTokenGenerator {
             oAuthToken = objectMapper.readValue(response.getBody(), OAuthKakaoToken.class);
         } catch (JsonProcessingException e) {
             // JSON 파싱 실패 시 원인 출력
-            System.err.println("Failed to parse JSON: " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException("Failed to parse OAuth token", e);
         } catch (Exception e) {

@@ -1,31 +1,26 @@
 package com.example.oauthlogin.controller;
 
 
+import com.example.oauthlogin.common.util.JwtTokenProvider;
 import com.example.oauthlogin.domain.User;
-import com.example.oauthlogin.domain.UserDto;
 import com.example.oauthlogin.repository.UserRepository;
-import com.example.oauthlogin.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
 @Tag(name = "User", description = "User API")
+@RequiredArgsConstructor
 public class UserController {
     private final UserRepository userRepository;
-    private final UserService userService;
-
-    public UserController(UserRepository userRepository, UserService userService) {
-        this.userRepository = userRepository;
-        this.userService = userService;
-    }
+    private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody User user) {
@@ -52,6 +47,25 @@ public class UserController {
 
         System.out.println("userId = " + userId);
         response.put("userId", userId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/current-info")
+    public ResponseEntity<Map<String, Object>> getCurrentUserInfo() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getCredentials() == null) {
+            throw new IllegalStateException("No authentication found");
+        }
+
+        String jwtToken = (String) authentication.getCredentials(); // JWT 토큰 추출
+        if (!jwtTokenProvider.isValidToken(jwtToken)) {
+            throw new IllegalStateException("Invalid JWT token");
+        }
+
+        String kakaoId = jwtTokenProvider.extractKakaoId(jwtToken);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("kakaoId", kakaoId);
         return ResponseEntity.ok(response);
     }
 }

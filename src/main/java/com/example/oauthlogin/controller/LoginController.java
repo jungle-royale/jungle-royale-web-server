@@ -34,16 +34,12 @@ public class LoginController {
     @PostMapping("/kakao/login")
     @Operation(summary = "kakao Login", description = "카카오 로그인, 회원가입, jwt발행")
     public ResponseEntity<KakaoLoginResponse> kakaoCallback(@RequestBody Map<String, String> payload) {
-
         String code = payload.get("code"); // 클라이언트에서 전송한 인가코드 추출
-        System.out.println("code = " + code);
 
         if (code == null || code.isEmpty()) {
             throw new IllegalArgumentException("Authorization code is missing");
         }
         KakaoLoginResponse kakaoLoginResponse = kakaoAuthService.loginWithKakao(code);
-
-        System.out.println("kakaoLoginResponse = " + kakaoLoginResponse);
 
         return ResponseEntity.ok(kakaoLoginResponse);
     }

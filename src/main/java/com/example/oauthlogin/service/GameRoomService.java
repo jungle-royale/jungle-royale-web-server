@@ -2,7 +2,7 @@ package com.example.oauthlogin.service;
 
 
 import com.example.oauthlogin.domain.GameRoom;
-import com.example.oauthlogin.domain.RoomStatus;
+import com.example.oauthlogin.common.types.RoomStatus;
 import com.example.oauthlogin.domain.dto.GameRoomDto;
 import com.example.oauthlogin.repository.GameRoomRepository;
 import lombok.RequiredArgsConstructor;

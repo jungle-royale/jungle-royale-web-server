@@ -1,8 +1,8 @@
 package com.example.oauthlogin.service;
 
 import com.example.oauthlogin.domain.OAuthKakaoToken;
-import com.example.oauthlogin.domain.UserDto;
-import com.example.oauthlogin.domain.UserRole;
+import com.example.oauthlogin.domain.dto.UserDto;
+import com.example.oauthlogin.common.types.UserRole;
 import com.example.oauthlogin.domain.dto.KakaoLoginResponse;
 import com.example.oauthlogin.common.util.AuthKakaoTokenGenerator;
 import com.example.oauthlogin.common.util.JwtTokenProvider;
@@ -45,7 +45,7 @@ public class KakaoAuthService {
         return authKakaoTokenGenerator.generate(accessCode);
     }
 
-    public String getKakaoId(OAuthKakaoToken oAuthKakaoToken) {
+    public String getKakaoIdUsingToken(OAuthKakaoToken oAuthKakaoToken) {
         // 회원번호 뽑아내기
         String kakaoId;
         try {
@@ -88,6 +88,8 @@ public class KakaoAuthService {
         return kakaoId;
     }
 
+
+
     public void logoutFromKakao(String accessToken) {
         String kakaoLogoutUrl = "https://kapi.kakao.com/v1/user/logout";
 
@@ -116,15 +118,16 @@ public class KakaoAuthService {
     public KakaoLoginResponse loginWithKakao(String code) {
         OAuthKakaoToken oAuthKakaoToken = getKakaoTokenUsingAccessCode(code);
 
-        String kakaoId = getKakaoId(oAuthKakaoToken);
+        String kakaoId = getKakaoIdUsingToken(oAuthKakaoToken);
 
         userService.kakaoUserJoin(kakaoId, oAuthKakaoToken);
 
         // 카카오회원 번호를 이용해서 jwt 생성
         UserDto userByKakaoId = userService.getUserByKakaoId(kakaoId);
         long userId = userByKakaoId.getId();
+        String kakaoId2 = userByKakaoId.getKakaoId();
 
-        String jwtToken = jwtTokenProvider.generateKakaoJwt(String.valueOf(userId), oAuthKakaoToken);
+        String jwtToken = jwtTokenProvider.generateKakaoJwt(String.valueOf(userId), kakaoId2, oAuthKakaoToken);
 
         return getKakaoLoginResponse(jwtToken, oAuthKakaoToken);
     }

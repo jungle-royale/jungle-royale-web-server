@@ -1,6 +1,6 @@
 package com.example.oauthlogin.controller;
 
-import com.example.oauthlogin.domain.RoomStatus;
+import com.example.oauthlogin.common.types.RoomStatus;
 import com.example.oauthlogin.domain.dto.GameRoomDto;
 import com.example.oauthlogin.service.RoomService;
 import lombok.RequiredArgsConstructor;

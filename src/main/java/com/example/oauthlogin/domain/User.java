@@ -1,7 +1,7 @@
 package com.example.oauthlogin.domain;
 
+import com.example.oauthlogin.common.types.UserRole;
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -42,5 +42,15 @@ public class User {
         guestUser.setLastLoginAt(LocalDateTime.now());
 
         return guestUser;
+    }
+
+    public User createKakaoUser(String kakaoId, String username){
+        User kakaoUser = new User();
+        kakaoUser.setKakaoId(kakaoId); // GUEST 고유 ID 생성
+        kakaoUser.setUsername(username);
+        kakaoUser.setRole(UserRole.MEMBER);
+        kakaoUser.setLastLoginAt(LocalDateTime.now());
+
+        return kakaoUser;
     }
 }
