@@ -5,6 +5,7 @@ import com.example.oauthlogin.domain.User;
 import com.example.oauthlogin.domain.UserDto;
 import com.example.oauthlogin.repository.UserRepository;
 import com.example.oauthlogin.service.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
+@Tag(name = "User", description = "User API")
 public class UserController {
     private final UserRepository userRepository;
     private final UserService userService;
