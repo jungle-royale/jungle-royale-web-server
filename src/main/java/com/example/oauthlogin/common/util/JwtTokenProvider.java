@@ -17,6 +17,9 @@ import java.util.Date;
 public class JwtTokenProvider {
     private final Key key;
 
+    public static final String AUTHORIZATION_HEADER = "Authorization";
+    public static final String TYPE = "Bearer";
+
     public JwtTokenProvider(@Value("${jwt.secret-key}") String secretKey) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
