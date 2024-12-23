@@ -1,24 +1,14 @@
 package com.example.oauthlogin.controller;
 
 import com.example.oauthlogin.domain.OAuthKakaoToken;
-import com.example.oauthlogin.domain.UserDto;
-import com.example.oauthlogin.dto.KakaoLoginResponse;
-import com.example.oauthlogin.repository.BlackListRepository;
+import com.example.oauthlogin.domain.dto.KakaoLoginResponse;
 import com.example.oauthlogin.service.BlackListService;
 import com.example.oauthlogin.service.KakaoAuthService;
 import com.example.oauthlogin.service.UserService;
-import com.example.oauthlogin.util.AuthTokensGenerator;
-import com.example.oauthlogin.util.JwtTokenProvider;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import com.example.oauthlogin.common.util.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.Map;

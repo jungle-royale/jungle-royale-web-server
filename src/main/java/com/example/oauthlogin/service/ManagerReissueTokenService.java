@@ -1,8 +1,8 @@
 package com.example.oauthlogin.service;
 
 import com.example.oauthlogin.auth.AuthTokensResponse;
-import com.example.oauthlogin.util.AuthTokensGenerator;
-import com.example.oauthlogin.util.RefreshTokenValidator;
+import com.example.oauthlogin.common.util.AuthTokensGenerator;
+import com.example.oauthlogin.common.util.RefreshTokenValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

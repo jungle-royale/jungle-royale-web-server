@@ -1,6 +1,6 @@
 package com.example.oauthlogin.domain;
 
-import com.example.oauthlogin.dto.GameRoomDto;
+import com.example.oauthlogin.domain.dto.GameRoomDto;
 import jakarta.persistence.*;
 import lombok.Data;
 

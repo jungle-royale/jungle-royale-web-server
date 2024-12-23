@@ -2,7 +2,7 @@ package com.example.oauthlogin.service;
 
 import com.example.oauthlogin.domain.BlackList;
 import com.example.oauthlogin.repository.BlackListRepository;
-import com.example.oauthlogin.util.RefreshTokenValidator;
+import com.example.oauthlogin.common.util.RefreshTokenValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

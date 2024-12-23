@@ -1,8 +1,7 @@
-package com.example.oauthlogin.util;
+package com.example.oauthlogin.common.util;
 
-import com.example.oauthlogin.exception.UnAuthorizationException;
+import com.example.oauthlogin.common.exceptions.UnAuthorizationException;
 import com.example.oauthlogin.repository.BlackListRepository;
-import com.example.oauthlogin.exception.UnAuthorizationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

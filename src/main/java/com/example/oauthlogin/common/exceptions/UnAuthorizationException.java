@@ -1,4 +1,4 @@
-package com.example.oauthlogin.exception;
+package com.example.oauthlogin.common.exceptions;
 
 public class UnAuthorizationException extends JungleRoyalException{
     public UnAuthorizationException(String message) {

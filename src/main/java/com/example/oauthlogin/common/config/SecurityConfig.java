@@ -1,6 +1,6 @@
-package com.example.oauthlogin.config;
+package com.example.oauthlogin.common.config;
 
-import com.example.oauthlogin.util.JwtAuthenticationFilter;
+import com.example.oauthlogin.common.util.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,8 +10,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-
-import java.util.Arrays;
 
 @Configuration
 @RequiredArgsConstructor

@@ -1,7 +1,7 @@
 package com.example.oauthlogin.service;
 
 import com.example.oauthlogin.domain.RoomStatus;
-import com.example.oauthlogin.dto.GameRoomDto;
+import com.example.oauthlogin.domain.dto.GameRoomDto;
 
 import java.util.List;
 import java.util.Optional;

@@ -2,7 +2,7 @@ package com.example.oauthlogin.gameroom;
 
 import com.example.oauthlogin.domain.GameRoom;
 import com.example.oauthlogin.domain.RoomStatus;
-import com.example.oauthlogin.dto.GameRoomDto;
+import com.example.oauthlogin.domain.dto.GameRoomDto;
 import com.example.oauthlogin.repository.GameRoomRepository;
 import com.example.oauthlogin.service.GameRoomService;
 import org.junit.jupiter.api.BeforeEach;

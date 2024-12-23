@@ -1,4 +1,4 @@
-package com.example.oauthlogin.util;
+package com.example.oauthlogin.common.util;
 
 import com.example.oauthlogin.domain.OAuthKakaoToken;
 import io.jsonwebtoken.*;

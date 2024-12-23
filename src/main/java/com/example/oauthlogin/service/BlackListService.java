@@ -1,7 +1,7 @@
 package com.example.oauthlogin.service;
 
 import com.example.oauthlogin.repository.BlackListRepository;
-import com.example.oauthlogin.util.AuthTokensGenerator;
+import com.example.oauthlogin.common.util.AuthTokensGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
