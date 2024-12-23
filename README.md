@@ -10,9 +10,10 @@
 ## 🔧 Stack
 - **Language**: Java 17
 - **Library & Framework** : SpringBoot 3.3.7
-- **Database** : AWS RDS (MySQL)
+- **Database** : AWS RDS (MySQL 8.3.0)
 - **ORM** : JPA 3.4.0
 - **IDE** : IntellJ 
+- **Build Tool** : Gradle 8.11.1
 - **Deploy**: AWS EC2
 
 
