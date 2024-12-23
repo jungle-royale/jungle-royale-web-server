@@ -25,10 +25,10 @@ import java.util.Map;
 public class AuthKakaoTokenGenerator {
     private static final String BEARER_TYPE = "Bearer";
 
-        private final String clientId = "9b5e1f47241e82beb559d44bd2a25377"; // 카카오 REST API 키 - 서버
-//    private final String clientId = "e8304b2a6b5aeb5020ef6abeb405115b"; // 카카오 REST API 키 - 프론트엔드
-        private final String redirectUri = "http://192.168.1.241:8080/api/auth/kakao/callback"; // 카카오 redirect_uri - 백엔드
-//    private final String redirectUri = "http://localhost:5173/login"; // 카카오 redirect_uri - 프론트엔드
+//        private final String clientId = "9b5e1f47241e82beb559d44bd2a25377"; // 카카오 REST API 키 - 서버
+    private final String clientId = "e8304b2a6b5aeb5020ef6abeb405115b"; // 카카오 REST API 키 - 프론트엔드
+//        private final String redirectUri = "http://192.168.1.241:8080/api/auth/kakao/callback"; // 카카오 redirect_uri - 백엔드
+    private final String redirectUri = "http://localhost:5173/login"; // 카카오 redirect_uri - 프론트엔드
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 5;       // 5분
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;  // 7일
 

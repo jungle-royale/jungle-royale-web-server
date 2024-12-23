@@ -2,6 +2,7 @@ package com.example.oauthlogin.service;
 
 import com.example.oauthlogin.domain.OAuthKakaoToken;
 import com.example.oauthlogin.domain.UserDto;
+import com.example.oauthlogin.domain.UserRole;
 import com.example.oauthlogin.dto.KakaoLoginResponse;
 import com.example.oauthlogin.util.AuthKakaoTokenGenerator;
 import com.example.oauthlogin.util.JwtTokenProvider;
@@ -34,7 +35,7 @@ public class KakaoAuthService {
                 .accessToken(oAuthKakaoToken.getAccess_token())
                 .refreshToken(oAuthKakaoToken.getRefresh_token())
                 .expiresIn(String.valueOf(oAuthKakaoToken.getExpires_in()))
-                .isGuest(false)
+                .role(UserRole.MEMBER)
                 .build();
         return response;
     }
@@ -117,7 +118,7 @@ public class KakaoAuthService {
 
         String kakaoId = getKakaoId(oAuthKakaoToken);
 
-        userService.join(kakaoId, oAuthKakaoToken);
+        userService.kakaoUserJoin(kakaoId, oAuthKakaoToken);
 
         // 카카오회원 번호를 이용해서 jwt 생성
         UserDto userByKakaoId = userService.getUserByKakaoId(kakaoId);

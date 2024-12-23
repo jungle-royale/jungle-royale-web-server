@@ -1,9 +1,6 @@
 package com.example.oauthlogin.service;
 
-import com.example.oauthlogin.domain.OAuthKakaoToken;
-import com.example.oauthlogin.domain.RefreshToken;
-import com.example.oauthlogin.domain.User;
-import com.example.oauthlogin.domain.UserDto;
+import com.example.oauthlogin.domain.*;
 import com.example.oauthlogin.repository.RefreshTokenRepository;
 import com.example.oauthlogin.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,12 +19,13 @@ public class UserService {
         return userRepository.findByKakaoId(kakaoId).isPresent();
     }
 
-    public User saveUser(String kakaoId, String username) {
+    public User saveKakaoUser(String kakaoId, String username) {
         User user = userRepository.findByKakaoId(kakaoId)
                 .orElse(new User());
 
         user.setKakaoId(kakaoId);
         user.setUsername(username);
+        user.setRole(UserRole.MEMBER);
         user.setLastLoginAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
         if (user.getCreatedAt() == null) {
@@ -59,10 +57,10 @@ public class UserService {
                 .build();
     }
 
-    public void join(String kakaoId, OAuthKakaoToken oAuthKakaoToken) {
+    public void kakaoUserJoin(String kakaoId, OAuthKakaoToken oAuthKakaoToken) {
         // 유저가 존재하지않으면 회원, 리프레시 토큰 저장
         if (!isUserExistsByKakaoId(kakaoId)) {
-            User savedUser = saveUser(kakaoId, "테스터1");
+            User savedUser = saveKakaoUser(kakaoId, "테스터1");
             saveRefreshToken(savedUser, oAuthKakaoToken.getRefresh_token(), oAuthKakaoToken.getRefresh_token_expires_in());
             // 유저 등록 및 refreshtoken 등록
         } else {
@@ -72,9 +70,31 @@ public class UserService {
                     .orElse(new User());
             saveRefreshToken(user, oAuthKakaoToken.getRefresh_token(), oAuthKakaoToken.getRefresh_token_expires_in());
         }
-
-
     }
 
+    /**
+     * 비회원 유저 생성
+     * @return
+     */
+    public User registerGuest() {
+        User guestUser = new User();
+        return userRepository.save(guestUser.createGueutUser());
+    }
+
+    /**
+     * 회원인지 비회원인지 판단
+     * @param kakaoId
+     * @return
+     */
+    public User findOrRegisterGuest(String kakaoId) {
+        if (kakaoId == null || kakaoId.isEmpty()) {
+            // 비회원 처리
+            return registerGuest();
+        }
+
+        // 회원 데이터 조회
+        return userRepository.findByKakaoId(kakaoId)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found with Kakao ID: " + kakaoId));
+    }
 
 }

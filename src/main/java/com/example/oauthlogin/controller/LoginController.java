@@ -44,6 +44,8 @@ public class LoginController {
         }
         KakaoLoginResponse kakaoLoginResponse = kakaoAuthService.loginWithKakao(code);
 
+        System.out.println("kakaoLoginResponse = " + kakaoLoginResponse);
+
         return ResponseEntity.ok(kakaoLoginResponse);
     }
 

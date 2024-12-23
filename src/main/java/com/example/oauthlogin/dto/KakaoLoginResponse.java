@@ -1,5 +1,6 @@
 package com.example.oauthlogin.dto;
 
+import com.example.oauthlogin.domain.UserRole;
 import com.example.oauthlogin.service.KakaoAuthService;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,5 +16,5 @@ public class KakaoLoginResponse {
     private String accessToken;
     private String refreshToken;
     private String expiresIn;
-    private boolean isGuest;
+    private UserRole role;
 }
