@@ -65,9 +65,9 @@ public class JwtTokenProvider {
     }
 
     // user ID 추출
-    public Long extractSubject(String jwt) {
+    public String extractSubject(String jwt) {
         Claims claims = parseClaims(jwt);
-        return Long.parseLong(claims.getSubject());
+        return claims.getSubject();
     }
 
     // Kakao ID 추출

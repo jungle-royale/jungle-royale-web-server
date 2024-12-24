@@ -26,7 +26,7 @@ public class GameRoomController {
             @RequestBody GameRoomRequest gameRoomRequest,
             @RequestHeader("Authorization") String authorization) {
         String jwtToken = authorization.substring(7);
-        Long userId = jwtTokenProvider.extractSubject(jwtToken);
+        String userId = jwtTokenProvider.extractSubject(jwtToken);
         GameRoomDto room = gameRoomService.createRoom(GameRoomDto.fromRequest(gameRoomRequest, userId));
         log.info("room = " + room);
 
@@ -38,8 +38,8 @@ public class GameRoomController {
             @PathVariable Long roomId,
             @RequestBody GameRoomRequest gameRoomRequest) {
         System.out.println("방 수정 로직 호출");
-        GameRoomDto gameRoomDto = GameRoomDto.fromRequest(gameRoomRequest, roomId);
-        gameRoomService.updateRoom(roomId, gameRoomDto);
+        GameRoomDto gameRoomDto = GameRoomDto.updateRoomFromRequest(gameRoomRequest, roomId);
+        gameRoomService.updateRoom(gameRoomDto);
 
         return ResponseEntity.ok("ok");
     }

@@ -17,8 +17,9 @@ public class UserService {
         return userRepository.findByKakaoId(kakaoId).isPresent();
     }
 
-    public String getKakaoIdByUserId(Long userId){
-        User user = userRepository.findById(userId).orElse(new User());
+    public String getKakaoIdByUserId(String userId){
+        Long id = Long.parseLong(userId);
+        User user = userRepository.findById(id).orElse(new User());
         return user.getKakaoId();
 
     }

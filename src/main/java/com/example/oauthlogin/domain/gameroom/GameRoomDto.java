@@ -20,10 +20,24 @@ public class GameRoomDto {
     private RoomStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private Long hostId;
+    private String hostId;
     private String gameUrl;
 
-    public static GameRoomDto fromRequest(GameRoomRequest request, Long hostId) {
+    public static GameRoomDto updateRoomFromRequest(GameRoomRequest request, Long roomId) {
+        return GameRoomDto.builder()
+                .id(roomId)
+                .title(request.getTitle())
+                .minPlayers(request.getMinPlayers())
+                .maxPlayers(request.getMaxPlayers())
+                .maxGameTime(request.getMaxGameTime())
+                .map(request.getMap())
+                .secret(request.getSecret())
+                .currentPlayers(request.getCurrentPlayers())
+                .status(request.getStatus())
+                .build();
+    }
+
+    public static GameRoomDto fromRequest(GameRoomRequest request, String hostId) {
         return GameRoomDto.builder()
                 .title(request.getTitle())
                 .minPlayers(request.getMinPlayers())

@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface GameRoomService {
     GameRoomDto createRoom(GameRoomDto gameRoomDto);
-    void updateRoom(Long roomId, GameRoomDto roomDto);
+    void updateRoom(GameRoomDto roomDto);
 
     void updateRoomStatus(Long roomId, RoomStatus status);
 

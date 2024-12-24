@@ -17,7 +17,7 @@ public class GameRoom {
     private String map;
     private Boolean secret;
     private int currentPlayers; // New field for tracking connected players
-    private Long hostId; // New field for tracking connected players
+    private String hostId; // New field for tracking connected players
     private RoomStatus status = RoomStatus.WAITING;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

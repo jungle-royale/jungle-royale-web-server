@@ -43,7 +43,7 @@ public class GameRoomJpaEntity {
     private int currentPlayers; // New field for tracking connected players
 
     @Column(nullable = false)
-    private Long hostId; // New field for tracking connected players
+    private String hostId; // New field for tracking connected players
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

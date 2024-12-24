@@ -23,7 +23,7 @@ public class GameController {
         String jwtToken = authorization.substring(7);
 
         System.out.println("jwtToken = " + jwtToken);
-        Long userId = jwtTokenProvider.extractSubject(jwtToken);
+        String userId = jwtTokenProvider.extractSubject(jwtToken);
 
         String kakaoId = userService.getKakaoIdByUserId(userId);
 
