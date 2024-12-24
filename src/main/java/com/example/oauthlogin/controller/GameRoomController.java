@@ -52,9 +52,9 @@ public class GameRoomController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/delete/{roomId}")
-    public ResponseEntity<Void> deleteRoom(@PathVariable Long roomId) {
-        gameRoomService.deleteRoom(roomId);
+    @DeleteMapping("/delete/{gameUrl}")
+    public ResponseEntity<Void> deleteRoom(@PathVariable String gameUrl) {
+        gameRoomService.deleteRoom(gameUrl);
         return ResponseEntity.noContent().build();
     }
 

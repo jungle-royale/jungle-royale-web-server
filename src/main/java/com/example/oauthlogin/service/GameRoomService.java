@@ -12,7 +12,7 @@ public interface GameRoomService {
 
     void updateRoomStatus(Long roomId, RoomStatus status);
 
-    void deleteRoom(Long roomId);
+    void deleteRoom(String gameUrl);
 
     List<GameRoomDto> listAllRooms();
 

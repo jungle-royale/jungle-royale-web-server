@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface GameRoomRepository extends JpaRepository<GameRoomJpaEntity, Long> {
     Optional<GameRoomJpaEntity> findByGameUrl(String gameUrl);
 
+    boolean existsByHostId(String hostId);
 }
