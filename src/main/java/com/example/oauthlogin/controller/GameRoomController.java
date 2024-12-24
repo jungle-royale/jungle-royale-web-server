@@ -65,6 +65,10 @@ public class GameRoomController {
                 .map(GameRoomResponse::fromDto) // GameRoomDto → GameRoomResponse 변환
                 .toList();
 
+        for (GameRoomResponse gameRoomResponse : responseList) {
+            System.out.println("gameRoomResponse = " + gameRoomResponse);
+        }
+
         return ResponseEntity.ok(responseList);
     }
 

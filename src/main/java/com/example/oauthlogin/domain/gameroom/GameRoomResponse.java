@@ -19,7 +19,7 @@ public class GameRoomResponse {
     private int currentPlayers; // New field for tracking connected players
     private Long hostId; // New field for tracking connected players
     private RoomStatus status;
-    private String hash;
+    private String gameUrl;
 
     public static GameRoomResponse fromDto(GameRoomDto gameRoomDto) {
         return GameRoomResponse.builder()
@@ -32,7 +32,7 @@ public class GameRoomResponse {
                 .secret(gameRoomDto.getSecret())
                 .currentPlayers(gameRoomDto.getCurrentPlayers())
                 .status(gameRoomDto.getStatus())
-                .hash(gameRoomDto.getHash())
+                .gameUrl(gameRoomDto.getGameUrl())
                 .hostId(gameRoomDto.getHostId())
                 .build();
     }

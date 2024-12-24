@@ -1,6 +1,7 @@
 package com.example.oauthlogin.service;
 
 
+import com.example.oauthlogin.common.exceptions.DuplicateRoomException;
 import com.example.oauthlogin.common.exceptions.RoomNotFoundException;
 import com.example.oauthlogin.common.types.RoomStatus;
 import com.example.oauthlogin.domain.gameroom.GameRoom;
@@ -9,6 +10,7 @@ import com.example.oauthlogin.domain.gameroom.GameRoomJpaEntity;
 import com.example.oauthlogin.repository.GameRoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,22 +22,26 @@ public class GameRoomServiceImpl implements GameRoomService {
     private final GameRoomRepository gameRoomRepository;
 
     @Override
+    @Transactional
     public GameRoomDto createRoom(GameRoomDto gameRoomDto) {
-        String hashValue = UUID.randomUUID().toString();
-        gameRoomDto.setHash(hashValue);
-        GameRoomJpaEntity gameRoomJpaEntity = GameRoomJpaEntity.fromDto(gameRoomDto);
+        String gameUrl = UUID.randomUUID().toString();
 
+        gameRoomDto.setGameUrl(gameUrl);
+
+        GameRoomJpaEntity gameRoomJpaEntity = GameRoomJpaEntity.fromDto(gameRoomDto);
         GameRoomJpaEntity savedRoom = gameRoomRepository.save(gameRoomJpaEntity);
         return GameRoomDto.fromGameRoomJpaEntity(savedRoom);
     }
 
     @Override
+    @Transactional
     public void updateRoom(Long roomId, GameRoomDto gameRoomDto) {
         gameRoomRepository.save(GameRoomJpaEntity.fromDto(gameRoomDto));
     }
 
 
     @Override
+    @Transactional
     public void updateRoomStatus(Long roomId, RoomStatus status) {
         GameRoomJpaEntity room = gameRoomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("Room not found"));
@@ -49,6 +55,7 @@ public class GameRoomServiceImpl implements GameRoomService {
     }
 
     @Override
+    @Transactional
     public List<GameRoomDto> listAllRooms() {
         return gameRoomRepository.findAll()
                 .stream()

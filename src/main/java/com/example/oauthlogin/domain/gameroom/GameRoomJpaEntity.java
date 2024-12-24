@@ -8,7 +8,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "game_rooms")
+@Table(name = "game_rooms",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = "gameUrl") // 방 해시의 중복 방지
+        })
 @Data
 @Builder
 @NoArgsConstructor
@@ -47,7 +50,7 @@ public class GameRoomJpaEntity {
     private RoomStatus status = RoomStatus.WAITING;
 
     @Column(nullable = false)
-    private String hash;
+    private String gameUrl;
 
     public GameRoomDto toDto() {
         return GameRoomDto.builder()
@@ -61,7 +64,7 @@ public class GameRoomJpaEntity {
                 .secret(secret)
                 .status(status)
                 .hostId(hostId)
-                .hash(hash)
+                .gameUrl(gameUrl)
                 .build();
     }
 
@@ -77,7 +80,7 @@ public class GameRoomJpaEntity {
                 .secret(dto.getSecret())
                 .status(dto.getStatus())
                 .hostId(dto.getHostId())
-                .hash(dto.getHash())
+                .gameUrl(dto.getGameUrl())
                 .build();
     }
 

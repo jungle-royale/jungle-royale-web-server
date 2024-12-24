@@ -21,7 +21,7 @@ public class GameRoomDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Long hostId;
-    private String hash;
+    private String gameUrl;
 
     public static GameRoomDto fromRequest(GameRoomRequest request, Long hostId) {
         return GameRoomDto.builder()
@@ -49,7 +49,7 @@ public class GameRoomDto {
                 .currentPlayers(request.getCurrentPlayers())
                 .status(request.getStatus())
                 .hostId(request.getHostId())
-                .hash(request.getHash())
+                .gameUrl(request.getGameUrl())
                 .build();
     }
 }
