@@ -23,6 +23,7 @@ public class GameRoomDto {
     private String hostId;
     private String gameUrl;
 
+
     public static GameRoomDto updateRoomFromRequest(GameRoomRequest request, Long roomId) {
         return GameRoomDto.builder()
                 .id(roomId)
@@ -32,8 +33,6 @@ public class GameRoomDto {
                 .maxGameTime(request.getMaxGameTime())
                 .map(request.getMap())
                 .secret(request.getSecret())
-                .currentPlayers(request.getCurrentPlayers())
-                .status(request.getStatus())
                 .build();
     }
 
@@ -45,8 +44,6 @@ public class GameRoomDto {
                 .maxGameTime(request.getMaxGameTime())
                 .map(request.getMap())
                 .secret(request.getSecret())
-                .currentPlayers(request.getCurrentPlayers())
-                .status(request.getStatus())
                 .hostId(hostId)
                 .build();
     }

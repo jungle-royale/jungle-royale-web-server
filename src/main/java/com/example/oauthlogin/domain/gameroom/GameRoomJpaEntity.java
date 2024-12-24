@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "game_rooms",
         uniqueConstraints = {
@@ -44,6 +46,12 @@ public class GameRoomJpaEntity {
 
     @Column(nullable = false)
     private String hostId; // New field for tracking connected players
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

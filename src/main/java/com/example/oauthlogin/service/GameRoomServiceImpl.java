@@ -15,6 +15,7 @@ import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -45,7 +46,12 @@ public class GameRoomServiceImpl implements GameRoomService {
                 String hashValue = UUID.randomUUID().toString();
                 gameRoomDto.setGameUrl(hashValue);
 
+                // TODO : gameRoomJpaEntity 의 세팅 메소드 생성 필요
                 GameRoomJpaEntity gameRoomJpaEntity = GameRoomJpaEntity.fromDto(gameRoomDto);
+                gameRoomJpaEntity.setCurrentPlayers(1);
+                gameRoomJpaEntity.setCreatedAt(LocalDateTime.now());
+                gameRoomJpaEntity.setUpdatedAt(LocalDateTime.now());
+                gameRoomJpaEntity.setStatus(RoomStatus.WAITING);
                 GameRoomJpaEntity savedRoom = gameRoomRepository.save(gameRoomJpaEntity);
 
                 return GameRoomDto.fromGameRoomJpaEntity(savedRoom);
@@ -81,6 +87,7 @@ public class GameRoomServiceImpl implements GameRoomService {
     @Override
     @Transactional
     public void updateRoom(GameRoomDto gameRoomDto) {
+        gameRoomDto.setUpdatedAt(LocalDateTime.now());
         gameRoomRepository.save(GameRoomJpaEntity.fromDto(gameRoomDto));
     }
 
@@ -91,6 +98,7 @@ public class GameRoomServiceImpl implements GameRoomService {
         GameRoomJpaEntity room = gameRoomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("Room not found"));
         room.setStatus(status);
+        room.setUpdatedAt(LocalDateTime.now());
         gameRoomRepository.save(room);
     }
 

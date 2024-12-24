@@ -4,6 +4,9 @@ import com.example.oauthlogin.common.types.RoomStatus;
 import lombok.Builder;
 import lombok.Data;
 
+/**
+ * 게임 생성 시 요청
+ */
 @Data
 @Builder
 public class GameRoomRequest {
@@ -12,7 +15,5 @@ public class GameRoomRequest {
     private int maxPlayers;
     private int maxGameTime;
     private String map;
-    private int currentPlayers;
     private Boolean secret;
-    private RoomStatus status = RoomStatus.WAITING;
 }

@@ -6,26 +6,29 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-/**
- * 게임 생성 response
- */
 @Data
 @Builder
-public class GameRoomResponse {
+public class GameRoomListResponse {
     private Long id;
     private String title;
     private int maxPlayers;
-    private int currentPlayers;
-    private RoomStatus status;
-    // TODO : 방 생성시 게임에 입장하면 웹 프론트엔드에는 gameUrl이 필요할까?
     private String gameUrl;
+    private RoomStatus status;
+    private int currentPlayers;
+    // TODO : 추후 프론트엔드에서 필요하면 보냄
+//    private Boolean secret;
+//    private String map;
+//    private int maxGameTime;
 
-    public static GameRoomResponse fromDto(GameRoomDto gameRoomDto) {
-        return GameRoomResponse.builder()
+    public static GameRoomListResponse fromDto(GameRoomDto gameRoomDto) {
+        return GameRoomListResponse.builder()
                 .id(gameRoomDto.getId())
                 .title(gameRoomDto.getTitle())
                 .maxPlayers(gameRoomDto.getMaxPlayers())
+//                .maxGameTime(gameRoomDto.getMaxGameTime())
+//                .map(gameRoomDto.getMap())
                 .currentPlayers(gameRoomDto.getCurrentPlayers())
+//                .secret(gameRoomDto.getSecret())
                 .status(gameRoomDto.getStatus())
                 .gameUrl(gameRoomDto.getGameUrl())
                 .build();

@@ -3,6 +3,7 @@ package com.example.oauthlogin.controller;
 import com.example.oauthlogin.common.types.RoomStatus;
 import com.example.oauthlogin.common.util.JwtTokenProvider;
 import com.example.oauthlogin.domain.gameroom.GameRoomDto;
+import com.example.oauthlogin.domain.gameroom.GameRoomListResponse;
 import com.example.oauthlogin.domain.gameroom.GameRoomRequest;
 import com.example.oauthlogin.domain.gameroom.GameRoomResponse;
 import com.example.oauthlogin.service.GameRoomService;
@@ -25,6 +26,7 @@ public class GameRoomController {
     public ResponseEntity<GameRoomResponse> createRoom(
             @RequestBody GameRoomRequest gameRoomRequest,
             @RequestHeader("Authorization") String authorization) {
+
         String jwtToken = authorization.substring(7);
         String userId = jwtTokenProvider.extractSubject(jwtToken);
         GameRoomDto room = gameRoomService.createRoom(GameRoomDto.fromRequest(gameRoomRequest, userId));
@@ -33,6 +35,8 @@ public class GameRoomController {
         return ResponseEntity.ok(GameRoomResponse.fromDto(room));
     }
 
+
+    // TODO: 인게임에서 방 속성 변경 시 어떻게 처리할까? 추후 확인할 것
     @PutMapping("/update/{roomId}")
     public ResponseEntity<String> updateRoom(
             @PathVariable Long roomId,
@@ -59,15 +63,11 @@ public class GameRoomController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<GameRoomResponse>> listAllRooms() {
-        List<GameRoomResponse> responseList = gameRoomService.listAllRooms()
+    public ResponseEntity<List<GameRoomListResponse>> listAllRooms() {
+        List<GameRoomListResponse> responseList = gameRoomService.listAllRooms()
                 .stream()
-                .map(GameRoomResponse::fromDto) // GameRoomDto → GameRoomResponse 변환
+                .map(GameRoomListResponse::fromDto) // GameRoomDto → GameRoomResponse 변환
                 .toList();
-
-        for (GameRoomResponse gameRoomResponse : responseList) {
-            System.out.println("gameRoomResponse = " + gameRoomResponse);
-        }
 
         return ResponseEntity.ok(responseList);
     }
