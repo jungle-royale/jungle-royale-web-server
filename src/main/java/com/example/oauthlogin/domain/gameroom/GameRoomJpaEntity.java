@@ -1,14 +1,19 @@
-package com.example.oauthlogin.domain;
+package com.example.oauthlogin.domain.gameroom;
 
 import com.example.oauthlogin.common.types.RoomStatus;
-import com.example.oauthlogin.domain.dto.GameRoomDto;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "game_rooms")
 @Data
-public class GameRoom {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class GameRoomJpaEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,7 +34,7 @@ public class GameRoom {
     private String map;
 
     @Column(nullable = false)
-    private boolean secret;
+    private Boolean secret;
 
     @Column(nullable = false)
     private int currentPlayers; // New field for tracking connected players
@@ -40,6 +45,9 @@ public class GameRoom {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private RoomStatus status = RoomStatus.WAITING;
+
+    @Column(nullable = false)
+    private String hash;
 
     public GameRoomDto toDto() {
         return GameRoomDto.builder()
@@ -53,33 +61,25 @@ public class GameRoom {
                 .secret(secret)
                 .status(status)
                 .hostId(hostId)
+                .hash(hash)
                 .build();
     }
 
-    public static GameRoom fromDto(GameRoomDto dto) {
-        GameRoom room = new GameRoom();
-        room.setTitle(dto.getTitle());
-        room.setMinPlayers(dto.getMinPlayers());
-        room.setMaxPlayers(dto.getMaxPlayers());
-        room.setMaxGameTime(dto.getMaxGameTime());
-        room.setMap(dto.getMap());
-        room.setCurrentPlayers(dto.getCurrentPlayers());
-        room.setSecret(dto.isSecret());
-//        room.setSecret(dto.getSecret());
-        room.setStatus(dto.getStatus());
-        room.setHostId(dto.getHostId());
-        return room;
+    public static GameRoomJpaEntity fromDto(GameRoomDto dto) {
+        return GameRoomJpaEntity.builder()
+                .id(dto.getId())
+                .title(dto.getTitle())
+                .minPlayers(dto.getMinPlayers())
+                .maxPlayers(dto.getMaxPlayers())
+                .maxGameTime(dto.getMaxGameTime())
+                .map(dto.getMap())
+                .currentPlayers(dto.getCurrentPlayers())
+                .secret(dto.getSecret())
+                .status(dto.getStatus())
+                .hostId(dto.getHostId())
+                .hash(dto.getHash())
+                .build();
     }
 
-    public void updateFromDto(GameRoomDto dto) {
-        this.title = dto.getTitle();
-        this.minPlayers = dto.getMinPlayers();
-        this.maxPlayers = dto.getMaxPlayers();
-        this.maxGameTime = dto.getMaxGameTime();
-        this.map = dto.getMap();
-        this.secret = dto.isSecret();
-        this.currentPlayers = dto.getCurrentPlayers();
-        this.status = dto.getStatus();
-    }
+
 }
-

@@ -1,10 +1,11 @@
 package com.example.oauthlogin.gameroom;
 
-import com.example.oauthlogin.domain.GameRoom;
+import com.example.oauthlogin.domain.gameroom.GameRoom;
 import com.example.oauthlogin.common.types.RoomStatus;
-import com.example.oauthlogin.domain.dto.GameRoomDto;
+import com.example.oauthlogin.domain.gameroom.GameRoomDto;
 import com.example.oauthlogin.repository.GameRoomRepository;
 import com.example.oauthlogin.service.GameRoomService;
+import com.example.oauthlogin.service.GameRoomServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -18,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 
-public class GameRoomServiceTest {
+public class GameRoomServiceImplTest {
     @Mock
     private GameRoomRepository gameRoomRepository;
 
@@ -39,16 +40,18 @@ public class GameRoomServiceTest {
                 .maxPlayers(10)
                 .maxGameTime(30)
                 .map("Desert Map")
-                .currentPlayers(0)
+                .currentPlayers(1)
                 .status(RoomStatus.WAITING)
+                .secret(false)
+                .hostId(2L)
                 .build();
 
-        GameRoom room = GameRoom.fromDto(roomDto);
+
 
         when(gameRoomRepository.save(any(GameRoom.class))).thenReturn(room);
 
         // when
-        GameRoomDto createdRoom = gameRoomService.createRoom(roomDto);
+        gameRoomServiceImpl.createRoom(roomDto);
 
         // then
         assertThat(createdRoom).isNotNull();
@@ -77,7 +80,7 @@ public class GameRoomServiceTest {
                 .build();
 
         // when
-        GameRoomDto result = gameRoomService.updateRoom(1L, updatedRoomDto);
+        GameRoomDto result = gameRoomServiceImpl.updateRoom(1L, updatedRoomDto);
 
         // then
         assertThat(result).isNotNull();
@@ -94,7 +97,7 @@ public class GameRoomServiceTest {
         doNothing().when(gameRoomRepository).deleteById(roomId);
 
         // when
-        gameRoomService.deleteRoom(roomId);
+        gameRoomServiceImpl.deleteRoom(roomId);
 
         // then
         verify(gameRoomRepository, times(1)).deleteById(roomId);
@@ -114,7 +117,7 @@ public class GameRoomServiceTest {
         when(gameRoomRepository.findAll()).thenReturn(List.of(room1, room2));
 
         // when
-        List<GameRoomDto> rooms = gameRoomService.listAllRooms();
+        List<GameRoomDto> rooms = gameRoomServiceImpl.listAllRooms();
 
         // then
         assertThat(rooms).hasSize(2);
@@ -131,7 +134,7 @@ public class GameRoomServiceTest {
         when(gameRoomRepository.findById(1L)).thenReturn(Optional.of(room));
 
         // when
-        Optional<GameRoomDto> result = gameRoomService.getRoomById(1L);
+        Optional<GameRoomDto> result = gameRoomServiceImpl.getRoomById(1L);
 
         // then
         assertThat(result).isPresent();

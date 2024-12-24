@@ -1,4 +1,4 @@
-package com.example.oauthlogin.domain.dto;
+package com.example.oauthlogin.domain.gameroom;
 
 import com.example.oauthlogin.common.types.RoomStatus;
 import lombok.Builder;
@@ -13,6 +13,6 @@ public class GameRoomRequest {
     private int maxGameTime;
     private String map;
     private int currentPlayers;
-    private boolean secret;
+    private Boolean secret;
     private RoomStatus status = RoomStatus.WAITING;
 }

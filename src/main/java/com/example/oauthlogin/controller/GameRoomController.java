@@ -2,10 +2,12 @@ package com.example.oauthlogin.controller;
 
 import com.example.oauthlogin.common.types.RoomStatus;
 import com.example.oauthlogin.common.util.JwtTokenProvider;
-import com.example.oauthlogin.domain.dto.GameRoomDto;
-import com.example.oauthlogin.domain.dto.GameRoomRequest;
-import com.example.oauthlogin.service.RoomService;
+import com.example.oauthlogin.domain.gameroom.GameRoomDto;
+import com.example.oauthlogin.domain.gameroom.GameRoomRequest;
+import com.example.oauthlogin.domain.gameroom.GameRoomResponse;
+import com.example.oauthlogin.service.GameRoomService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,57 +16,62 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/rooms")
 @RequiredArgsConstructor
+@Slf4j
 public class GameRoomController {
-    private final RoomService roomService;
+    private final GameRoomService gameRoomService;
     private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/create")
-    public ResponseEntity<String> createRoom(
+    public ResponseEntity<GameRoomResponse> createRoom(
             @RequestBody GameRoomRequest gameRoomRequest,
             @RequestHeader("Authorization") String authorization) {
-        System.out.println("방 생성 로직 호출 ");
-        System.out.println("gameRoomRequest = " + gameRoomRequest);
-
         String jwtToken = authorization.substring(7);
-
-        System.out.println("jwtToken = " + jwtToken);
         Long userId = jwtTokenProvider.extractSubject(jwtToken);
+        GameRoomDto room = gameRoomService.createRoom(GameRoomDto.fromRequest(gameRoomRequest, userId));
+        log.info("room = " + room);
 
-        GameRoomDto createdRoom = roomService.createRoom(GameRoomDto.fromRequest(gameRoomRequest, userId));
-
-        return ResponseEntity.ok("ok");
+        return ResponseEntity.ok(GameRoomResponse.fromDto(room));
     }
 
     @PutMapping("/update/{roomId}")
-    public ResponseEntity<GameRoomDto> updateRoom(
+    public ResponseEntity<String> updateRoom(
             @PathVariable Long roomId,
-            @RequestBody GameRoomDto roomDto) {
+            @RequestBody GameRoomRequest gameRoomRequest) {
         System.out.println("방 수정 로직 호출");
-        GameRoomDto updatedRoom = roomService.updateRoom(roomId, roomDto);
-        return ResponseEntity.ok(updatedRoom);
+        GameRoomDto gameRoomDto = GameRoomDto.fromRequest(gameRoomRequest, roomId);
+        gameRoomService.updateRoom(roomId, gameRoomDto);
+
+        return ResponseEntity.ok("ok");
     }
 
     @PutMapping("/update/status/{roomId}")
     public ResponseEntity<Void> updateRoomStatus(
             @PathVariable Long roomId,
             @RequestParam RoomStatus status) {
-        roomService.updateRoomStatus(roomId, status);
+        gameRoomService.updateRoomStatus(roomId, status);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/delete/{roomId}")
     public ResponseEntity<Void> deleteRoom(@PathVariable Long roomId) {
-        roomService.deleteRoom(roomId);
+        gameRoomService.deleteRoom(roomId);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<GameRoomDto>> listAllRooms() {
-        return ResponseEntity.ok(roomService.listAllRooms());
+    public ResponseEntity<List<GameRoomResponse>> listAllRooms() {
+        List<GameRoomResponse> responseList = gameRoomService.listAllRooms()
+                .stream()
+                .map(GameRoomResponse::fromDto) // GameRoomDto → GameRoomResponse 변환
+                .toList();
+
+        return ResponseEntity.ok(responseList);
     }
 
     @GetMapping("/{roomId}")
-    public ResponseEntity<GameRoomDto> getRoomById(@PathVariable Long roomId) {
-        return ResponseEntity.of(roomService.getRoomById(roomId));
+    public ResponseEntity<GameRoomResponse> getRoomById(@PathVariable Long roomId) {
+        GameRoomDto roomDto = gameRoomService.getRoomByIdOrThrow(roomId);
+        GameRoomResponse response = GameRoomResponse.fromDto(roomDto);
+        return ResponseEntity.ok(response);
     }
 }
