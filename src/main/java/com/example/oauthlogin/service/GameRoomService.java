@@ -1,5 +1,6 @@
 package com.example.oauthlogin.service;
 
+import com.example.oauthlogin.common.types.GameRoomStatus;
 import com.example.oauthlogin.common.types.RoomStatus;
 import com.example.oauthlogin.domain.gameroom.GameRoomDto;
 
@@ -19,4 +20,5 @@ public interface GameRoomService {
     Optional<GameRoomDto> getRoomById(Long roomId);
 
     GameRoomDto getRoomByIdOrThrow(Long roomId);
+    GameRoomStatus checkRoomAvailability(Long roomId);
 }

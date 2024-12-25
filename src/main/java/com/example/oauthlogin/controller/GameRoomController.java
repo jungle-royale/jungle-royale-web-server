@@ -1,5 +1,6 @@
 package com.example.oauthlogin.controller;
 
+import com.example.oauthlogin.common.types.GameRoomStatus;
 import com.example.oauthlogin.common.types.RoomStatus;
 import com.example.oauthlogin.common.util.JwtTokenProvider;
 import com.example.oauthlogin.domain.gameroom.*;
@@ -85,5 +86,17 @@ public class GameRoomController {
         GameRoomDto roomDto = gameRoomService.getRoomByIdOrThrow(roomId);
         GameRoomResponse response = GameRoomResponse.fromDto(roomDto);
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 게임 입장 체크
+     * @param roomId
+     * @return GameRoomStatus
+     */
+    @PostMapping("/{roomId}/check")
+    public ResponseEntity<GameRoomStatus> checkRoomAvailability(@PathVariable Long roomId) {
+        System.out.println("게임 입장 가능여부 확인 roomId = " + roomId);
+        GameRoomStatus status = gameRoomService.checkRoomAvailability(roomId);
+        return ResponseEntity.ok(status);
     }
 }

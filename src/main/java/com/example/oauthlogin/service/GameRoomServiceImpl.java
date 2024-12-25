@@ -4,6 +4,7 @@ package com.example.oauthlogin.service;
 import com.example.oauthlogin.common.exceptions.DuplicateRoomException;
 import com.example.oauthlogin.common.exceptions.RoomByGameUrlFoundException;
 import com.example.oauthlogin.common.exceptions.RoomNotFoundException;
+import com.example.oauthlogin.common.types.GameRoomStatus;
 import com.example.oauthlogin.common.types.RoomStatus;
 import com.example.oauthlogin.domain.gameroom.GameRoom;
 import com.example.oauthlogin.domain.gameroom.GameRoomDto;
@@ -91,7 +92,6 @@ public class GameRoomServiceImpl implements GameRoomService {
         gameRoomRepository.save(GameRoomJpaEntity.fromDto(gameRoomDto));
     }
 
-
     @Override
     @Transactional
     public void updateRoomStatus(Long roomId, RoomStatus status) {
@@ -128,4 +128,29 @@ public class GameRoomServiceImpl implements GameRoomService {
                 .map(GameRoomJpaEntity::toDto)
                 .orElseThrow(() -> new RoomNotFoundException(roomId));
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public GameRoomStatus checkRoomAvailability(Long roomId) {
+        Optional<GameRoomJpaEntity> optionalRoom = gameRoomRepository.findById(roomId);
+        if (optionalRoom.isEmpty()) {
+            return GameRoomStatus.GAME_ROOM_NOT_FOUND;
+        }
+
+        GameRoomJpaEntity room = optionalRoom.get();
+        // 게임 진행 여부 확인
+        if (room.getStatus() == RoomStatus.RUNNING) {
+            return GameRoomStatus.GAME_ALREADY_STARTED;
+        }
+
+        // 방 정원 초과 여부 확인
+        if (room.getCurrentPlayers() >= room.getMaxPlayers()) {
+            return GameRoomStatus.GAME_ROOM_FULL;
+        }
+
+        // 입장 가능
+        return GameRoomStatus.GAME_JOIN_AVAILABLE;
+    }
+
+
 }
