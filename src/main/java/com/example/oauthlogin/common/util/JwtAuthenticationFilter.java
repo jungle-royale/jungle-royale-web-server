@@ -1,5 +1,6 @@
 package com.example.oauthlogin.common.util;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,22 +27,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String jwtToken = authorizationHeader.substring(7);
-            if (jwtTokenProvider.isValidToken(jwtToken)) {
-                String kakaoId = jwtTokenProvider.extractKakaoId(jwtToken);
-                Long userId = Long.valueOf(jwtTokenProvider.extractSubject(jwtToken));
+            try{
+                if (jwtTokenProvider.isValidToken(jwtToken)) {
+                    Long userId = Long.valueOf(jwtTokenProvider.extractSubject(jwtToken));
 //                // JWT 만료가 임박했는지 확인 (1분 이하로 남았을 경우 새로 발급)
 //                if (jwtTokenProvider.isTokenExpiringSoon(jwtToken, 60 * 1000)) {
 //                    String newJwtToken = jwtTokenProvider.generate(userId, new Date(System.currentTimeMillis() + 3600 * 1000));
 //                    response.setHeader("Authorization", "Bearer " + newJwtToken); // 새로운 JWT를 헤더에 추가
 //                }
 
-                // 인증 정보를 SecurityContext에 설정
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(userId, null, null);
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            } else {
-                log.warn("Invalid JWT token");
+                    // 인증 정보를 SecurityContext에 설정
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(userId, null, null);
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                } else {
+                    log.warn("Invalid JWT token");
+                }
+            } catch(ExpiredJwtException e) {
+                log.warn("Expired JWT token" , e);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("JWT token has expired");
+                return;
             }
         } else {
             log.info("No JWT token found in request");
