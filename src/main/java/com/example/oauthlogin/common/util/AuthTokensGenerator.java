@@ -22,9 +22,9 @@ public class AuthTokensGenerator {
 
         String subject = memberId.toString();
 
-        String accessToken = jwtTokenProvider.generate(subject, accessTokenExpiredAt);
+        String accessToken = jwtTokenProvider.generate(subject);
 
-        String refreshToken = jwtTokenProvider.generate(subject, refreshTokenExpiredAt);
+        String refreshToken = jwtTokenProvider.generate(subject);
 
         return AuthTokensResponse.of(accessToken, refreshToken, BEARER_TYPE, ACCESS_TOKEN_EXPIRE_TIME / 1000L);
     }
