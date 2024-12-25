@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -23,10 +24,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String authorizationHeader = request.getHeader("Authorization");
 
+        // 특정 경로들에 대해 필터 로직을 건너뛰도록 설정
+        if (request.getMethod().equals(HttpMethod.OPTIONS.name())) {
+            // OPTIONS 요청일 경우 필터 처리를 건너뛰고 다음 필터로 진행
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        String authorizationHeader = request.getHeader("Authorization");
+        System.out.println("authorizationHeader = " + authorizationHeader);
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String jwtToken = authorizationHeader.substring(7);
+            System.out.println("jwtToken = " + jwtToken);
             try{
                 if (jwtTokenProvider.isValidToken(jwtToken)) {
                     Long userId = Long.valueOf(jwtTokenProvider.extractSubject(jwtToken));
