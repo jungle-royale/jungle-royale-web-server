@@ -1,18 +1,19 @@
-package com.example.oauthlogin.domain.dto;
+package com.example.oauthlogin.domain.gameroom;
 
 import com.example.oauthlogin.common.types.RoomStatus;
 import lombok.Builder;
 import lombok.Data;
 
+/**
+ * 게임 생성 시 요청
+ */
 @Data
 @Builder
-public class GameRoomDto {
-    private Long id;
+public class GameRoomRequest {
     private String title;
     private int minPlayers;
     private int maxPlayers;
     private int maxGameTime;
-    private String mapInfo;
-    private int currentPlayers;
-    private RoomStatus status;
+    private String map;
+    private Boolean secret;
 }

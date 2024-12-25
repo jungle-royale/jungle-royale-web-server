@@ -1,5 +1,7 @@
 package com.example.oauthlogin.service;
 
+import com.example.oauthlogin.common.types.UserRole;
+import com.example.oauthlogin.common.util.RandomNicknameGenerator;
 import com.example.oauthlogin.domain.*;
 import com.example.oauthlogin.domain.dto.UserDto;
 import com.example.oauthlogin.repository.RefreshTokenRepository;
@@ -12,21 +14,17 @@ import org.springframework.stereotype.Service;
 public class UserService {
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final RandomNicknameGenerator randomNicknameGenerator;
 
     public boolean isUserExistsByKakaoId(String kakaoId) {
         return userRepository.findByKakaoId(kakaoId).isPresent();
     }
 
-    public String getKakaoIdByUserId(Long userId){
-        User user = userRepository.findById(userId).orElse(new User());
+    public String getKakaoIdByUserId(String userId){
+        Long id = Long.parseLong(userId);
+        User user = userRepository.findById(id).orElse(new User());
         return user.getKakaoId();
 
-    }
-
-    public User saveKakaoUser(String kakaoId, String username) {
-        User user = userRepository.findByKakaoId(kakaoId)
-                .orElse(new User());
-        return userRepository.save(user.createKakaoUser(kakaoId, username));
     }
 
     private void saveRefreshToken(User user, String token, Integer expiresAt) {
@@ -55,7 +53,10 @@ public class UserService {
     public void kakaoUserJoin(String kakaoId, OAuthKakaoToken oAuthKakaoToken) {
         // 유저가 존재하지않으면 회원, 리프레시 토큰 저장
         if (!isUserExistsByKakaoId(kakaoId)) {
-            User savedUser = saveKakaoUser(kakaoId, "테스터1");
+            String username = randomNicknameGenerator.generate();
+            User savedUser = saveKakaoUser(kakaoId, username);
+
+            System.out.println("savedUser = " + savedUser);
             saveRefreshToken(savedUser, oAuthKakaoToken.getRefresh_token(), oAuthKakaoToken.getRefresh_token_expires_in());
             // 유저 등록 및 refreshtoken 등록
         } else {
@@ -72,8 +73,11 @@ public class UserService {
      * @return
      */
     public User registerGuest() {
-        User guestUser = new User();
-        return userRepository.save(guestUser.createGueutUser());
+
+        String randomNickname = randomNicknameGenerator.generate();
+        User gueutUser = User.createGueutUser(randomNickname);
+
+        return userRepository.save(gueutUser);
     }
 
     /**
@@ -92,4 +96,13 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("Member not found with Kakao ID: " + kakaoId));
     }
 
+    private User saveKakaoUser(String kakaoId, String username) {
+        User user = userRepository.findByKakaoId(kakaoId)
+                .orElse(new User());
+        return userRepository.save(user.createKakaoUser(kakaoId, username));
+    }
+
+    public String getUsernameById(String userId) {
+        return userRepository.findUsernameById(Long.parseLong(userId));
+    }
 }

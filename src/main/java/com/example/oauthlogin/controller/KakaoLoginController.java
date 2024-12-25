@@ -4,7 +4,6 @@ import com.example.oauthlogin.domain.OAuthKakaoToken;
 import com.example.oauthlogin.domain.dto.KakaoLoginResponse;
 import com.example.oauthlogin.service.BlackListService;
 import com.example.oauthlogin.service.KakaoAuthService;
-import com.example.oauthlogin.service.UserService;
 import com.example.oauthlogin.common.util.JwtTokenProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,10 +15,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/auth")
-@Tag(name = "Login", description = "Login API")
+@RequestMapping("/api/auth/kakao")
+@Tag(name = "kakaoLogin", description = "kakaoLogin API")
 @RequiredArgsConstructor
-public class LoginController {
+public class KakaoLoginController {
 
     private final KakaoAuthService kakaoAuthService;
     private final JwtTokenProvider jwtTokenProvider;
@@ -31,7 +30,7 @@ public class LoginController {
      * @param payload
      * @return
      */
-    @PostMapping("/kakao/login")
+    @PostMapping("/login")
     @Operation(summary = "kakao Login", description = "카카오 로그인, 회원가입, jwt발행")
     public ResponseEntity<KakaoLoginResponse> kakaoCallback(@RequestBody Map<String, String> payload) {
         String code = payload.get("code"); // 클라이언트에서 전송한 인가코드 추출
@@ -131,7 +130,7 @@ public class LoginController {
      * @param refreshToken
      * @return access_token , refresh_token, expires_in
      */
-    @PostMapping("/kakao/refresh-token")
+    @PostMapping("/refresh-token")
     public ResponseEntity<Map<String, String>> refreshAccessToken(@RequestHeader("authorization_refresh") String refreshToken) {
         if (refreshToken == null || refreshToken.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("error", "Refresh token is missing"));

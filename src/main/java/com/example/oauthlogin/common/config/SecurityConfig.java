@@ -4,6 +4,7 @@ import com.example.oauthlogin.common.util.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -15,12 +16,6 @@ import org.springframework.web.filter.CorsFilter;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private static final String[] AUTH_WHITELIST = {
-            "/api/**", "/graphiql", "/graphql",
-            "/swagger-ui/**", "/api-docs", "/swagger-ui-custom.html",
-            "/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html"
-    };
-
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -28,6 +23,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable()) // CSRF 비활성화
             .authorizeHttpRequests(auth -> auth
 //                    .requestMatchers("/api/").permitAll() // 인증 필요 없는 경로
+                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()  // 모든 OPTIONS 요청에 대해 인증을 요구하지 않음
                     .requestMatchers("/api/users").authenticated()  // 인증이 필요한 경로
                     .anyRequest().permitAll() // 모든 요청 인증 없이 허용
 //                    .anyRequest().authenticated()  // 인증 필요
