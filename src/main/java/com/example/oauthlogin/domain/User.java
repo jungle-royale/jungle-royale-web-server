@@ -34,10 +34,10 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime lastLoginAt = LocalDateTime.now();
 
-    public User createGueutUser(){
+    public static User createGueutUser(String randomNickname){
         User guestUser = new User();
         guestUser.setKakaoId("GUEST_" + System.currentTimeMillis()); // GUEST 고유 ID 생성
-        guestUser.setUsername("Guest" + guestUser.getKakaoId());
+        guestUser.setUsername(randomNickname);
         guestUser.setRole(UserRole.GUEST);
         guestUser.setLastLoginAt(LocalDateTime.now());
 

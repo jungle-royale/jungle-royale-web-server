@@ -1,5 +1,6 @@
 package com.example.oauthlogin.service;
 
+import com.example.oauthlogin.common.types.UserRole;
 import com.example.oauthlogin.common.util.RandomNicknameGenerator;
 import com.example.oauthlogin.domain.*;
 import com.example.oauthlogin.domain.dto.UserDto;
@@ -72,8 +73,11 @@ public class UserService {
      * @return
      */
     public User registerGuest() {
-        User guestUser = new User();
-        return userRepository.save(guestUser.createGueutUser());
+
+        String randomNickname = randomNicknameGenerator.generate();
+        User gueutUser = User.createGueutUser(randomNickname);
+
+        return userRepository.save(gueutUser);
     }
 
     /**
