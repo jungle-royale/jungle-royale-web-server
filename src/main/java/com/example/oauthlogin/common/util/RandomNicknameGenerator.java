@@ -52,6 +52,6 @@ public class RandomNicknameGenerator {
         String nouns = NOUNS[RANDOM.nextInt(NOUNS.length)];
 
 
-        return MessageFormat.format("{0} {1}", adjective, nouns);
+        return MessageFormat.format("{0}{1}", adjective, nouns);
     }
 }

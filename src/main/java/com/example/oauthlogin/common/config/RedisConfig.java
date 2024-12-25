@@ -22,10 +22,10 @@ public class RedisConfig {
         Config config = new Config();
 
         String activeProfile = environment.getProperty("spring.profiles.active");
-        if ("DEV".equals(activeProfile)) {
+        if ("dev".equals(activeProfile)) {
             config.useSingleServer().setAddress("redis://127.0.0.1:6379");
-        } else if ("PROD".equals(activeProfile)) {
-            config.useSingleServer().setAddress("redis://redis.example.com:6379");
+        } else if ("prod".equals(activeProfile)) {
+            config.useSingleServer().setAddress("redis://clustercfg.jungle-royale-redis-demo.u8i6dt.use2.cache.amazonaws.com:6379");
         } else {
             throw new IllegalArgumentException("Unknown profile: " + activeProfile);
         }
