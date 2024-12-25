@@ -97,4 +97,8 @@ public class UserService {
                 .orElse(new User());
         return userRepository.save(user.createKakaoUser(kakaoId, username));
     }
+
+    public String getUsernameById(String userId) {
+        return userRepository.findUsernameById(Long.parseLong(userId));
+    }
 }

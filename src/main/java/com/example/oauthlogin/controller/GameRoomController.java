@@ -2,11 +2,10 @@ package com.example.oauthlogin.controller;
 
 import com.example.oauthlogin.common.types.RoomStatus;
 import com.example.oauthlogin.common.util.JwtTokenProvider;
-import com.example.oauthlogin.domain.gameroom.GameRoomDto;
-import com.example.oauthlogin.domain.gameroom.GameRoomListResponse;
-import com.example.oauthlogin.domain.gameroom.GameRoomRequest;
-import com.example.oauthlogin.domain.gameroom.GameRoomResponse;
+import com.example.oauthlogin.domain.gameroom.*;
+import com.example.oauthlogin.domain.user.UserInfoUsingRoomListResponse;
 import com.example.oauthlogin.service.GameRoomService;
+import com.example.oauthlogin.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +20,7 @@ import java.util.List;
 public class GameRoomController {
     private final GameRoomService gameRoomService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserService userService;
 
     @PostMapping("/create")
     public ResponseEntity<GameRoomResponse> createRoom(
@@ -63,13 +63,21 @@ public class GameRoomController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<GameRoomListResponse>> listAllRooms() {
+    public ResponseEntity<GameRoomListWithUserReponse> listAllRooms(@RequestHeader("Authorization") String authorization) {
+        String jwtToken = authorization.substring(7);
+        String userId = jwtTokenProvider.extractSubject(jwtToken);
+
+        String username = userService.getUsernameById(userId);
+        UserInfoUsingRoomListResponse userInfoUsingRoomListResponse = UserInfoUsingRoomListResponse.createUserInfoUsingRoomListResponse(username);
+
         List<GameRoomListResponse> responseList = gameRoomService.listAllRooms()
                 .stream()
                 .map(GameRoomListResponse::fromDto) // GameRoomDto → GameRoomResponse 변환
                 .toList();
 
-        return ResponseEntity.ok(responseList);
+        GameRoomListWithUserReponse gameRoomListWithUserReponse = GameRoomListWithUserReponse.createGameRoomListWithUserReponse(userInfoUsingRoomListResponse, responseList);
+
+        return ResponseEntity.ok(gameRoomListWithUserReponse);
     }
 
     @GetMapping("/{roomId}")
