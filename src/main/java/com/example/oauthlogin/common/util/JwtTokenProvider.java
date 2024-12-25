@@ -18,6 +18,8 @@ public class JwtTokenProvider {
     private final Key key;
 
     public static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final long JWT_EXPIRE_TIME = 1000 * 60 * 60;       // 1시간
+
     public static final String TYPE = "Bearer";
 
     public JwtTokenProvider(@Value("${jwt.secret-key}") String secretKey) {
@@ -25,10 +27,16 @@ public class JwtTokenProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generate(String subject, Date expiredAt) {
+    /**
+     *
+     * @param subject
+     * @return
+     */
+    public String generate(String subject) {
+        Date expirationDate = new Date(System.currentTimeMillis() + JWT_EXPIRE_TIME);
         return Jwts.builder()
                 .setSubject(subject)
-                .setExpiration(expiredAt)
+                .setExpiration(expirationDate)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
     }
