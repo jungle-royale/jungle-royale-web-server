@@ -38,6 +38,7 @@ src
 
 ## 👨‍👩‍👧‍👦 Developer
 *  **노태호** ([taehoy](https://github.com/taehoy))
+*  **정재명** ([jjm159](https://github.com/jjm159))
 
 ## Convention
 > 주요 컨벤션을 정리했다. 자세한 내용은 링크를 참고하자.
