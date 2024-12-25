@@ -55,7 +55,7 @@ public class GameRoomJpaEntity {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private RoomStatus status = RoomStatus.WAITING;
+    private RoomStatus status;
 
     @Column(nullable = false)
     private String gameUrl;
