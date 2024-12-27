@@ -31,7 +31,7 @@ src
 ├── domain
 │   └── dto
 ├── service
-│   └── user
+│   └── userJpaEntity
 └── repository
 ```
 

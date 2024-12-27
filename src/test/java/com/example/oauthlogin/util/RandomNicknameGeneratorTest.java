@@ -1,6 +1,6 @@
-package com.example.oauthlogin.util;
+package com.example.jungleroyal.util;
 
-import com.example.oauthlogin.common.util.RandomNicknameGenerator;
+import com.example.jungleroyal.common.util.RandomNicknameGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
