@@ -2,10 +2,11 @@ package com.example.oauthlogin.controller;
 
 
 import com.example.oauthlogin.common.util.JwtTokenProvider;
-import com.example.oauthlogin.domain.User;
+import com.example.oauthlogin.domain.user.User;
 import com.example.oauthlogin.repository.UserRepository;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/users")
 @Tag(name = "User", description = "User API")
@@ -21,7 +23,6 @@ import java.util.Map;
 public class UserController {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
-
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody User user) {
         System.out.println("user = " + user.toString());
@@ -29,12 +30,16 @@ public class UserController {
         return ResponseEntity.ok("User registered successfully!");
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        return userRepository.findById(id)
+
+    @GetMapping("/profile")
+    public ResponseEntity<User> getUserById(@RequestHeader("Authorization") String jwt) {
+        String jwtToken = jwt.substring(7);
+        String userId = jwtTokenProvider.extractSubject(jwtToken);
+        return userRepository.findById(Long.parseLong(userId))
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
 
     /**
      * 현재 사용자 추출
