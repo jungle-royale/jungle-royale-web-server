@@ -1,6 +1,6 @@
 spring:
   application:
-    name: oauthlogin
+    name: jungleroyal
 
   datasource:
     url: jdbc:mysql://jungle-royal-mysql.c9geowaym6y3.us-east-2.rds.amazonaws.com:3306/jungleroyal
