@@ -24,4 +24,4 @@ jobs:
         port: 22
         script: |
           cd
-          ./server_run.sh
+          sh server_run.sh
