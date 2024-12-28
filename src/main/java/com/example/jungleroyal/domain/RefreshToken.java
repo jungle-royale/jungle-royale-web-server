@@ -4,6 +4,8 @@ import com.example.jungleroyal.domain.user.UserJpaEntity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "refresh_tokens")
 @Data
@@ -18,6 +20,11 @@ public class RefreshToken {
 
     @Column(nullable = false)
     private String token;
+
+    private String refreshToken;
+
+    private LocalDateTime updatedAt = LocalDateTime.now();
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(nullable = false)
     private Integer expiresAt;
