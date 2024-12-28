@@ -33,6 +33,7 @@ public class UserServiceImpl {
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setUserJpaEntity(userJpaEntity);
         refreshToken.setToken(token);
+        refreshToken.setRefreshToken(token);
         refreshToken.setExpiresAt(expiresAt);
 
         refreshTokenRepository.save(refreshToken);
