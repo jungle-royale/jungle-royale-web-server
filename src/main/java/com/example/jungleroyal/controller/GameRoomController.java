@@ -79,21 +79,15 @@ public class GameRoomController {
     @GetMapping("/list")
     public ResponseEntity<GameRoomListWithUserReponse> listAllRooms(@RequestHeader("Authorization") String authorization) {
         String jwtToken = authorization.substring(7);
-        log.info("방 호출 시간 :" + System.currentTimeMillis());
         String userId = jwtTokenProvider.extractSubject(jwtToken);
-        log.info("토큰으로부터 userId 얻은 시간 :" + System.currentTimeMillis());
         String username = userService.getUsernameById(userId);
-        log.info("(DB)유저 이름 얻어오기 완료  :" + System.currentTimeMillis());
         UserInfoUsingRoomListResponse userInfoUsingRoomListResponse = UserInfoUsingRoomListResponse.createUserInfoUsingRoomListResponse(username);
-        log.info("UserInfoUsingRoomListResponse 객체 생성 완료  :" + System.currentTimeMillis());
 
         List<GameRoomListResponse> responseList = gameRoomService.listAllRooms()
                 .stream()
                 .map(GameRoomListResponse::fromDto) // GameRoomDto → GameRoomResponse 변환
                 .toList();
-        log.info("룸 리스트 조회 후 리스트화 완료 :" + System.currentTimeMillis());
         GameRoomListWithUserReponse gameRoomListWithUserReponse = GameRoomListWithUserReponse.createGameRoomListWithUserReponse(userInfoUsingRoomListResponse, responseList);
-        log.info("GameRoomListWithUserReponse 생성 완료   :" + System.currentTimeMillis());
         return ResponseEntity.ok(gameRoomListWithUserReponse);
     }
 
