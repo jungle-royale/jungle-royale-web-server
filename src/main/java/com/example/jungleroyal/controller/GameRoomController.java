@@ -1,15 +1,19 @@
 package com.example.jungleroyal.controller;
 
+import com.example.jungleroyal.common.pubsub.RedisPublisher;
 import com.example.jungleroyal.common.types.GameRoomStatus;
 import com.example.jungleroyal.common.types.RoomStatus;
 import com.example.jungleroyal.common.util.JwtTokenProvider;
+import com.example.jungleroyal.domain.dto.MessageCreateGameDto;
 import com.example.jungleroyal.domain.gameroom.*;
 import com.example.jungleroyal.domain.user.UserInfoUsingRoomListResponse;
 import com.example.jungleroyal.service.GameRoomService;
+import com.example.jungleroyal.service.RedisPubService;
 import com.example.jungleroyal.service.UserService;
 import com.example.jungleroyal.service.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +27,7 @@ public class GameRoomController {
     private final GameRoomService gameRoomService;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserServiceImpl userService;
-
+    private final RedisPublisher redisPublisher;
     @PostMapping("/create")
     public ResponseEntity<GameRoomResponse> createRoom(
             @RequestBody GameRoomRequest gameRoomRequest,
@@ -33,6 +37,14 @@ public class GameRoomController {
         String userId = jwtTokenProvider.extractSubject(jwtToken);
         GameRoomDto room = gameRoomService.createRoom(GameRoomDto.fromRequest(gameRoomRequest, userId));
         log.info("room = " + room);
+
+        MessageCreateGameDto pubMsg = MessageCreateGameDto.builder()
+                .roomId(room.getId())
+                .userId(Long.parseLong(room.getHostId()))
+                .createdAt(room.getCreatedAt())
+                .build();
+        
+        redisPublisher.publish(new ChannelTopic("CreateGame"), pubMsg);
 
         return ResponseEntity.ok(GameRoomResponse.fromDto(room));
     }

@@ -61,6 +61,8 @@ public class GameRoomDto {
                 .status(request.getStatus())
                 .hostId(request.getHostId())
                 .gameUrl(request.getGameUrl())
+                .createdAt(request.getCreatedAt())
+                .updatedAt(request.getUpdatedAt())
                 .build();
     }
 }
