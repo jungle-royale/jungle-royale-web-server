@@ -1,2 +1,3 @@
-package com.example.jungleroyal.service;public interface UserService {
+package com.example.jungleroyal.service;
+public interface UserService {
 }
