@@ -2,7 +2,7 @@ package com.example.jungleroyal.service;
 
 import com.example.jungleroyal.common.util.RandomNicknameGenerator;
 import com.example.jungleroyal.domain.*;
-import com.example.jungleroyal.domain.dto.UserDto;
+import com.example.jungleroyal.domain.user.UserDto;
 import com.example.jungleroyal.domain.user.UserJpaEntity;
 import com.example.jungleroyal.repository.RefreshTokenRepository;
 import com.example.jungleroyal.repository.UserRepository;
@@ -112,5 +112,17 @@ public class UserServiceImpl implements UserService{
     @Override
     public String getUsernameById(String userId) {
         return userRepository.findUsernameById(Long.parseLong(userId));
+    }
+
+    @Override
+    public void updateNickName(UserDto userDto) {
+        // 사용자 정보 조회
+        UserJpaEntity userJpaEntity = getUserJpaEntityById(userDto.getId());
+
+        userJpaEntity.setUsername(userDto.getUsername());
+
+        // 데이터베이스에 저장
+        userRepository.save(userJpaEntity);
+
     }
 }

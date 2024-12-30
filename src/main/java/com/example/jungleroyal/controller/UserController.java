@@ -2,6 +2,8 @@ package com.example.jungleroyal.controller;
 
 
 import com.example.jungleroyal.common.util.JwtTokenProvider;
+import com.example.jungleroyal.domain.user.UserDto;
+import com.example.jungleroyal.domain.user.UserEditMyPageRequest;
 import com.example.jungleroyal.domain.user.UserJpaEntity;
 import com.example.jungleroyal.domain.user.UserMyPageResponse;
 import com.example.jungleroyal.repository.UserRepository;
@@ -74,7 +76,7 @@ public class UserController {
     }
 
     @GetMapping("/mypage")
-    public ResponseEntity<UserMyPageResponse> mypage(@RequestHeader("Authorization") String jwt){
+    public ResponseEntity<UserMyPageResponse> myPage(@RequestHeader("Authorization") String jwt){
         String jwtToken = jwt.substring(7);
         String userId = jwtTokenProvider.extractSubject(jwtToken);
         String usernameById = userService.getUsernameById(userId);
@@ -83,6 +85,20 @@ public class UserController {
                 .username(usernameById)
                 .build();
         return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/mypage")
+    public ResponseEntity<String> editMyPage(
+            @RequestHeader("Authorization") String jwt,
+            @RequestBody UserEditMyPageRequest userEditMyPageRequest){
+        System.out.println("userEditMyPageRequest = " + userEditMyPageRequest);
+        String jwtToken = jwt.substring(7);
+        String userId = jwtTokenProvider.extractSubject(jwtToken);
+
+        UserDto userDto = UserDto.fromUserEditMyPageRequest(Long.parseLong(userId), userEditMyPageRequest);
+        userService.updateNickName(userDto);
+
+        return ResponseEntity.ok().build();
     }
 
 }
