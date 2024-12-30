@@ -1,13 +1,12 @@
 package com.example.jungleroyal.controller;
 
 import com.example.jungleroyal.common.util.JwtTokenProvider;
-import com.example.jungleroyal.domain.post.PostCreateResponse;
-import com.example.jungleroyal.domain.post.PostListResponse;
-import com.example.jungleroyal.domain.post.PostResponse;
-import com.example.jungleroyal.domain.post.PostUpdateRequest;
+import com.example.jungleroyal.domain.post.*;
 import com.example.jungleroyal.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,12 +32,14 @@ public class PostController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<?> listAllPosts() {
-        List<PostListResponse> responseList = postService.getPosts()
-                .stream()
-                .map(PostListResponse::fromDto) // GameRoomDto → GameRoomResponse 변환
-                .toList();
-        return ResponseEntity.ok().body(responseList);
+    public ResponseEntity<PageResponse<PostListResponse>> listAllPosts(@RequestParam() int page) {
+        PageResponse<PostListResponse> response = postService.getPostsByPagination(page);
+
+//        List<PostListResponse> responseList = postService.getPosts()
+//                .stream()
+//                .map(PostListResponse::fromDto) // GameRoomDto → GameRoomResponse 변환
+//                .toList();
+        return ResponseEntity.ok().body(response);
 
     }
 

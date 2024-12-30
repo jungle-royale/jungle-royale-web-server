@@ -6,6 +6,9 @@ import com.example.jungleroyal.repository.PostJpaEntity;
 import com.example.jungleroyal.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -144,8 +147,21 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
-    public List<PostListResponse> getPostsByPagination(int page) {
-        return postJdbcRepository.findPostsByPagination(page);
+    @Transactional
+    public PageResponse<PostListResponse> getPostsByPagination(int page) {
+        // JPA Pageable 사용
+        Pageable pageable = PageRequest.of(page - 1, 10); // 페이지는 0부터 시작
+        Page<PostJpaEntity> postsPage = postRepository.findAll(pageable);
+
+        // 페이지 데이터 변환
+        List<PostListResponse> postList = postsPage.getContent().stream()
+                .map(PostJpaEntity::toPostListResponse)
+                .toList();
+
+        return PageResponse.<PostListResponse>builder()
+                .data(postList)
+                .total(postsPage.getTotalElements())
+                .build();
     }
 
     private String generateImageUrl(String filePath) {

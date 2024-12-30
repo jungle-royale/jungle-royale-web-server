@@ -1,6 +1,7 @@
 package com.example.jungleroyal.service;
 
 import com.example.jungleroyal.domain.post.*;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -19,6 +20,6 @@ public interface PostService {
     String handleFileUpload(MultipartFile file, String existingFilePath);
 
     PostResponse getPostById(Long postId);
-    List<PostListResponse> getPostsByPagination(int page);
+    PageResponse<PostListResponse> getPostsByPagination(int page);
 
 }

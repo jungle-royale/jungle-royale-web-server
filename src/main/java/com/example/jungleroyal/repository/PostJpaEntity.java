@@ -3,6 +3,7 @@ package com.example.jungleroyal.repository;
 import com.example.jungleroyal.domain.gameroom.GameRoomDto;
 import com.example.jungleroyal.domain.post.PostCreateResponse;
 import com.example.jungleroyal.domain.post.PostDto;
+import com.example.jungleroyal.domain.post.PostListResponse;
 import com.example.jungleroyal.domain.post.PostResponse;
 import com.example.jungleroyal.domain.user.UserJpaEntity;
 import jakarta.persistence.*;
@@ -82,6 +83,18 @@ public class PostJpaEntity {
                 .writer(writer)
                 .writerId(userId)
                 .imageUrl(imageUrl)
+                .views(this.views)
+                .createdAt(this.createdAt)
+                .build();
+    }
+
+    // toPostListResponse 메서드
+    public PostListResponse toPostListResponse() {
+        return PostListResponse.builder()
+                .id(this.id)
+                .title(this.title)
+                .content(this.content)
+                .username(this.userJpaEntity.getUsername()) // 작성자 이름
                 .views(this.views)
                 .createdAt(this.createdAt)
                 .build();
