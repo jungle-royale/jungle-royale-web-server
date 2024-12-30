@@ -2,7 +2,7 @@ package com.example.jungleroyal.service;
 
 import com.example.jungleroyal.common.util.RandomNicknameGenerator;
 import com.example.jungleroyal.domain.*;
-import com.example.jungleroyal.domain.dto.UserDto;
+import com.example.jungleroyal.domain.user.UserDto;
 import com.example.jungleroyal.domain.user.UserJpaEntity;
 import com.example.jungleroyal.repository.RefreshTokenRepository;
 import com.example.jungleroyal.repository.UserRepository;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserServiceImpl {
+public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final RandomNicknameGenerator randomNicknameGenerator;
@@ -109,7 +109,20 @@ public class UserServiceImpl {
         return userRepository.save(userJpaEntity.createKakaoUser(kakaoId, username));
     }
 
+    @Override
     public String getUsernameById(String userId) {
         return userRepository.findUsernameById(Long.parseLong(userId));
+    }
+
+    @Override
+    public void updateNickName(UserDto userDto) {
+        // 사용자 정보 조회
+        UserJpaEntity userJpaEntity = getUserJpaEntityById(userDto.getId());
+
+        userJpaEntity.setUsername(userDto.getUsername());
+
+        // 데이터베이스에 저장
+        userRepository.save(userJpaEntity);
+
     }
 }
