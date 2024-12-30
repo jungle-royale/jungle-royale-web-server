@@ -1,10 +1,7 @@
 package com.example.jungleroyal.service;
 
 import com.example.jungleroyal.domain.gameroom.GameRoomJpaEntity;
-import com.example.jungleroyal.domain.post.PostCreateResponse;
-import com.example.jungleroyal.domain.post.PostDto;
-import com.example.jungleroyal.domain.post.PostResponse;
-import com.example.jungleroyal.domain.post.PostUpdateRequest;
+import com.example.jungleroyal.domain.post.*;
 import com.example.jungleroyal.domain.user.UserJpaEntity;
 import com.example.jungleroyal.repository.PostJpaEntity;
 import com.example.jungleroyal.repository.PostRepository;
@@ -29,6 +26,7 @@ public class PostServiceImpl implements PostService{
     private static final String UPLOAD_DIR = "src/main/resources/static/uploads";
     private final UserServiceImpl userService;
     private final PostRepository postRepository;
+    private final PostJdbcRepository postJdbcRepository;
 
     @Override
     public void savePost(PostCreateResponse postCreateResponse, Long userId) {
@@ -150,6 +148,11 @@ public class PostServiceImpl implements PostService{
         String username = post.getUserJpaEntity().getUsername();
         Long userId = post.getUserJpaEntity().getId();
         return post.toPostResponse(username, userId);
+    }
+
+    @Override
+    public List<PostListResponse> getPostsByPagination(int page) {
+        return postJdbcRepository.findPostsByPagination(page);
     }
 
 }
