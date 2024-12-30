@@ -40,4 +40,13 @@ public class JungleFileUtils {
         }
     }
 
+    public String generateImageUrl(String filePath) {
+        if (filePath == null || filePath.isEmpty()) {
+            return null; // 파일 경로가 없으면 null 반환
+        }
+
+        String baseUrl = "http://192.168.1.241:8080/uploads/"; // base URL 설정
+        return baseUrl + Paths.get(filePath).getFileName().toString(); // 파일명만 URL에 포함
+    }
+
 }

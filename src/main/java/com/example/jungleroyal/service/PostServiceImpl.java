@@ -107,7 +107,7 @@ public class PostServiceImpl implements PostService{
         post.incrementViews();
         postRepository.save(post); // 변경사항 저장
 
-        String imageUrl = generateImageUrl(post.getFilePath()); // 파일 경로를 URL로 변환
+        String imageUrl = fileUtils.generateImageUrl(post.getFilePath()); // 파일 경로를 URL로 변환
         String username = post.getUserJpaEntity().getUsername();
         Long userId = post.getUserJpaEntity().getId();
 
@@ -124,15 +124,6 @@ public class PostServiceImpl implements PostService{
                 .data(posts)
                 .total(totalPosts)
                 .build();
-    }
-
-    private String generateImageUrl(String filePath) {
-        if (filePath == null || filePath.isEmpty()) {
-            return null; // 파일 경로가 없으면 null 반환
-        }
-
-        String baseUrl = "http://192.168.1.241:8080/uploads/"; // base URL 설정
-        return baseUrl + Paths.get(filePath).getFileName().toString(); // 파일명만 URL에 포함
     }
 
 }

@@ -33,6 +33,9 @@ public class ItemServiceImpl implements ItemService{
         itemJpaEntity.setImageUrl(newFilePath);
 
         ItemJpaEntity savedItem = itemRepository.save(itemJpaEntity);
+
+        String imageUrl = fileUtils.generateImageUrl(savedItem.getImageUrl());
+        savedItem.setImageUrl(imageUrl);
         // 저장된 엔티티를 응답 객체로 변환
         return savedItem.toResponse();
     }
