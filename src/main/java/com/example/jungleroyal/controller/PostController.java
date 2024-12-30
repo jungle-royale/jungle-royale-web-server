@@ -8,10 +8,10 @@ import com.example.jungleroyal.domain.post.PostUpdateRequest;
 import com.example.jungleroyal.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -62,7 +62,7 @@ public class PostController {
     @DeleteMapping("/{postId}")
     public ResponseEntity<String> delete(
             @PathVariable Long postId
-    ){
+    ) throws IOException {
         postService.deletePost(postId);
         return ResponseEntity.ok().build();
     }

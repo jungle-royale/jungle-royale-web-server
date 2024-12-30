@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
@@ -72,7 +73,7 @@ public class PostJpaEntity {
                 .build();
     }
 
-    public PostResponse toPostResponse(String writer, Long userId) {
+    public PostResponse toPostResponse(String writer, Long userId, String imageUrl) {
 
         return PostResponse.builder()
                 .id(this.id)
@@ -80,6 +81,7 @@ public class PostJpaEntity {
                 .content(this.content)
                 .writer(writer)
                 .writerId(userId)
+                .imageUrl(imageUrl)
                 .views(this.views)
                 .createdAt(this.createdAt)
                 .build();

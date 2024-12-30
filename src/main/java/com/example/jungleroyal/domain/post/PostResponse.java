@@ -2,6 +2,7 @@ package com.example.jungleroyal.domain.post;
 
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
@@ -14,5 +15,6 @@ public class PostResponse {
     private String writer;
     private Long writerId;
     private int views;
+    private String imageUrl;
     private LocalDateTime createdAt;
 }

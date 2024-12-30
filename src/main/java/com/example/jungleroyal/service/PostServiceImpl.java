@@ -1,6 +1,5 @@
 package com.example.jungleroyal.service;
 
-import com.example.jungleroyal.domain.gameroom.GameRoomJpaEntity;
 import com.example.jungleroyal.domain.post.*;
 import com.example.jungleroyal.domain.user.UserJpaEntity;
 import com.example.jungleroyal.repository.PostJpaEntity;
@@ -16,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,26 +33,11 @@ public class PostServiceImpl implements PostService{
         MultipartFile file = postCreateResponse.getImage();
 
         String filePath = null;
-        // 파일 저장 로직
-        if (file != null && !file.isEmpty()) {
-            try {
-                // 업로드 디렉토리 확인 및 생성
-                Path uploadPath = Paths.get(UPLOAD_DIR);
-                if (!Files.exists(uploadPath)) {
-                    Files.createDirectories(uploadPath);
-                }
 
-                // 고유 파일명 생성
-                String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-                filePath = uploadPath.resolve(fileName).toString();
-                file.transferTo(Paths.get(filePath));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        String newFilePath = handleFileUpload(file, filePath);
 
         UserJpaEntity userJpaEntity = userService.getUserJpaEntityById(userId);
-        PostJpaEntity postJpaEntity = PostJpaEntity.fromPostCreateResponse(postCreateResponse, filePath, userJpaEntity);
+        PostJpaEntity postJpaEntity = PostJpaEntity.fromPostCreateResponse(postCreateResponse, newFilePath, userJpaEntity);
         postRepository.save(postJpaEntity);
     }
 
@@ -102,12 +87,13 @@ public class PostServiceImpl implements PostService{
 
     @Override
     @Transactional
-    public void deletePost(Long postId) {
+    public void deletePost(Long postId) throws IOException {
         // 게시글 존재 여부 확인
         PostJpaEntity postJpaEntity = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다."));
 
         // 삭제 처리
+        Files.deleteIfExists(Paths.get(postJpaEntity.getFilePath()));
         postRepository.delete(postJpaEntity);
     }
 
@@ -145,14 +131,26 @@ public class PostServiceImpl implements PostService{
     public PostResponse getPostById(Long postId) {
         PostJpaEntity post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다."));
+
+        String imageUrl = generateImageUrl(post.getFilePath()); // 파일 경로를 URL로 변환
         String username = post.getUserJpaEntity().getUsername();
         Long userId = post.getUserJpaEntity().getId();
-        return post.toPostResponse(username, userId);
+
+        return post.toPostResponse(username, userId, imageUrl);
     }
 
     @Override
     public List<PostListResponse> getPostsByPagination(int page) {
         return postJdbcRepository.findPostsByPagination(page);
+    }
+
+    private String generateImageUrl(String filePath) {
+        if (filePath == null || filePath.isEmpty()) {
+            return null; // 파일 경로가 없으면 null 반환
+        }
+
+        String baseUrl = "http://192.168.1.241:8080/uploads/"; // base URL 설정
+        return baseUrl + Paths.get(filePath).getFileName().toString(); // 파일명만 URL에 포함
     }
 
 }
