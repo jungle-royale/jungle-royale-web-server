@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class ItemJpaEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer itemCode;
+    private Long itemCode;
 
     @Column(nullable = false)
     private String name;
@@ -25,4 +25,22 @@ public class ItemJpaEntity {
 
     @Column(nullable = true)
     private String imageUrl;
+
+    public static ItemJpaEntity from(ItemCreateRequest request) {
+        return ItemJpaEntity.builder()
+                .name(request.getName())
+                .price(request.getPrice())
+                .imageUrl(request.getImageUrl())
+                .build();
+    }
+
+    public ItemCreateResponse toResponse() {
+        return ItemCreateResponse.builder()
+                .itemCode(this.itemCode)
+                .name(this.name)
+                .price(this.price)
+                .imageUrl(this.imageUrl)
+                .build();
+    }
+
 }
