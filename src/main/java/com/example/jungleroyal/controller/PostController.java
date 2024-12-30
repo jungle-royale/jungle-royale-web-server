@@ -1,22 +1,18 @@
 package com.example.jungleroyal.controller;
 
 import com.example.jungleroyal.common.util.JwtTokenProvider;
-import com.example.jungleroyal.domain.gameroom.GameRoomListResponse;
-import com.example.jungleroyal.domain.gameroom.GameRoomListWithUserReponse;
 import com.example.jungleroyal.domain.post.PostCreateResponse;
 import com.example.jungleroyal.domain.post.PostListResponse;
-import com.example.jungleroyal.domain.user.UserInfoUsingRoomListResponse;
+import com.example.jungleroyal.domain.post.PostResponse;
+import com.example.jungleroyal.domain.post.PostUpdateRequest;
 import com.example.jungleroyal.service.PostService;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,12 +33,37 @@ public class PostController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<?> listAllRooms() {
+    public ResponseEntity<?> listAllPosts() {
         List<PostListResponse> responseList = postService.getPosts()
                 .stream()
                 .map(PostListResponse::fromDto) // GameRoomDto → GameRoomResponse 변환
                 .toList();
         return ResponseEntity.ok().body(responseList);
 
+    }
+
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostResponse> getPost(
+            @PathVariable Long postId
+    ){
+        PostResponse response = postService.getPostById(postId);
+        return ResponseEntity.ok().body(response);
+    }
+
+    @PutMapping("/{postId}")
+    public ResponseEntity<String> update(
+            @PathVariable Long postId,
+            PostUpdateRequest postUpdateRequest
+    ){
+        postService.updatePost(postId, postUpdateRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<String> delete(
+            @PathVariable Long postId
+    ){
+        postService.deletePost(postId);
+        return ResponseEntity.ok().build();
     }
 }

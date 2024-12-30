@@ -3,6 +3,7 @@ package com.example.jungleroyal.repository;
 import com.example.jungleroyal.domain.gameroom.GameRoomDto;
 import com.example.jungleroyal.domain.post.PostCreateResponse;
 import com.example.jungleroyal.domain.post.PostDto;
+import com.example.jungleroyal.domain.post.PostResponse;
 import com.example.jungleroyal.domain.user.UserJpaEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -68,6 +69,19 @@ public class PostJpaEntity {
                 .filePath(filePath)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
+                .build();
+    }
+
+    public PostResponse toPostResponse(String writer, Long userId) {
+
+        return PostResponse.builder()
+                .id(this.id)
+                .title(this.title)
+                .content(this.content)
+                .writer(writer)
+                .writerId(userId)
+                .views(this.views)
+                .createdAt(this.createdAt)
                 .build();
     }
 }
