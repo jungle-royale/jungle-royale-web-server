@@ -3,12 +3,12 @@ spring:
     name: jungleroyal
 
   datasource:
-    url: jdbc:mysql://jungle-royal-mysql.c9geowaym6y3.us-east-2.rds.amazonaws.com:3306/jungleroyal
+    url: jdbc:mysql://jungle-royale-datebase.c9ok8ooiumgq.ap-northeast-2.rds.amazonaws.com:3306/jungleroyale
     username: admin
-    password: jungleroyal4
+    password: jungleroyale2
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
-      max-lifetime: 1800000 # 30분
+      max-lifetime: 1800000 # 29분
 
   jpa:
     hibernate:
