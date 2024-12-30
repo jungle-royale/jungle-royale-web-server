@@ -40,12 +40,18 @@ public class UserJpaEntity {
     @Column(nullable = false)
     private LocalDateTime lastLoginAt = LocalDateTime.now();
 
+    // 게임머니 필드 추가
+    @Column(nullable = false)
+    private Integer gameMoney = 0; // 기본값 0
+
+
     public static UserJpaEntity createGueutUser(String randomNickname){
         UserJpaEntity guestUserJpaEntity = new UserJpaEntity();
         guestUserJpaEntity.setKakaoId("GUEST_" + System.currentTimeMillis()); // GUEST 고유 ID 생성
         guestUserJpaEntity.setUsername(randomNickname);
         guestUserJpaEntity.setRole(UserRole.GUEST);
         guestUserJpaEntity.setLastLoginAt(LocalDateTime.now());
+        guestUserJpaEntity.setGameMoney(0); // 기본 게임머니 설정
 
         return guestUserJpaEntity;
     }
@@ -56,6 +62,7 @@ public class UserJpaEntity {
         kakaoUserJpaEntity.setUsername(username);
         kakaoUserJpaEntity.setRole(UserRole.MEMBER);
         kakaoUserJpaEntity.setLastLoginAt(LocalDateTime.now());
+        kakaoUserJpaEntity.setGameMoney(0); // 기본 게임머니 설정
 
         return kakaoUserJpaEntity;
     }
