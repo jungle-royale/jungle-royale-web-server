@@ -4,4 +4,6 @@ import com.example.jungleroyal.domain.shop.ShopResponse;
 
 public interface ShopService {
     ShopResponse getShopPage(String jwt);
+    String purchaseItem(Long userId, Long itemCode);
+
 }
