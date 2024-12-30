@@ -18,6 +18,12 @@ public class UserServiceImpl {
     private final RefreshTokenRepository refreshTokenRepository;
     private final RandomNicknameGenerator randomNicknameGenerator;
 
+    public UserJpaEntity getUserJpaEntityById(Long userId){
+        // UserJpaEntity 조회
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
+
     public boolean isUserExistsByKakaoId(String kakaoId) {
         return userRepository.findByKakaoId(kakaoId).isPresent();
     }
