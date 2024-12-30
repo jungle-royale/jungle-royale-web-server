@@ -132,6 +132,10 @@ public class PostServiceImpl implements PostService{
         PostJpaEntity post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다."));
 
+        // 조회수 증가
+        post.incrementViews();
+        postRepository.save(post); // 변경사항 저장
+
         String imageUrl = generateImageUrl(post.getFilePath()); // 파일 경로를 URL로 변환
         String username = post.getUserJpaEntity().getUsername();
         Long userId = post.getUserJpaEntity().getId();

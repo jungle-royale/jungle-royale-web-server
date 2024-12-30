@@ -86,4 +86,8 @@ public class PostJpaEntity {
                 .createdAt(this.createdAt)
                 .build();
     }
+
+    public void incrementViews() {
+        this.views +=1;
+    }
 }
