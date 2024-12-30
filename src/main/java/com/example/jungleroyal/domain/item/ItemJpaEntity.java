@@ -22,4 +22,7 @@ public class ItemJpaEntity {
 
     @Column(nullable = false)
     private Integer price;
+
+    @Column(nullable = true)
+    private String imageUrl;
 }

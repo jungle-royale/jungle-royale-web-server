@@ -13,12 +13,15 @@ public class ItemDto {
     private Integer itemCode;
     private String name;
     private Integer price;
+    private String imageUrl;
+
 
     public static ItemDto from(ItemJpaEntity itemJpaEntity) {
         return ItemDto.builder()
                 .itemCode(itemJpaEntity.getItemCode())
                 .name(itemJpaEntity.getName())
                 .price(itemJpaEntity.getPrice())
+                .imageUrl(itemJpaEntity.getImageUrl())
                 .build();
     }
 }
