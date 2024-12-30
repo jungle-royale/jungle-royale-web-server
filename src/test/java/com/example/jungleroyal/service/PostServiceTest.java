@@ -1,12 +1,17 @@
 package com.example.jungleroyal.service;
 
+import com.example.jungleroyal.domain.post.PostJdbcRepository;
+import com.example.jungleroyal.domain.post.PostListResponse;
 import com.example.jungleroyal.domain.post.PostResponse;
 import com.example.jungleroyal.domain.user.UserJpaEntity;
 import com.example.jungleroyal.repository.PostJpaEntity;
 import com.example.jungleroyal.repository.PostRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -14,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,12 +29,19 @@ public class PostServiceTest {
     @Mock
     private PostRepository postRepository;
 
-    @InjectMocks
-    private PostService postService;
+    @Mock
+    private PostJdbcRepository postJdbcRepository;
 
+    @InjectMocks
+    private PostServiceImpl postService;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
 
     @Test
-    void isPostOwner_ShouldReturnTrue_WhenUserIsOwner() {
+    void 작성자가_본인일_경우_true값을_반환한다() {
         // given
         String userId = "1";
         Long postId = 1L;
@@ -47,7 +60,7 @@ public class PostServiceTest {
     }
 
     @Test
-    void isPostOwner_ShouldReturnFalse_WhenUserIsNotOwner() {
+    void 작성자가_본인이_아닐_경우_false값을_반환한다() {
         // given
         String userId = "2";
         Long postId = 1L;
@@ -66,7 +79,7 @@ public class PostServiceTest {
     }
 
     @Test
-    void isPostOwner_ShouldThrowException_WhenPostNotFound() {
+    void 작성자id에_해당하는_게시글이_없을_경우_예외를_발생시킨다() {
         // given
         String userId = "1";
         Long postId = 1L;
@@ -80,7 +93,7 @@ public class PostServiceTest {
     }
 
     @Test
-    void handleFileUpload_ShouldSaveNewFileAndDeleteExistingFile() throws IOException {
+    void 파일을_저장하고_기존_파일을_삭제한다() throws IOException {
         // given
         MultipartFile newFile = mock(MultipartFile.class);
         String existingFilePath = "src/main/resources/static/uploads/old_file.txt";
@@ -102,11 +115,101 @@ public class PostServiceTest {
     }
 
     @Test
-    void toPostResponse_ShouldReturnPostResponse_WhenCalled() {
+    void 게시글_조회시_PostResponse를_정상적으로_반환한다() {
         // given
-        UserJpaEntity user = UserJpaEntity.builder().id(1L).username("testUser").build();
+        Long postId = 1L;
+        String filePath = "src/main/resources/static/uploads/testImage.jpg";
+
+        UserJpaEntity user = UserJpaEntity.builder()
+                .id(42L)
+                .username("testUser")
+                .build();
+
         PostJpaEntity post = PostJpaEntity.builder()
-                .id(1L)
+                .id(postId)
+                .title("Test Title")
+                .content("Test Content")
+                .views(100)
+                .userJpaEntity(user)
+                .filePath(filePath)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+
+        // when
+        PostResponse response = postService.getPostById(postId);
+
+        // then
+        assertNotNull(response, "PostResponse 객체는 null이 아니어야 합니다.");
+        assertEquals(post.getId(), response.getId(), "Post ID가 일치해야 합니다.");
+        assertEquals(post.getTitle(), response.getTitle(), "제목이 일치해야 합니다.");
+        assertEquals(post.getContent(), response.getContent(), "내용이 일치해야 합니다.");
+        assertEquals(user.getUsername(), response.getWriter(), "작성자 이름이 일치해야 합니다.");
+        assertEquals(user.getId(), response.getWriterId(), "작성자 ID가 일치해야 합니다.");
+        assertEquals("http://localhost:8080/uploads/testImage.jpg", response.getImageUrl(), "이미지 URL이 일치해야 합니다.");
+
+        verify(postRepository, times(1)).findById(postId);
+    }
+
+    @Test
+    void 게시글이_없을_경우_예외를_발생시킨다() {
+        // given
+        Long postId = 5L;
+        when(postRepository.findById(postId)).thenReturn(Optional.empty());
+
+        // when & then
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> postService.getPostById(postId));
+        assertEquals("해당 게시글을 찾을 수 없습니다.", exception.getMessage(), "예외 메시지가 정확해야 합니다.");
+
+        verify(postRepository, times(1)).findById(postId);
+    }
+
+    @Test
+    void 페이지네이션으로_게시글을_조회한다() {
+        // given
+        int page = 1;
+        int pageSize = 5;
+
+        List<PostListResponse> mockPosts = List.of(
+                PostListResponse.builder()
+                        .id(1L)
+                        .title("Post 1")
+                        .content("Content 1")
+                        .username("User 1")
+                        .views(100)
+                        .createdAt(LocalDateTime.now())
+                        .build(),
+                PostListResponse.builder()
+                        .id(2L)
+                        .title("Post 2")
+                        .content("Content 2")
+                        .username("User 2")
+                        .views(150)
+                        .createdAt(LocalDateTime.now())
+                        .build()
+        );
+
+        when(postJdbcRepository.findPostsByPagination(page)).thenReturn(mockPosts);
+
+        // when
+        List<PostListResponse> result = postService.getPostsByPagination(page);
+
+        // then
+        assertEquals(2, result.size());
+        assertEquals("Post 1", result.get(0).getTitle());
+        assertEquals("Post 2", result.get(1).getTitle());
+
+        verify(postJdbcRepository, times(1)).findPostsByPagination(page);
+    }
+
+    @Test
+    void 게시글_조회시_조회수가_증가한다() {
+        // given
+        Long postId = 1L;
+        UserJpaEntity user = UserJpaEntity.builder().id(42L).username("testUser").build();
+        PostJpaEntity post = PostJpaEntity.builder()
+                .id(postId)
                 .title("Test Title")
                 .content("Test Content")
                 .views(100)
@@ -114,13 +217,57 @@ public class PostServiceTest {
                 .createdAt(LocalDateTime.now())
                 .build();
 
+        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+
         // when
-        PostResponse response = post.toPostResponse(user.getUsername(), user.getId());
+        PostResponse response = postService.getPostById(postId);
 
         // then
-        assertNotNull(response);
-        assertEquals(post.getId(), response.getId());
-        assertEquals(post.getTitle(), response.getTitle());
-        assertEquals(post.getUserJpaEntity().getUsername(), response.getWriter());
+        assertEquals(101, post.getViews(), "조회수가 1 증가해야 합니다.");
+        verify(postRepository, times(1)).save(post);
+    }
+
+    @Test
+    void 게시글_삭제시_파일과_엔티티가_정상적으로_삭제된다() throws IOException {
+        // given
+        Long postId = 1L;
+        String filePath = "src/main/resources/static/uploads/testImage.jpg";
+
+        PostJpaEntity postJpaEntity = PostJpaEntity.builder()
+                .id(postId)
+                .filePath(filePath)
+                .build();
+
+        when(postRepository.findById(postId)).thenReturn(Optional.of(postJpaEntity));
+
+        // 파일 생성 (가상 파일)
+        Path mockPath = Paths.get(filePath);
+        Files.createDirectories(mockPath.getParent()); // 디렉토리 생성
+        Files.createFile(mockPath); // 파일 생성
+
+        // 파일이 존재하는지 확인
+        assertTrue(Files.exists(mockPath), "테스트 파일이 존재해야 합니다.");
+
+        // when
+        postService.deletePost(postId);
+
+        // then
+        assertFalse(Files.exists(mockPath), "파일이 삭제되어야 합니다.");
+        verify(postRepository, times(1)).findById(postId);
+        verify(postRepository, times(1)).delete(postJpaEntity);
+    }
+
+    @Test
+    void 삭제할_게시글이_존재하지_않을_경우_예외를_발생시킨다() {
+        // given
+        Long postId = 1L;
+        when(postRepository.findById(postId)).thenReturn(Optional.empty());
+
+        // when & then
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> postService.deletePost(postId));
+        assertEquals("해당 게시글을 찾을 수 없습니다.", exception.getMessage(), "예외 메시지가 정확해야 합니다.");
+
+        verify(postRepository, times(1)).findById(postId);
+        verify(postRepository, never()).delete(any());
     }
 }
