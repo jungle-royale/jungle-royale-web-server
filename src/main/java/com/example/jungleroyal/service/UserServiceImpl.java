@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserServiceImpl {
+public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final RandomNicknameGenerator randomNicknameGenerator;
@@ -109,6 +109,7 @@ public class UserServiceImpl {
         return userRepository.save(userJpaEntity.createKakaoUser(kakaoId, username));
     }
 
+    @Override
     public String getUsernameById(String userId) {
         return userRepository.findUsernameById(Long.parseLong(userId));
     }
