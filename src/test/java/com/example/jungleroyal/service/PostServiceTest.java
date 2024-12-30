@@ -1,6 +1,7 @@
 package com.example.jungleroyal.service;
 
-import com.example.jungleroyal.domain.post.PostJdbcRepository;
+import com.example.jungleroyal.domain.post.PageResponse;
+import com.example.jungleroyal.repository.PostJdbcRepository;
 import com.example.jungleroyal.domain.post.PostListResponse;
 import com.example.jungleroyal.domain.post.PostResponse;
 import com.example.jungleroyal.domain.user.UserJpaEntity;
@@ -11,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -153,6 +153,31 @@ public class PostServiceTest {
     }
 
     @Test
+    void 페이지네이션_응답을_정상적으로_반환한다() {
+        // given
+        int page = 1;
+        int pageSize = 5;
+
+        List<PostListResponse> mockPosts = List.of(
+                PostListResponse.builder().id(1L).title("Post 1").content("Content 1").username("User 1").views(10).createdAt(LocalDateTime.now()).build(),
+                PostListResponse.builder().id(2L).title("Post 2").content("Content 2").username("User 2").views(15).createdAt(LocalDateTime.now()).build()
+        );
+
+        when(postJdbcRepository.findPostsByPagination(0, 5)).thenReturn(mockPosts);
+        when(postJdbcRepository.countTotalPosts()).thenReturn(50);
+
+        // when
+        PageResponse<PostListResponse> response = postService.getPostsByPagination(page, pageSize);
+
+        // then
+        assertNotNull(response);
+        assertEquals(50L, response.getTotal());
+        assertEquals(2, response.getData().size());
+        verify(postJdbcRepository, times(1)).findPostsByPagination(0, 5);
+        verify(postJdbcRepository, times(1)).countTotalPosts();
+    }
+
+    @Test
     void 게시글이_없을_경우_예외를_발생시킨다() {
         // given
         Long postId = 5L;
@@ -163,44 +188,6 @@ public class PostServiceTest {
         assertEquals("해당 게시글을 찾을 수 없습니다.", exception.getMessage(), "예외 메시지가 정확해야 합니다.");
 
         verify(postRepository, times(1)).findById(postId);
-    }
-
-    @Test
-    void 페이지네이션으로_게시글을_조회한다() {
-        // given
-        int page = 1;
-        int pageSize = 5;
-
-        List<PostListResponse> mockPosts = List.of(
-                PostListResponse.builder()
-                        .id(1L)
-                        .title("Post 1")
-                        .content("Content 1")
-                        .username("User 1")
-                        .views(100)
-                        .createdAt(LocalDateTime.now())
-                        .build(),
-                PostListResponse.builder()
-                        .id(2L)
-                        .title("Post 2")
-                        .content("Content 2")
-                        .username("User 2")
-                        .views(150)
-                        .createdAt(LocalDateTime.now())
-                        .build()
-        );
-
-        when(postJdbcRepository.findPostsByPagination(page)).thenReturn(mockPosts);
-
-        // when
-        List<PostListResponse> result = postService.getPostsByPagination(page);
-
-        // then
-        assertEquals(2, result.size());
-        assertEquals("Post 1", result.get(0).getTitle());
-        assertEquals("Post 2", result.get(1).getTitle());
-
-        verify(postJdbcRepository, times(1)).findPostsByPagination(page);
     }
 
     @Test

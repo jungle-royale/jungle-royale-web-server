@@ -32,8 +32,10 @@ public class PostController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<PageResponse<PostListResponse>> listAllPosts(@RequestParam() int page) {
-        PageResponse<PostListResponse> response = postService.getPostsByPagination(page);
+    public ResponseEntity<PageResponse<PostListResponse>> listAllPosts(
+            @RequestParam int page,
+            @RequestParam int limit) {
+        PageResponse<PostListResponse> response = postService.getPostsByPagination(page,limit);
 
 //        List<PostListResponse> responseList = postService.getPosts()
 //                .stream()

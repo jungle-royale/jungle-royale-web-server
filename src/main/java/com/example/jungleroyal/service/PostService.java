@@ -20,6 +20,6 @@ public interface PostService {
     String handleFileUpload(MultipartFile file, String existingFilePath);
 
     PostResponse getPostById(Long postId);
-    PageResponse<PostListResponse> getPostsByPagination(int page);
+    PageResponse<PostListResponse> getPostsByPagination(int page, int limit);
 
 }

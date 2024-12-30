@@ -2,6 +2,7 @@ package com.example.jungleroyal.service;
 
 import com.example.jungleroyal.domain.post.*;
 import com.example.jungleroyal.domain.user.UserJpaEntity;
+import com.example.jungleroyal.repository.PostJdbcRepository;
 import com.example.jungleroyal.repository.PostJpaEntity;
 import com.example.jungleroyal.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
@@ -148,19 +148,13 @@ public class PostServiceImpl implements PostService{
 
     @Override
     @Transactional
-    public PageResponse<PostListResponse> getPostsByPagination(int page) {
-        // JPA Pageable 사용
-        Pageable pageable = PageRequest.of(page - 1, 10); // 페이지는 0부터 시작
-        Page<PostJpaEntity> postsPage = postRepository.findAll(pageable);
-
-        // 페이지 데이터 변환
-        List<PostListResponse> postList = postsPage.getContent().stream()
-                .map(PostJpaEntity::toPostListResponse)
-                .toList();
+    public PageResponse<PostListResponse> getPostsByPagination(int page, int limit) {
+        List<PostListResponse> posts = postJdbcRepository.findPostsByPagination(page, limit);
+        int totalPosts = postJdbcRepository.countTotalPosts();
 
         return PageResponse.<PostListResponse>builder()
-                .data(postList)
-                .total(postsPage.getTotalElements())
+                .data(posts)
+                .total(totalPosts)
                 .build();
     }
 
