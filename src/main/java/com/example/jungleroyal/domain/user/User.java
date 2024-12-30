@@ -16,5 +16,6 @@ public class User {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime lastLoginAt;
+    private Integer gameMoney; // 게임머니 필드 추가
 
 }

@@ -1,5 +1,6 @@
 package com.example.jungleroyal.service;
 
+import com.example.jungleroyal.common.util.JungleFileUtils;
 import com.example.jungleroyal.domain.post.PageResponse;
 import com.example.jungleroyal.repository.PostJdbcRepository;
 import com.example.jungleroyal.domain.post.PostListResponse;
@@ -31,6 +32,9 @@ public class PostServiceTest {
 
     @Mock
     private PostJdbcRepository postJdbcRepository;
+
+    @Mock
+    private JungleFileUtils jungleFileUtils;
 
     @InjectMocks
     private PostServiceImpl postService;
@@ -97,6 +101,7 @@ public class PostServiceTest {
         // given
         MultipartFile newFile = mock(MultipartFile.class);
         String existingFilePath = "src/main/resources/static/uploads/old_file.txt";
+        String uploadDir = "src/main/resources/static/uploads/items";
 
         when(newFile.getOriginalFilename()).thenReturn("new_file.txt");
         when(newFile.isEmpty()).thenReturn(false);
@@ -106,7 +111,7 @@ public class PostServiceTest {
         Files.createFile(mockPath);
 
         // when
-        String result = postService.handleFileUpload(newFile, existingFilePath);
+        String result = jungleFileUtils.handleFileUpload(newFile, existingFilePath,uploadDir);
 
         // then
         assertNotNull(result);

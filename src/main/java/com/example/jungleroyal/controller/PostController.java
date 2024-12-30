@@ -5,13 +5,10 @@ import com.example.jungleroyal.domain.post.*;
 import com.example.jungleroyal.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,10 +34,6 @@ public class PostController {
             @RequestParam int limit) {
         PageResponse<PostListResponse> response = postService.getPostsByPagination(page,limit);
 
-//        List<PostListResponse> responseList = postService.getPosts()
-//                .stream()
-//                .map(PostListResponse::fromDto) // GameRoomDto → GameRoomResponse 변환
-//                .toList();
         return ResponseEntity.ok().body(response);
 
     }
