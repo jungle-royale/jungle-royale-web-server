@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemDto {
-    private Integer itemCode;
+    private Long itemCode;
     private String name;
     private Integer price;
     private String imageUrl;
