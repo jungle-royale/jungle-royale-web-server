@@ -25,7 +25,7 @@ public class RedisConfig {
         if ("dev".equals(activeProfile)) {
             config.useSingleServer().setAddress("redis://127.0.0.1:6379");
         } else if ("prod".equals(activeProfile)) {
-            config.useSingleServer().setAddress("redis://jungle-royale-redis.u8i6dt.ng.0001.use2.cache.amazonaws.com:6379");
+            config.useSingleServer().setAddress("redis://clustercfg.jungle-royale-redis.bgoupc.apn2.cache.amazonaws.com:6379");
         } else {
             throw new IllegalArgumentException("Unknown profile: " + activeProfile);
         }
