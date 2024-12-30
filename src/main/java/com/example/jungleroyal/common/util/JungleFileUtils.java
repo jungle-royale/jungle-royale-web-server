@@ -11,16 +11,15 @@ import java.util.UUID;
 
 @Component
 public class JungleFileUtils {
-    private static final String UPLOAD_DIR = "src/main/resources/static/uploads";
 
-    public String handleFileUpload(MultipartFile file, String existingFilePath) {
+    public String handleFileUpload(MultipartFile file, String existingFilePath, String uploadDir) {
         if (file == null || file.isEmpty()) {
             return existingFilePath; // 파일이 없으면 기존 경로 유지
         }
 
         try {
             // 업로드 디렉토리 확인 및 생성
-            Path uploadPath = Paths.get(UPLOAD_DIR);
+            Path uploadPath = Paths.get(uploadDir);
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }

@@ -101,6 +101,7 @@ public class PostServiceTest {
         // given
         MultipartFile newFile = mock(MultipartFile.class);
         String existingFilePath = "src/main/resources/static/uploads/old_file.txt";
+        String uploadDir = "src/main/resources/static/uploads/items";
 
         when(newFile.getOriginalFilename()).thenReturn("new_file.txt");
         when(newFile.isEmpty()).thenReturn(false);
@@ -110,7 +111,7 @@ public class PostServiceTest {
         Files.createFile(mockPath);
 
         // when
-        String result = jungleFileUtils.handleFileUpload(newFile, existingFilePath);
+        String result = jungleFileUtils.handleFileUpload(newFile, existingFilePath,uploadDir);
 
         // then
         assertNotNull(result);

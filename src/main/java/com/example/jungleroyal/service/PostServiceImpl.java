@@ -27,13 +27,15 @@ public class PostServiceImpl implements PostService{
     private final PostJdbcRepository postJdbcRepository;
     private final JungleFileUtils fileUtils;
 
+    private static final String UPLOAD_DIR = "src/main/resources/static/uploads";
+
     @Override
     public void savePost(PostCreateResponse postCreateResponse, Long userId) {
         MultipartFile file = postCreateResponse.getImage();
 
         String filePath = null;
 
-        String newFilePath = fileUtils.handleFileUpload(file, filePath);
+        String newFilePath = fileUtils.handleFileUpload(file, filePath, UPLOAD_DIR);
 
         UserJpaEntity userJpaEntity = userService.getUserJpaEntityById(userId);
         PostJpaEntity postJpaEntity = PostJpaEntity.fromPostCreateResponse(postCreateResponse, newFilePath, userJpaEntity);
@@ -63,7 +65,7 @@ public class PostServiceImpl implements PostService{
         postJpaEntity.setUpdatedAt(LocalDateTime.now());
 
         // 파일 처리 (별도 메서드 호출)
-        String newFilePath = fileUtils.handleFileUpload(postUpdateRequest.getImage(), postJpaEntity.getFilePath());
+        String newFilePath = fileUtils.handleFileUpload(postUpdateRequest.getImage(), postJpaEntity.getFilePath(), UPLOAD_DIR);
         postJpaEntity.setFilePath(newFilePath);
 
         // 엔티티 저장

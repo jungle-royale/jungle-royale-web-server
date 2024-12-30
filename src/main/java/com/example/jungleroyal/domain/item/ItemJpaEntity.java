@@ -30,7 +30,6 @@ public class ItemJpaEntity {
         return ItemJpaEntity.builder()
                 .name(request.getName())
                 .price(request.getPrice())
-                .imageUrl(request.getImageUrl())
                 .build();
     }
 
