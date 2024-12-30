@@ -1,5 +1,6 @@
 package com.example.jungleroyal.common.util;
 
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -8,10 +9,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 
-public class FileUtils {
+@Component
+public class JungleFileUtils {
     private static final String UPLOAD_DIR = "src/main/resources/static/uploads";
 
-    public static String handleFileUpload(MultipartFile file, String existingFilePath) {
+    public String handleFileUpload(MultipartFile file, String existingFilePath) {
         if (file == null || file.isEmpty()) {
             return existingFilePath; // 파일이 없으면 기존 경로 유지
         }
