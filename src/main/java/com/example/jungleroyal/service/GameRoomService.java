@@ -21,4 +21,6 @@ public interface GameRoomService {
 
     GameRoomDto getRoomByIdOrThrow(Long roomId);
     GameRoomStatus checkRoomAvailability(Long roomId);
+
+    String getRoomClientIdByUserId(String userId);
 }

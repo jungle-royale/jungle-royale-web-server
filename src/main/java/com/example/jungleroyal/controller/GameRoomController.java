@@ -109,4 +109,26 @@ public class GameRoomController {
         GameRoomStatus status = gameRoomService.checkRoomAvailability(roomId);
         return ResponseEntity.ok(status);
     }
+
+    @PostMapping("/{roomId}/join")
+    public ResponseEntity<GameRoomJoinReponse> joinGameRoom(
+            @RequestHeader("Authorization") String jwt,
+            @PathVariable Long roomId) {
+
+        String jwtToken = jwt.substring(7);
+        String userId = jwtTokenProvider.extractSubject(jwtToken);
+        gameRoomService.checkRoomAvailability(roomId);
+
+        String clinetId = gameRoomService.getRoomClientIdByUserId(userId);
+
+        GameRoomJoinReponse response = GameRoomJoinReponse.builder()
+                .roomId(roomId)
+                .clientId(clinetId)
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+
+
 }

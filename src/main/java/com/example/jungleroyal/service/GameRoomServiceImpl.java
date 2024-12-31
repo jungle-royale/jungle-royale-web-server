@@ -7,7 +7,7 @@ import com.example.jungleroyal.common.exceptions.RoomByGameUrlFoundException;
 import com.example.jungleroyal.common.exceptions.RoomNotFoundException;
 import com.example.jungleroyal.common.types.GameRoomStatus;
 import com.example.jungleroyal.common.types.RoomStatus;
-import com.example.jungleroyal.domain.gameroom.GameRoom;
+import com.example.jungleroyal.common.util.EncryptionUtil;
 import com.example.jungleroyal.domain.gameroom.GameRoomDto;
 import com.example.jungleroyal.domain.gameroom.GameRoomJpaEntity;
 import com.example.jungleroyal.repository.GameRoomRepository;
@@ -154,6 +154,11 @@ public class GameRoomServiceImpl implements GameRoomService {
 
         // 입장 가능
         return GameRoomStatus.GAME_JOIN_AVAILABLE;
+    }
+
+    @Override
+    public String getRoomClientIdByUserId(String userId) {
+        return EncryptionUtil.encrypt(userId);
     }
 
 
