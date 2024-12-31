@@ -35,7 +35,7 @@ public class ShopController {
      * @return 응답없음
      */
     @PostMapping("/purchase")
-    public ResponseEntity<String> purchaseItem(
+    public ResponseEntity<ShopPageResponse> purchaseItem(
             @RequestHeader("Authorization") String jwt,
             @RequestParam Long itemCode) {
 
@@ -44,6 +44,8 @@ public class ShopController {
         String userId = jwtTokenProvider.extractSubject(jwtToken);
 
         shopService.purchaseItem(Long.parseLong(userId), itemCode);
-        return ResponseEntity.ok().build();
+
+        ShopPageResponse response = shopService.getShopPage(jwt);
+        return ResponseEntity.ok(response);
     }
 }
