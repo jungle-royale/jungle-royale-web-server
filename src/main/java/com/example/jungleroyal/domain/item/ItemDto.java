@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -14,6 +16,8 @@ public class ItemDto {
     private String name;
     private Integer price;
     private String imageUrl;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
 
     public static ItemDto from(ItemJpaEntity itemJpaEntity) {
@@ -22,6 +26,8 @@ public class ItemDto {
                 .name(itemJpaEntity.getName())
                 .price(itemJpaEntity.getPrice())
                 .imageUrl(itemJpaEntity.getImageUrl())
+                .createdAt(itemJpaEntity.getCreatedAt())
+                .updatedAt(itemJpaEntity.getUpdatedAt())
                 .build();
     }
 }

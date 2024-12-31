@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "items")
 @Data
@@ -26,10 +28,15 @@ public class ItemJpaEntity {
     @Column(nullable = true)
     private String imageUrl;
 
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
     public static ItemJpaEntity from(ItemCreateRequest request) {
         return ItemJpaEntity.builder()
                 .name(request.getName())
                 .price(request.getPrice())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
     }
 

@@ -2,12 +2,12 @@ package com.example.jungleroyal.controller;
 
 import com.example.jungleroyal.domain.item.ItemCreateRequest;
 import com.example.jungleroyal.domain.item.ItemCreateResponse;
+import com.example.jungleroyal.domain.item.ItemUpdateRequest;
+import com.example.jungleroyal.domain.post.PostUpdateRequest;
 import com.example.jungleroyal.service.ItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/items")
@@ -19,6 +19,15 @@ public class ItemController {
     public ResponseEntity<ItemCreateResponse> createItem(ItemCreateRequest request) {
         ItemCreateResponse createdItem = itemService.createItem(request);
         return ResponseEntity.ok(createdItem);
+    }
+
+    @PutMapping
+    public ResponseEntity<String> updateItem(
+            @RequestParam Long itemId,
+            ItemUpdateRequest itemUpdateRequest
+    ){
+        itemService.updatePost(itemId, itemUpdateRequest);
+        return ResponseEntity.ok().build();
     }
 
 }

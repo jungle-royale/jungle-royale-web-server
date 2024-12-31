@@ -4,11 +4,16 @@ import com.example.jungleroyal.common.util.JungleFileUtils;
 import com.example.jungleroyal.domain.item.ItemCreateRequest;
 import com.example.jungleroyal.domain.item.ItemCreateResponse;
 import com.example.jungleroyal.domain.item.ItemJpaEntity;
+import com.example.jungleroyal.domain.item.ItemUpdateRequest;
 import com.example.jungleroyal.repository.ItemRepository;
+import com.example.jungleroyal.repository.PostJpaEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -39,5 +44,24 @@ public class ItemServiceImpl implements ItemService{
         savedItem.setImageUrl(imageUrl);
         // 저장된 엔티티를 응답 객체로 변환
         return savedItem.toResponse();
+    }
+
+    @Override
+    public void updatePost(Long itemId, ItemUpdateRequest itemUpdateRequest) {
+        // 게시글 존재 여부 확인
+        ItemJpaEntity itemJpaEntity = itemRepository.findById(itemId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 아이템을 찾을 수 없습니다."));
+
+        // 업데이트 수행
+        itemJpaEntity.setName(itemUpdateRequest.getName());
+        itemJpaEntity.setPrice(itemUpdateRequest.getPrice());
+        itemJpaEntity.setUpdatedAt(LocalDateTime.now());
+
+        // 파일 처리 (별도 메서드 호출)
+        String newFilePath = fileUtils.handleFileUpload(itemUpdateRequest.getImage(), itemJpaEntity.getImageUrl(), UPLOAD_DIR);
+        itemJpaEntity.setImageUrl(newFilePath);
+
+        // 엔티티 저장
+        itemRepository.save(itemJpaEntity);
     }
 }
