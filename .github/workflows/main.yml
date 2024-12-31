@@ -23,6 +23,6 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         port: 22
         script: |
-          cd
+          cd ~/jungle-royale-web-server
           git pull
-          sh ~/jungle-royale-web-server/server.sh
+          sh ./server.sh
