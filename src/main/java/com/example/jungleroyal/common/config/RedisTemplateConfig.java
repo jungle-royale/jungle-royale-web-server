@@ -23,19 +23,11 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @RequiredArgsConstructor
 @EnableRedisRepositories
 public class RedisTemplateConfig {
-
-    private final RedisProperties redisProperties;
-
-    // lettuce
     @Bean
-    public RedisConnectionFactory redisConnectionFactory() {
-        return new LettuceConnectionFactory(redisProperties.getHost(), redisProperties.getPort());
-    }
-
-    @Bean
-    public RedisTemplate<?, ?> redisTemplate() {
+    public RedisTemplate<?, ?> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<?, ?> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(redisConnectionFactory());   //connection
+        redisTemplate.setConnectionFactory(redisConnectionFactory);   //connection
+
         // ObjectMapper 설정
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule()); // LocalDateTime 지원
@@ -51,9 +43,9 @@ public class RedisTemplateConfig {
     }
 
     @Bean
-    public RedisMessageListenerContainer redisMessageListener() {
+    public RedisMessageListenerContainer redisMessageListener(RedisConnectionFactory redisConnectionFactory) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(redisConnectionFactory());
+        container.setConnectionFactory(redisConnectionFactory);
         return container;
     }
 }
