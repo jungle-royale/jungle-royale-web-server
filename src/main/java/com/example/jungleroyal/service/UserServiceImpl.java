@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -111,9 +113,12 @@ public class UserServiceImpl implements UserService{
                 .orElse(new UserJpaEntity());
         UserJpaEntity savedUser = userRepository.save(userJpaEntity.createKakaoUser(kakaoId, username));
 
+
         // 회원 가입 후 인벤토리 생성
         InventoryJpaEntity inventory = InventoryJpaEntity.builder()
                 .user(savedUser)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
         inventoryRepository.save(inventory);
 
