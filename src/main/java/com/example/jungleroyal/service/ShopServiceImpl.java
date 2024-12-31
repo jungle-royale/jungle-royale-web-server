@@ -45,6 +45,7 @@ public class ShopServiceImpl implements ShopService{
                         .itemCode(item.getItemCode())
                         .name(item.getName())
                         .price(item.getPrice())
+                        .imageUrl(item.getImageUrl())
                         .build())
                 .collect(Collectors.toList());
 
