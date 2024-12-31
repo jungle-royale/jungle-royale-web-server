@@ -4,11 +4,15 @@ import com.example.jungleroyal.common.util.RandomNicknameGenerator;
 import com.example.jungleroyal.domain.*;
 import com.example.jungleroyal.domain.user.UserDto;
 import com.example.jungleroyal.domain.user.UserJpaEntity;
+import com.example.jungleroyal.repository.InventoryJpaEntity;
+import com.example.jungleroyal.repository.InventoryRepository;
 import com.example.jungleroyal.repository.RefreshTokenRepository;
 import com.example.jungleroyal.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +21,7 @@ public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final RandomNicknameGenerator randomNicknameGenerator;
+    private final InventoryRepository inventoryRepository;
 
     public UserJpaEntity getUserJpaEntityById(Long userId){
         // UserJpaEntity 조회
@@ -103,10 +108,21 @@ public class UserServiceImpl implements UserService{
                 .orElseThrow(() -> new IllegalArgumentException("Member not found with Kakao ID: " + kakaoId));
     }
 
-    private UserJpaEntity saveKakaoUser(String kakaoId, String username) {
+    public UserJpaEntity saveKakaoUser(String kakaoId, String username) {
         UserJpaEntity userJpaEntity = userRepository.findByKakaoId(kakaoId)
                 .orElse(new UserJpaEntity());
-        return userRepository.save(userJpaEntity.createKakaoUser(kakaoId, username));
+        UserJpaEntity savedUser = userRepository.save(userJpaEntity.createKakaoUser(kakaoId, username));
+
+
+        // 회원 가입 후 인벤토리 생성
+        InventoryJpaEntity inventory = InventoryJpaEntity.builder()
+                .user(savedUser)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+        inventoryRepository.save(inventory);
+
+        return savedUser;
     }
 
     @Override

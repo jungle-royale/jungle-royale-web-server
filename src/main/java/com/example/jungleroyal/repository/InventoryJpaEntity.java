@@ -1,6 +1,5 @@
 package com.example.jungleroyal.repository;
 
-import com.example.jungleroyal.domain.item.ItemJpaEntity;
 import com.example.jungleroyal.domain.user.UserJpaEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,11 +30,12 @@ public class InventoryJpaEntity {
     @JoinColumn(name = "inventory_id")
     private List<ItemJpaEntity> items = new ArrayList<>();
 
-    public void addItem(ItemJpaEntity item) {
-        this.items.add(item);
-    }
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
 
-    public void removeItem(ItemJpaEntity item) {
-        this.items.remove(item);
-    }
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+
+
+
 }

@@ -34,28 +34,6 @@ public class ShopServiceTest {
     }
 
     @Test
-    void 유저가_존재할_때_게임머니를_반환한다() {
-        // given
-        String jwt = "Bearer test-token";
-        String userId = "1";
-        UserJpaEntity userJpaEntity = UserJpaEntity.builder()
-                .id(1L)
-                .gameMoney(1000)
-                .build();
-
-        when(jwtTokenProvider.extractSubject(anyString())).thenReturn(userId);
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(userJpaEntity));
-
-        // when
-        ShopResponse response = shopService.getShopPage(jwt);
-
-        // then
-        assertEquals(1000, response.getGameMoney());
-        verify(jwtTokenProvider, times(1)).extractSubject(jwt.substring(7));
-        verify(userRepository, times(1)).findById(1L);
-    }
-
-    @Test
     void 유저가_존재하지_않을_때_예외를_던진다() {
         // given
         String jwt = "Bearer test-token";

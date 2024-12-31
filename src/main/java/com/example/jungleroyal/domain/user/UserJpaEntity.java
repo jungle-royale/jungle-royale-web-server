@@ -42,7 +42,7 @@ public class UserJpaEntity {
 
     // 게임머니 필드 추가
     @Column(nullable = false)
-    private Integer gameMoney = 0; // 기본값 0
+    private Integer gameMoney = 100000000; // 기본값 0
 
 
     public static UserJpaEntity createGueutUser(String randomNickname){
@@ -51,7 +51,6 @@ public class UserJpaEntity {
         guestUserJpaEntity.setUsername(randomNickname);
         guestUserJpaEntity.setRole(UserRole.GUEST);
         guestUserJpaEntity.setLastLoginAt(LocalDateTime.now());
-        guestUserJpaEntity.setGameMoney(0); // 기본 게임머니 설정
 
         return guestUserJpaEntity;
     }
@@ -62,7 +61,6 @@ public class UserJpaEntity {
         kakaoUserJpaEntity.setUsername(username);
         kakaoUserJpaEntity.setRole(UserRole.MEMBER);
         kakaoUserJpaEntity.setLastLoginAt(LocalDateTime.now());
-        kakaoUserJpaEntity.setGameMoney(0); // 기본 게임머니 설정
 
         return kakaoUserJpaEntity;
     }

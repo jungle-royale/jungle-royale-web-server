@@ -1,10 +1,14 @@
-package com.example.jungleroyal.domain.item;
+package com.example.jungleroyal.repository;
 
+import com.example.jungleroyal.domain.item.ItemCreateRequest;
+import com.example.jungleroyal.domain.item.ItemCreateResponse;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "items")
@@ -26,10 +30,15 @@ public class ItemJpaEntity {
     @Column(nullable = true)
     private String imageUrl;
 
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
     public static ItemJpaEntity from(ItemCreateRequest request) {
         return ItemJpaEntity.builder()
                 .name(request.getName())
                 .price(request.getPrice())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
     }
 

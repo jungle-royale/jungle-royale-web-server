@@ -1,13 +1,13 @@
 package com.example.jungleroyal.domain.item;
 
-import java.time.LocalDateTime;
+import lombok.Builder;
+import lombok.Data;
 
-public class Item {
+@Data
+@Builder
+public class ItemShopPageResponse {
     private Long itemCode;
     private String name;
     private Integer price;
     private String imageUrl;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-
 }
