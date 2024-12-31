@@ -2,6 +2,7 @@ package com.example.jungleroyal.service;
 
 import com.example.jungleroyal.common.util.JungleFileUtils;
 import com.example.jungleroyal.common.util.JwtTokenProvider;
+import com.example.jungleroyal.domain.inventory.InventoryListReponse;
 import com.example.jungleroyal.repository.ItemJpaEntity;
 import com.example.jungleroyal.repository.InventoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ public class InventoryServiceImpl implements InventoryService{
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemJpaEntity> getItemsByJwt(String jwt) {
+    public InventoryListReponse getItemsByJwt(String jwt) {
         String jwtToken = jwt.substring(7);
 
         // JWT에서 사용자 ID 추출
@@ -34,7 +35,8 @@ public class InventoryServiceImpl implements InventoryService{
             itemJpaEntity.setImageUrl(imageUrl);
         }
 
-        // 사용자 ID를 이용해 아이템 목록 조회
-        return itemsByUserId;
+        return InventoryListReponse.builder()
+                .items(itemsByUserId)
+                .build();
     }
 }

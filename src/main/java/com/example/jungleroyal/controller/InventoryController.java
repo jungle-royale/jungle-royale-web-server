@@ -1,5 +1,6 @@
 package com.example.jungleroyal.controller;
 
+import com.example.jungleroyal.domain.inventory.InventoryListReponse;
 import com.example.jungleroyal.repository.ItemJpaEntity;
 import com.example.jungleroyal.service.InventoryService;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +15,8 @@ import java.util.List;
 public class InventoryController {
     private final InventoryService inventoryService;
     @GetMapping("/items")
-    public ResponseEntity<List<ItemJpaEntity>> getItems(@RequestHeader("Authorization") String jwt) {
-        List<ItemJpaEntity> items = inventoryService.getItemsByJwt(jwt);
+    public ResponseEntity<InventoryListReponse> getItems(@RequestHeader("Authorization") String jwt) {
+        InventoryListReponse items = inventoryService.getItemsByJwt(jwt);
         return ResponseEntity.ok(items);
     }
 }
