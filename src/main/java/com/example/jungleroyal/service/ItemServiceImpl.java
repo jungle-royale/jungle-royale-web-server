@@ -50,14 +50,25 @@ public class ItemServiceImpl implements ItemService{
         ItemJpaEntity itemJpaEntity = itemRepository.findById(itemId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 아이템을 찾을 수 없습니다."));
 
-        // 업데이트 수행
-        itemJpaEntity.setName(itemUpdateRequest.getName());
-        itemJpaEntity.setPrice(itemUpdateRequest.getPrice());
-        itemJpaEntity.setUpdatedAt(LocalDateTime.now());
+        // 이름 업데이트 (입력 값이 null이 아닌 경우)
+        if (itemUpdateRequest.getName() != null && !itemUpdateRequest.getName().isEmpty()) {
+            itemJpaEntity.setName(itemUpdateRequest.getName());
+        }
 
-        // 파일 처리 (별도 메서드 호출)
-        String newFilePath = fileUtils.handleFileUpload(itemUpdateRequest.getImage(), itemJpaEntity.getImageUrl(), UPLOAD_DIR);
-        itemJpaEntity.setImageUrl(newFilePath);
+        // 가격 업데이트 (입력 값이 null이 아닌 경우)
+        if (itemUpdateRequest.getPrice() != null) {
+            itemJpaEntity.setPrice(itemUpdateRequest.getPrice());
+        }
+
+        // 파일 업데이트 (입력된 파일이 있는 경우만 처리)
+        if (itemUpdateRequest.getImage() != null && !itemUpdateRequest.getImage().isEmpty()) {
+            String newFilePath = fileUtils.handleFileUpload(
+                    itemUpdateRequest.getImage(),
+                    itemJpaEntity.getImageUrl(),
+                    UPLOAD_DIR
+            );
+            itemJpaEntity.setImageUrl(newFilePath);
+        }
 
         // 엔티티 저장
         itemRepository.save(itemJpaEntity);

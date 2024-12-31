@@ -21,9 +21,9 @@ public class ItemController {
         return ResponseEntity.ok(createdItem);
     }
 
-    @PutMapping
+    @PutMapping({"/{itemId}"})
     public ResponseEntity<String> updateItem(
-            @RequestParam Long itemId,
+            @PathVariable Long itemId,
             ItemUpdateRequest itemUpdateRequest
     ){
         itemService.updatePost(itemId, itemUpdateRequest);
