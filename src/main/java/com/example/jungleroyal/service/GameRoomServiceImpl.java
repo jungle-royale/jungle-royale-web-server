@@ -2,6 +2,7 @@ package com.example.jungleroyal.service;
 
 
 import com.example.jungleroyal.common.exceptions.DuplicateRoomException;
+import com.example.jungleroyal.common.exceptions.GameRoomException;
 import com.example.jungleroyal.common.exceptions.RoomByGameUrlFoundException;
 import com.example.jungleroyal.common.exceptions.RoomNotFoundException;
 import com.example.jungleroyal.common.types.GameRoomStatus;
@@ -138,18 +139,17 @@ public class GameRoomServiceImpl implements GameRoomService {
     public GameRoomStatus checkRoomAvailability(Long roomId) {
         Optional<GameRoomJpaEntity> optionalRoom = gameRoomRepository.findById(roomId);
         if (optionalRoom.isEmpty()) {
-            return GameRoomStatus.GAME_ROOM_NOT_FOUND;
+            throw new GameRoomException("ROOM_NOT_FOUND", "존재하지 않는 방입니다.");
         }
 
         GameRoomJpaEntity room = optionalRoom.get();
-        // 게임 진행 여부 확인
+
         if (room.getStatus() == RoomStatus.RUNNING) {
-            return GameRoomStatus.GAME_ALREADY_STARTED;
+            throw new GameRoomException("GAME_ALREADY_STARTED", "게임이 이미 시작되었습니다.");
         }
 
-        // 방 정원 초과 여부 확인
         if (room.getCurrentPlayers() >= room.getMaxPlayers()) {
-            return GameRoomStatus.GAME_ROOM_FULL;
+            throw new GameRoomException("GAME_ROOM_FULL", "방 정원이 초과되었습니다.");
         }
 
         // 입장 가능

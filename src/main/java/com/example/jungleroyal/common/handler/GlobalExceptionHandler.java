@@ -1,9 +1,6 @@
 package com.example.jungleroyal.common.handler;
 
-import com.example.jungleroyal.common.exceptions.DuplicateRoomException;
-import com.example.jungleroyal.common.exceptions.GameServerException;
-import com.example.jungleroyal.common.exceptions.MoneyInsufficientException;
-import com.example.jungleroyal.common.exceptions.RoomNotFoundException;
+import com.example.jungleroyal.common.exceptions.*;
 import com.example.jungleroyal.domain.error.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,5 +32,14 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(),"MONEY_INSUFFICIENT", e.getMessage()));
     }
+
+    @ExceptionHandler(GameRoomException.class)
+    public ResponseEntity<ErrorResponse> handleGameRoomException(GameRoomException e) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), e.getErrorCode(), e.getMessage()));
+    }
+
+
 
 }
