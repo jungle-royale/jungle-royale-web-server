@@ -1,5 +1,6 @@
 package com.example.jungleroyal.service;
 
+import com.example.jungleroyal.common.exceptions.MoneyInsufficientException;
 import com.example.jungleroyal.common.util.JwtTokenProvider;
 import com.example.jungleroyal.domain.item.ItemJpaEntity;
 import com.example.jungleroyal.domain.shop.ShopResponse;
@@ -49,7 +50,7 @@ public class ShopServiceImpl implements ShopService{
 
         // 유저의 게임머니 확인
         if (user.getGameMoney() < item.getPrice()) {
-            throw new IllegalStateException("돈이 부족합니다.");
+            throw new MoneyInsufficientException(userId, user.getGameMoney(), item.getPrice());
         }
 
         // 인벤토리 조회 또는 생성
