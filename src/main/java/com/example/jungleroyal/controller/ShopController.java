@@ -25,6 +25,6 @@ public class ShopController {
             @RequestParam Long userId,
             @RequestParam Long itemCode) {
         String response = shopService.purchaseItem(userId, itemCode);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok().build();
     }
 }
