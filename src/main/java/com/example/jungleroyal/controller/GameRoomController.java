@@ -1,19 +1,16 @@
 package com.example.jungleroyal.controller;
 
-import com.example.jungleroyal.common.pubsub.RedisPublisher;
 import com.example.jungleroyal.common.types.GameRoomStatus;
 import com.example.jungleroyal.common.types.RoomStatus;
+import com.example.jungleroyal.common.util.GameServerClient;
 import com.example.jungleroyal.common.util.JwtTokenProvider;
-import com.example.jungleroyal.domain.dto.MessageCreateGameDto;
+import com.example.jungleroyal.domain.game.GameServerNotificationResponse;
 import com.example.jungleroyal.domain.gameroom.*;
 import com.example.jungleroyal.domain.user.UserInfoUsingRoomListResponse;
 import com.example.jungleroyal.service.GameRoomService;
-import com.example.jungleroyal.service.RedisPubService;
-import com.example.jungleroyal.service.UserService;
 import com.example.jungleroyal.service.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,29 +24,45 @@ public class GameRoomController {
     private final GameRoomService gameRoomService;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserServiceImpl userService;
-    private final RedisPublisher redisPublisher;
+    private final GameServerClient gameServerClient;
     @PostMapping("/create")
-    public ResponseEntity<GameRoomResponse> createRoom(
+    public ResponseEntity<GameRoomCreateReponse> createRoom(
             @RequestBody GameRoomRequest gameRoomRequest,
             @RequestHeader("Authorization") String authorization) {
 
         String jwtToken = authorization.substring(7);
         String userId = jwtTokenProvider.extractSubject(jwtToken);
+
+        String clientId = gameRoomService.getRoomClientIdByUserId(userId);
+
+        // 게임서버에 HTTP 찌르고 기다렸다가 return
+        // 게임 서버와 통신
+        GameServerNotificationResponse gameServerResponse = gameServerClient.notifyGameServer(userId);
+
+        // 게임 서버 응답 확인
+        if (!gameServerResponse.isSuccess()) {
+            log.error("게임 서버 응답 실패");
+            throw new IllegalStateException("게임 서버에서 방 생성을 허용하지 않았습니다.");
+        }
+
         GameRoomDto room = gameRoomService.createRoom(GameRoomDto.fromRequest(gameRoomRequest, userId));
         log.info("room = " + room);
 
-        MessageCreateGameDto pubMsg = MessageCreateGameDto.builder()
+        GameRoomCreateReponse response = GameRoomCreateReponse.builder()
                 .roomId(room.getId())
-                .userId(Long.parseLong(room.getHostId()))
-                .createdAt(room.getCreatedAt())
+                .clientId(clientId)
                 .build();
-        
-        redisPublisher.publish(new ChannelTopic("CreateGame"), pubMsg);
 
-        return ResponseEntity.ok(GameRoomResponse.fromDto(room));
+        return ResponseEntity.ok(response);
     }
 
-
+    //        MessageCreateGameDto pubMsg = MessageCreateGameDto.builder()
+//                .roomId(room.getId())
+//                .userId(Long.parseLong(room.getHostId()))
+//                .createdAt(room.getCreatedAt())
+//                .build();
+//
+//        redisPublisher.publish(new ChannelTopic("CreateGame"), pubMsg);
     // TODO: 인게임에서 방 속성 변경 시 어떻게 처리할까? 추후 확인할 것
     @PutMapping("/update/{roomId}")
     public ResponseEntity<String> updateRoom(
