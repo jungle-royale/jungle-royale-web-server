@@ -2,17 +2,20 @@ package com.example.jungleroyal.service;
 
 import com.example.jungleroyal.common.exceptions.MoneyInsufficientException;
 import com.example.jungleroyal.common.util.JwtTokenProvider;
+import com.example.jungleroyal.domain.inventory.InventoryShopPageResponse;
 import com.example.jungleroyal.domain.item.ItemJpaEntity;
-import com.example.jungleroyal.domain.shop.ShopResponse;
+import com.example.jungleroyal.domain.item.ItemShopPageResponse;
+import com.example.jungleroyal.domain.shop.ShopPageResponse;
 import com.example.jungleroyal.domain.user.UserJpaEntity;
-import com.example.jungleroyal.repository.InventoryJpaEntity;
-import com.example.jungleroyal.repository.InventoryRepository;
-import com.example.jungleroyal.repository.ItemRepository;
-import com.example.jungleroyal.repository.UserRepository;
+import com.example.jungleroyal.domain.user.UserShopPageResponse;
+import com.example.jungleroyal.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,9 +25,10 @@ public class ShopServiceImpl implements ShopService{
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final InventoryRepository inventoryRepository;
+    private final OwnedItemRepository ownedItemRepository;
     @Override
     @Transactional
-    public ShopResponse getShopPage(String jwt) {
+    public ShopPageResponse getShopPage(String jwt) {
         // JWT에서 유저 ID 추출
         String jwtToken = jwt.substring(7);
         String userId = jwtTokenProvider.extractSubject(jwtToken);
@@ -33,8 +37,45 @@ public class ShopServiceImpl implements ShopService{
         UserJpaEntity userJpaEntity = userRepository.findById(Long.parseLong(userId))
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        // ShopResponse 생성 및 반환
-        return ShopResponse.fromUserJpaEntity(userJpaEntity);
+        System.out.println("상점 페이지 요청 ::::: userJpaEntity = " + userJpaEntity);
+        UserShopPageResponse userShopPageResponse = UserShopPageResponse.fromUserJpaEntity(userJpaEntity);
+
+        // 아이템 목록 조회
+        List<ItemShopPageResponse> items = itemRepository.findAll().stream()
+                .map(item -> ItemShopPageResponse.builder()
+                        .itemCode(item.getItemCode())
+                        .name(item.getName())
+                        .price(item.getPrice())
+                        .build())
+                .collect(Collectors.toList());
+        System.out.println("유저 인벤토리 :::: = " + inventoryRepository.findItemsByUserId(userJpaEntity.getId()));
+
+        List<InventoryShopPageResponse> inventory = ownedItemRepository.findOwnedItemsByUserId(userJpaEntity.getId()).stream()
+                .map(item -> InventoryShopPageResponse.builder()
+                        .itemCode(item.getTemplateItemCode())
+                        .itemName(item.getName())
+                        .itemPrice(item.getPrice())
+                        .build())
+                .collect(Collectors.toList());
+
+        System.out.println("inventory = " + inventory);
+
+//        // 유저 인벤토리 조회
+//        List<InventoryShopPageResponse> inventory = inventoryRepository.findItemsByUserId(userJpaEntity.getId()).stream()
+//                .map(item -> InventoryShopPageResponse.builder()
+//                        .itemCode(item.getItemCode())
+//                        .itemName(item.getName())
+//                        .itemPrice(item.getPrice())
+//                        .build())
+//                .collect(Collectors.toList());
+
+        // ShopPageResponse 생성
+        return ShopPageResponse.builder()
+                .inventory(inventory)
+                .userInfo(userShopPageResponse)
+                .items(items)
+                .build();
+
     }
 
     @Override
@@ -45,23 +86,31 @@ public class ShopServiceImpl implements ShopService{
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         // 아이템 조회
-        ItemJpaEntity item = itemRepository.findById(itemCode)
+        ItemJpaEntity shopItem = itemRepository.findById(itemCode)
                 .orElseThrow(() -> new IllegalArgumentException("Item not found"));
 
         // 유저의 게임머니 확인
-        if (user.getGameMoney() < item.getPrice()) {
-            throw new MoneyInsufficientException(userId, user.getGameMoney(), item.getPrice());
+        if (user.getGameMoney() < shopItem.getPrice()) {
+            throw new MoneyInsufficientException(userId, user.getGameMoney(), shopItem.getPrice());
         }
-
         // 인벤토리 조회 또는 생성
         InventoryJpaEntity inventory = inventoryRepository.findByUser(user)
                 .orElse(InventoryJpaEntity.builder().user(user).build());
 
-        // 아이템 추가
-        inventory.addItem(item);
+        // 소유 아이템 생성
+        OwnedItemJpaEntity ownedItem = OwnedItemJpaEntity.builder()
+                .inventory(inventory)
+                .name(shopItem.getName())
+                .price(shopItem.getPrice())
+                .imageUrl(shopItem.getImageUrl())
+                .templateItemCode(shopItem.getItemCode())
+                .build();
+
+        // 소유 아이템 저장
+        ownedItemRepository.save(ownedItem);
 
         // 게임머니 차감
-        user.setGameMoney(user.getGameMoney() - item.getPrice());
+        user.setGameMoney(user.getGameMoney() - shopItem.getPrice());
 
         // 데이터 저장
         inventoryRepository.save(inventory);
