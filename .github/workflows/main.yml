@@ -38,16 +38,12 @@ jobs:
       - name: Log in to Amazon ECR
         id: ecr-login
         uses: aws-actions/amazon-ecr-login@v1
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
       # Docker 이미지 빌드 및 푸시
       - name: Build and push Docker image
         run: |
+          export AWS_DEFAULT_REGION=ap-northeast-2
           export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
           export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          export AWS_DEFAULT_REGION=ap-northeast-2
           docker build -t jungle-royale/web-server .
           docker tag jungle-royale/web-server:latest 014188558656.dkr.ecr.ap-northeast-2.amazonaws.com/jungle-royale/web-server:latest
           docker push 014188558656.dkr.ecr.ap-northeast-2.amazonaws.com/jungle-royale/web-server:latest
