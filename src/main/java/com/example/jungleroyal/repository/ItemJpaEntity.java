@@ -1,5 +1,7 @@
-package com.example.jungleroyal.domain.item;
+package com.example.jungleroyal.repository;
 
+import com.example.jungleroyal.domain.item.ItemCreateRequest;
+import com.example.jungleroyal.domain.item.ItemCreateResponse;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

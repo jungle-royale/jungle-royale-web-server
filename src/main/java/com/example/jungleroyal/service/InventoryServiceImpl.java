@@ -2,7 +2,7 @@ package com.example.jungleroyal.service;
 
 import com.example.jungleroyal.common.util.JungleFileUtils;
 import com.example.jungleroyal.common.util.JwtTokenProvider;
-import com.example.jungleroyal.domain.item.ItemJpaEntity;
+import com.example.jungleroyal.repository.ItemJpaEntity;
 import com.example.jungleroyal.repository.InventoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -3,17 +3,15 @@ package com.example.jungleroyal.service;
 import com.example.jungleroyal.common.util.JungleFileUtils;
 import com.example.jungleroyal.domain.item.ItemCreateRequest;
 import com.example.jungleroyal.domain.item.ItemCreateResponse;
-import com.example.jungleroyal.domain.item.ItemJpaEntity;
+import com.example.jungleroyal.repository.ItemJpaEntity;
 import com.example.jungleroyal.domain.item.ItemUpdateRequest;
 import com.example.jungleroyal.repository.ItemRepository;
-import com.example.jungleroyal.repository.PostJpaEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

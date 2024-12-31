@@ -3,7 +3,7 @@ package com.example.jungleroyal.service;
 import com.example.jungleroyal.common.exceptions.MoneyInsufficientException;
 import com.example.jungleroyal.common.util.JwtTokenProvider;
 import com.example.jungleroyal.domain.inventory.InventoryShopPageResponse;
-import com.example.jungleroyal.domain.item.ItemJpaEntity;
+import com.example.jungleroyal.repository.ItemJpaEntity;
 import com.example.jungleroyal.domain.item.ItemShopPageResponse;
 import com.example.jungleroyal.domain.shop.ShopPageResponse;
 import com.example.jungleroyal.domain.user.UserJpaEntity;

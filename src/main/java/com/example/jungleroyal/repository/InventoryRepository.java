@@ -1,6 +1,5 @@
 package com.example.jungleroyal.repository;
 
-import com.example.jungleroyal.domain.item.ItemJpaEntity;
 import com.example.jungleroyal.domain.user.UserJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

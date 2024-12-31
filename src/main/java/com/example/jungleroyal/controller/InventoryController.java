@@ -1,6 +1,6 @@
 package com.example.jungleroyal.controller;
 
-import com.example.jungleroyal.domain.item.ItemJpaEntity;
+import com.example.jungleroyal.repository.ItemJpaEntity;
 import com.example.jungleroyal.service.InventoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

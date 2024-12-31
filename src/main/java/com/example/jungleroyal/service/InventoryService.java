@@ -1,6 +1,6 @@
 package com.example.jungleroyal.service;
 
-import com.example.jungleroyal.domain.item.ItemJpaEntity;
+import com.example.jungleroyal.repository.ItemJpaEntity;
 
 import java.util.List;
 
