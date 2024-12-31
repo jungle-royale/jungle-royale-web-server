@@ -28,6 +28,7 @@ public class PostServiceImpl implements PostService{
     private final JungleFileUtils fileUtils;
 
     private static final String UPLOAD_DIR = "src/main/resources/static/uploads";
+    private static final String baseUrl = "http://192.168.1.241:8080/uploads/";
 
     @Override
     public void savePost(PostCreateResponse postCreateResponse, Long userId) {
@@ -107,7 +108,7 @@ public class PostServiceImpl implements PostService{
         post.incrementViews();
         postRepository.save(post); // 변경사항 저장
 
-        String imageUrl = fileUtils.generateImageUrl(post.getFilePath()); // 파일 경로를 URL로 변환
+        String imageUrl = fileUtils.generateImageUrl(post.getFilePath(),baseUrl); // 파일 경로를 URL로 변환
         String username = post.getUserJpaEntity().getUsername();
         Long userId = post.getUserJpaEntity().getId();
 

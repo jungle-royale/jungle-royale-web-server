@@ -18,6 +18,8 @@ public class ItemServiceImpl implements ItemService{
     private final JungleFileUtils fileUtils;
 
     private static final String UPLOAD_DIR = "src/main/resources/static/uploads/items";
+    private static final String baseUrl = "http://192.168.1.241:8080/uploads/items/";
+
 
     @Override
     public ItemCreateResponse createItem(ItemCreateRequest itemCreateRequest) {
@@ -33,7 +35,7 @@ public class ItemServiceImpl implements ItemService{
 
         ItemJpaEntity savedItem = itemRepository.save(itemJpaEntity);
 
-        String imageUrl = fileUtils.generateImageUrl(savedItem.getImageUrl());
+        String imageUrl = fileUtils.generateImageUrl(savedItem.getImageUrl(),baseUrl);
         savedItem.setImageUrl(imageUrl);
         // 저장된 엔티티를 응답 객체로 변환
         return savedItem.toResponse();
