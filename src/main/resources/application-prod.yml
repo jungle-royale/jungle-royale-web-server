@@ -1,0 +1,7 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+  redis:
+    host: clustercfg.jungle-royale-redis.bgoupc.apn2.cache.amazonaws.com
+    port: 6379

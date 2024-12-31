@@ -1,35 +1,29 @@
 package com.example.jungleroyal.common.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
-import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 
+@Slf4j
 @Configuration
-@EnableRedisRepositories
 public class RedisConfig {
-    private final Environment environment;
 
-    public RedisConfig(Environment environment) {
-        this.environment = environment;
-    }
+    @Value("${spring.redis.host}")
+    private String redisHost;
+
+    @Value("${spring.redis.port}")
+    private int redisPort;
 
     @Bean
     public RedissonClient redissonClient() {
         Config config = new Config();
-
-        String activeProfile = environment.getProperty("spring.profiles.active");
-        if ("dev".equals(activeProfile)) {
-            config.useSingleServer().setAddress("redis://127.0.0.1:6379");
-        } else if ("prod".equals(activeProfile)) {
-            config.useSingleServer().setAddress("redis://clustercfg.jungle-royale-redis.bgoupc.apn2.cache.amazonaws.com:6379");
-        } else {
-            throw new IllegalArgumentException("Unknown profile: " + activeProfile);
-        }
-
+        String address = String.format("redis://%s:%d", redisHost, redisPort);
+        config.useSingleServer()
+                .setAddress(address);
         return Redisson.create(config);
     }
 }

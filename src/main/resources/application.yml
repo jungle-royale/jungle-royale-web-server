@@ -1,7 +1,8 @@
 spring:
   application:
-    name: jungleroyal
-
+    name: jungle-royale
+  profiles:
+    active: dev # 기본 프로파일
   datasource:
     url: jdbc:mysql://jungle-royale-datebase.c9ok8ooiumgq.ap-northeast-2.rds.amazonaws.com:3306/jungleroyale
     username: admin
