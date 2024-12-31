@@ -93,6 +93,8 @@ public class ShopServiceImpl implements ShopService{
                 .orElseGet(() -> {
                     InventoryJpaEntity newInventory = InventoryJpaEntity.builder()
                             .user(user)
+                            .createdAt(LocalDateTime.now())
+                            .updatedAt(LocalDateTime.now())
                             .build();
                     return inventoryRepository.save(newInventory); // 인벤토리 먼저 저장
                 });
