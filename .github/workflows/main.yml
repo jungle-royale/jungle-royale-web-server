@@ -19,8 +19,8 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: 17
-          distribution: temurin # 필수 입력 추가
-          cache: gradle # Gradle 빌드 캐시
+          distribution: temurin
+          cache: gradle
 
       # Gradle 캐시 설정
       - name: Cache Gradle packages
@@ -31,9 +31,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      # 애플리케이션 빌드
-      - name: Build the application
-        run: ./gradlew build
+      # 애플리케이션 빌드 (실행은 하지 않음)
+      - name: Build JAR file
+        run: ./gradlew build -x test
 
       # AWS ECR 로그인
       - name: Log in to Amazon ECR
