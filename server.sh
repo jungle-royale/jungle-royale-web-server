@@ -30,3 +30,5 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 echo "Docker container is running and mapped to port $PORT."
+
+rm -rf jungle-royale-web-server
