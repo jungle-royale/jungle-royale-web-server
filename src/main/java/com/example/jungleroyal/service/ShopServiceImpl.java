@@ -37,7 +37,6 @@ public class ShopServiceImpl implements ShopService{
         UserJpaEntity userJpaEntity = userRepository.findById(Long.parseLong(userId))
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        System.out.println("상점 페이지 요청 ::::: userJpaEntity = " + userJpaEntity);
         UserShopPageResponse userShopPageResponse = UserShopPageResponse.fromUserJpaEntity(userJpaEntity);
 
         // 아이템 목록 조회
@@ -48,7 +47,6 @@ public class ShopServiceImpl implements ShopService{
                         .price(item.getPrice())
                         .build())
                 .collect(Collectors.toList());
-        System.out.println("유저 인벤토리 :::: = " + inventoryRepository.findItemsByUserId(userJpaEntity.getId()));
 
         List<InventoryShopPageResponse> inventory = ownedItemRepository.findOwnedItemsByUserId(userJpaEntity.getId()).stream()
                 .map(item -> InventoryShopPageResponse.builder()
@@ -58,7 +56,6 @@ public class ShopServiceImpl implements ShopService{
                         .build())
                 .collect(Collectors.toList());
 
-        System.out.println("inventory = " + inventory);
 
 //        // 유저 인벤토리 조회
 //        List<InventoryShopPageResponse> inventory = inventoryRepository.findItemsByUserId(userJpaEntity.getId()).stream()
@@ -89,13 +86,19 @@ public class ShopServiceImpl implements ShopService{
         ItemJpaEntity shopItem = itemRepository.findById(itemCode)
                 .orElseThrow(() -> new IllegalArgumentException("Item not found"));
 
+        // 유저 인벤토리 조회 또는 생성
+        InventoryJpaEntity inventory = inventoryRepository.findByUser(user)
+                .orElseGet(() -> {
+                    InventoryJpaEntity newInventory = InventoryJpaEntity.builder()
+                            .user(user)
+                            .build();
+                    return inventoryRepository.save(newInventory); // 인벤토리 먼저 저장
+                });
+
         // 유저의 게임머니 확인
         if (user.getGameMoney() < shopItem.getPrice()) {
             throw new MoneyInsufficientException(userId, user.getGameMoney(), shopItem.getPrice());
         }
-        // 인벤토리 조회 또는 생성
-        InventoryJpaEntity inventory = inventoryRepository.findByUser(user)
-                .orElse(InventoryJpaEntity.builder().user(user).build());
 
         // 소유 아이템 생성
         OwnedItemJpaEntity ownedItem = OwnedItemJpaEntity.builder()
