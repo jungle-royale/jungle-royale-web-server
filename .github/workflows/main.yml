@@ -30,7 +30,6 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-
       # 애플리케이션 빌드 (실행은 하지 않음)
       - name: Build JAR file
         run: ./gradlew build -x test
@@ -46,11 +45,12 @@ jobs:
       # Docker 이미지 빌드 및 푸시
       - name: Build and push Docker image
         run: |
+          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
           export AWS_DEFAULT_REGION=ap-northeast-2
           docker build -t jungle-royale/web-server .
           docker tag jungle-royale/web-server:latest 014188558656.dkr.ecr.ap-northeast-2.amazonaws.com/jungle-royale/web-server:latest
           docker push 014188558656.dkr.ecr.ap-northeast-2.amazonaws.com/jungle-royale/web-server:latest
-
       # EC2 서버에 배포
       - name: Deploy to EC2
         run: |
