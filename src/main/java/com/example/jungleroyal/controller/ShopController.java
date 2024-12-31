@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 public class ShopController {
     private final ShopService shopService;
 
-    @GetMapping
+    @GetMapping("/items")
     public ResponseEntity<ShopResponse> getShopPage(@RequestHeader("Authorization") String jwt) {
         ShopResponse response = shopService.getShopPage(jwt);
         return ResponseEntity.ok(response);
