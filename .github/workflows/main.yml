@@ -32,7 +32,6 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-
       # 애플리케이션 빌드 (실행은 하지 않음)
       - name: Build JAR file
         run: ./gradlew build -x test
