@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -107,6 +108,8 @@ public class ShopServiceImpl implements ShopService{
                 .name(shopItem.getName())
                 .price(shopItem.getPrice())
                 .imageUrl(shopItem.getImageUrl())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .templateItemCode(shopItem.getItemCode())
                 .build();
 

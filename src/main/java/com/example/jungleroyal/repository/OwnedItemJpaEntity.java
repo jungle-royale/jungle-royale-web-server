@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "owned_items")
 @Data
@@ -31,5 +33,10 @@ public class OwnedItemJpaEntity {
     private String imageUrl;
 
     @Column(nullable = false)
-    private Long templateItemCode; // 원래의 ShopItem 코드 (참고용)
+    private Long templateItemCode;
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
 }
