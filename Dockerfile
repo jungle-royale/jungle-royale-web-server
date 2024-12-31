@@ -1,29 +1,16 @@
-# Stage 1: Build the application
-FROM amazoncorretto:17 AS build
-
-# Set the working directory
-WORKDIR /app
-
-# Copy all files from the current directory to the container
-COPY . .
-
-# Grant execution permission to gradlew
-RUN chmod +x ./gradlew
-
-# Build the application using gradlew
-RUN ./gradlew clean bootJar --no-daemon
-
-# Stage 2: Create the runtime image
+# Dockerfile 예시
+# (Amazon Corretto 17 JDK를 사용합니다)
 FROM amazoncorretto:17
 
-# Set the working directory
+# 작업 디렉터리 생성 및 이동
 WORKDIR /app
 
-# Copy the JAR file from the build stage
-COPY --from=build /app/build/libs/*.jar app.jar
+# 빌드된 JAR 파일 복사
+# (build/libs 폴더에 JAR 파일이 있다고 가정)
+COPY build/libs/*.jar app.jar
 
-# Expose the application port
+# 필요시 포트 열기 (기본 8080 가정)
 EXPOSE 8080
 
-# Run the application with environment variable for profile
+# 컨테이너 실행 시 JAR 실행
 ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-jar", "app.jar"]
