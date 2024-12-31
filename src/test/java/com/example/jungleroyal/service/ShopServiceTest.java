@@ -1,15 +1,12 @@
 package com.example.jungleroyal.service;
 
 import com.example.jungleroyal.common.util.JwtTokenProvider;
-import com.example.jungleroyal.domain.shop.ShopResponse;
-import com.example.jungleroyal.domain.user.UserJpaEntity;
 import com.example.jungleroyal.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.verification.VerificationMode;
 
 import java.util.Optional;
 

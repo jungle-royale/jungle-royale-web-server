@@ -1,17 +1,14 @@
 package com.example.jungleroyal.repository;
 
-import com.example.jungleroyal.domain.gameroom.GameRoomDto;
 import com.example.jungleroyal.domain.post.PostCreateResponse;
 import com.example.jungleroyal.domain.post.PostDto;
 import com.example.jungleroyal.domain.post.PostListResponse;
 import com.example.jungleroyal.domain.post.PostResponse;
-import com.example.jungleroyal.domain.user.UserJpaEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 

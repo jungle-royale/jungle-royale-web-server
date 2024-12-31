@@ -1,4 +1,4 @@
-package com.example.jungleroyal.domain.user;
+package com.example.jungleroyal.repository;
 
 import com.example.jungleroyal.common.types.UserRole;
 import jakarta.persistence.*;

@@ -3,7 +3,7 @@ package com.example.jungleroyal.service;
 import com.example.jungleroyal.common.util.RandomNicknameGenerator;
 import com.example.jungleroyal.domain.*;
 import com.example.jungleroyal.domain.user.UserDto;
-import com.example.jungleroyal.domain.user.UserJpaEntity;
+import com.example.jungleroyal.repository.UserJpaEntity;
 import com.example.jungleroyal.repository.InventoryJpaEntity;
 import com.example.jungleroyal.repository.InventoryRepository;
 import com.example.jungleroyal.repository.RefreshTokenRepository;

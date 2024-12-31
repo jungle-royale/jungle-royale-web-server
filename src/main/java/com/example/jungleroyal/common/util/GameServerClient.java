@@ -14,10 +14,10 @@ import org.springframework.web.client.RestTemplate;
 public class GameServerClient {
     private final RestTemplate restTemplate;
 
-    @Value("${game-server.base-url}/rooms/notify")
+    @Value("${game-server.base-url}/create-game")
     private String gameServerUrl;
 
-//    private static final String GAME_SERVER_URL = "http://game-server/api/rooms/notify"; // 게임 서버 URL
+//    private static final String GAME_SERVER_URL = "http://game-server/api/"; // 게임 서버 URL
 
     public GameServerNotificationResponse notifyGameServer(String userId) {
         log.info("Sending notification to game server , userId: [{}]", userId);

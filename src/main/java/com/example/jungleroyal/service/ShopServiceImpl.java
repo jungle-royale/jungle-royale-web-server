@@ -7,7 +7,7 @@ import com.example.jungleroyal.domain.inventory.InventoryShopPageResponse;
 import com.example.jungleroyal.repository.ItemJpaEntity;
 import com.example.jungleroyal.domain.item.ItemShopPageResponse;
 import com.example.jungleroyal.domain.shop.ShopPageResponse;
-import com.example.jungleroyal.domain.user.UserJpaEntity;
+import com.example.jungleroyal.repository.UserJpaEntity;
 import com.example.jungleroyal.domain.user.UserShopPageResponse;
 import com.example.jungleroyal.repository.*;
 import lombok.RequiredArgsConstructor;

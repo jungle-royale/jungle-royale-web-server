@@ -4,7 +4,7 @@ package com.example.jungleroyal.controller;
 import com.example.jungleroyal.common.util.JwtTokenProvider;
 import com.example.jungleroyal.domain.user.UserDto;
 import com.example.jungleroyal.domain.user.UserEditMyPageRequest;
-import com.example.jungleroyal.domain.user.UserJpaEntity;
+import com.example.jungleroyal.repository.UserJpaEntity;
 import com.example.jungleroyal.domain.user.UserMyPageResponse;
 import com.example.jungleroyal.repository.UserRepository;
 import com.example.jungleroyal.service.UserService;
