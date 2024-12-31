@@ -19,7 +19,7 @@ public class ShopController {
     /**
      *  상점 페이지 조회
      * @param jwt
-     * @return ShopPageResponse(
+     * @return ShopPageResponse
      */
     @GetMapping("/items")
     public ResponseEntity<ShopPageResponse> getShopPage(@RequestHeader("Authorization") String jwt) {
@@ -32,7 +32,7 @@ public class ShopController {
      * 상점 아이템 구매
      * @param jwt
      * @param itemCode
-     * @return 응답없음
+     * @return ShopPageResponse
      */
     @PostMapping("/purchase")
     public ResponseEntity<ShopPageResponse> purchaseItem(
