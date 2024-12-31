@@ -24,4 +24,4 @@ jobs:
         port: 22
         script: |
           cd
-          sh server_run.sh
+          sh jungle-royale-web-server/server_run.sh
