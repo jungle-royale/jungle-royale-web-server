@@ -1,6 +1,7 @@
 package com.example.jungleroyal.service;
 
 import com.example.jungleroyal.common.exceptions.MoneyInsufficientException;
+import com.example.jungleroyal.common.util.JungleFileUtils;
 import com.example.jungleroyal.common.util.JwtTokenProvider;
 import com.example.jungleroyal.domain.inventory.InventoryShopPageResponse;
 import com.example.jungleroyal.repository.ItemJpaEntity;
@@ -27,6 +28,9 @@ public class ShopServiceImpl implements ShopService{
     private final ItemRepository itemRepository;
     private final InventoryRepository inventoryRepository;
     private final OwnedItemRepository ownedItemRepository;
+    private final JungleFileUtils fileUtils;
+
+    private static final String baseUrl = "http://192.168.1.241:8080/uploads/items/";
 
     /**
      *
@@ -51,7 +55,7 @@ public class ShopServiceImpl implements ShopService{
                         .itemCode(item.getItemCode())
                         .name(item.getName())
                         .price(item.getPrice())
-                        .imageUrl(item.getImageUrl())
+                        .imageUrl(fileUtils.generateImageUrl(item.getImageUrl(), baseUrl))
                         .build())
                 .collect(Collectors.toList());
 
