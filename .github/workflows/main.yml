@@ -55,10 +55,9 @@ jobs:
       # 8) PEM 파일 저장
       - name: Save PEM file
         run: echo "${{ secrets.PEM_FILE }}" > ~/my-key.pem
-
-      # 9) EC2로 배포
-      - name: Deploy to EC2
+        
+      # 9) EC2에서 server.sh 실행
+      - name: Run server.sh on EC2
         run: |
           chmod 600 ~/my-key.pem
-          scp -o StrictHostKeyChecking=no -i ~/my-key.pem server.sh ec2-user@${{ secrets.EC2_HOST }}:~/
           ssh -o StrictHostKeyChecking=no -i ~/my-key.pem ec2-user@${{ secrets.EC2_HOST }} "bash ~/server.sh"
