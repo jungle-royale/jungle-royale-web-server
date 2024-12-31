@@ -9,12 +9,8 @@ import java.util.Base64;
 public class EncryptionUtil {
     private static final String AES = "AES";
     // 비밀키는 환경 변수 또는 구성 파일에서 가져옵니다.
-    private static String secretKey;
+    private static String secretKey = "jungleroyale1234";
 
-    // 비밀키를 Spring의 @Value로 주입
-    public EncryptionUtil(@Value("${security.encryption.secret-key}") String key) {
-        secretKey = key;
-    };
 
     public static String encrypt(String data) {
         try {
