@@ -8,5 +8,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GameServerNotificationRequest {
-    private String clientId;
+    private String roomId;
 }

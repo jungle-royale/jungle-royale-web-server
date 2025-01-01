@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 @Builder
 public class GameRoomCreateReponse {
-    private Long roomId;
+    private String roomId;
     private String clientId;
 }

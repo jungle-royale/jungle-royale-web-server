@@ -1,5 +1,6 @@
 package com.example.jungleroyal.common.util;
 
+import com.example.jungleroyal.domain.game.GameServerNotificationRequest;
 import com.example.jungleroyal.domain.game.GameServerNotificationResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,13 +20,13 @@ public class GameServerClient {
 
 //    private static final String GAME_SERVER_URL = "http://game-server/api/"; // 게임 서버 URL
 
-    public GameServerNotificationResponse notifyGameServer(String userId) {
+    public GameServerNotificationResponse notifyGameServer(GameServerNotificationRequest gameServerNotificationRequest, String userId) {
         log.info("Sending notification to game server , userId: [{}]", userId);
 
         try {
             ResponseEntity<GameServerNotificationResponse> response = restTemplate.postForEntity(
                     gameServerUrl,
-                    null,
+                    gameServerNotificationRequest,
                     GameServerNotificationResponse.class
             );
 

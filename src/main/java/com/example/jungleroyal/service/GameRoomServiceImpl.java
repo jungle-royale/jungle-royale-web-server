@@ -8,6 +8,7 @@ import com.example.jungleroyal.common.exceptions.RoomNotFoundException;
 import com.example.jungleroyal.common.types.GameRoomStatus;
 import com.example.jungleroyal.common.types.RoomStatus;
 import com.example.jungleroyal.common.util.EncryptionUtil;
+import com.example.jungleroyal.common.util.HashUtil;
 import com.example.jungleroyal.domain.gameroom.GameRoomDto;
 import com.example.jungleroyal.domain.gameroom.GameRoomJpaEntity;
 import com.example.jungleroyal.repository.GameRoomRepository;
@@ -47,8 +48,8 @@ public class GameRoomServiceImpl implements GameRoomService {
                 }
 
                 // 방 생성
-                String hashValue = UUID.randomUUID().toString();
-                gameRoomDto.setGameUrl(hashValue);
+                String gameUrl = HashUtil.encryptWithUUIDAndHash();
+                gameRoomDto.setGameUrl(gameUrl);
 
                 // TODO : gameRoomJpaEntity 의 세팅 메소드 생성 필요
                 GameRoomJpaEntity gameRoomJpaEntity = GameRoomJpaEntity.fromDto(gameRoomDto);
@@ -159,6 +160,20 @@ public class GameRoomServiceImpl implements GameRoomService {
     @Override
     public String getRoomClientIdByUserId(String userId) {
         return EncryptionUtil.encrypt(userId);
+    }
+
+
+    @Override
+    public void deleteRoomById(Long id) {
+        GameRoomJpaEntity gameRoomJpaEntity = gameRoomRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Room not found"));
+
+        gameRoomRepository.delete(gameRoomJpaEntity);
+    }
+
+    @Override
+    public String getRoomUrlById(Long roomId) {
+        return gameRoomRepository.getGameUrlById(roomId);
     }
 
 

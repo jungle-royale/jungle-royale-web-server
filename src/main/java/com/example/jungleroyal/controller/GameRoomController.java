@@ -2,8 +2,10 @@ package com.example.jungleroyal.controller;
 
 import com.example.jungleroyal.common.types.GameRoomStatus;
 import com.example.jungleroyal.common.types.RoomStatus;
+import com.example.jungleroyal.common.util.EncryptionUtil;
 import com.example.jungleroyal.common.util.GameServerClient;
 import com.example.jungleroyal.common.util.JwtTokenProvider;
+import com.example.jungleroyal.domain.game.GameServerNotificationRequest;
 import com.example.jungleroyal.domain.game.GameServerNotificationResponse;
 import com.example.jungleroyal.domain.gameroom.*;
 import com.example.jungleroyal.domain.user.UserInfoUsingRoomListResponse;
@@ -34,22 +36,24 @@ public class GameRoomController {
         String userId = jwtTokenProvider.extractSubject(jwtToken);
 
         String clientId = gameRoomService.getRoomClientIdByUserId(userId);
+        GameRoomDto room = gameRoomService.createRoom(GameRoomDto.fromRequest(gameRoomRequest, userId));
+        log.info("room = " + room);
 
+        String roomUrl = gameRoomService.getRoomUrlById(room.getId());
         // 게임서버에 HTTP 찌르고 기다렸다가 return
         // 게임 서버와 통신
-        GameServerNotificationResponse gameServerResponse = gameServerClient.notifyGameServer(userId);
+        GameServerNotificationRequest gameServerNotificationRequest = new GameServerNotificationRequest(roomUrl);
+        GameServerNotificationResponse gameServerResponse = gameServerClient.notifyGameServer(gameServerNotificationRequest,userId);
 
         // 게임 서버 응답 확인
         if (!gameServerResponse.isSuccess()) {
             log.error("게임 서버 응답 실패");
+            gameRoomService.deleteRoomById(room.getId());
             throw new IllegalStateException("게임 서버에서 방 생성을 허용하지 않았습니다.");
         }
 
-        GameRoomDto room = gameRoomService.createRoom(GameRoomDto.fromRequest(gameRoomRequest, userId));
-        log.info("room = " + room);
-
         GameRoomCreateReponse response = GameRoomCreateReponse.builder()
-                .roomId(room.getId())
+                .roomId(roomUrl)
                 .clientId(clientId)
                 .build();
 
@@ -132,10 +136,11 @@ public class GameRoomController {
         String userId = jwtTokenProvider.extractSubject(jwtToken);
         gameRoomService.checkRoomAvailability(roomId);
 
+        String roomUrl = gameRoomService.getRoomUrlById(roomId);
         String clinetId = gameRoomService.getRoomClientIdByUserId(userId);
 
         GameRoomJoinReponse response = GameRoomJoinReponse.builder()
-                .roomId(roomId)
+                .roomId(roomUrl)
                 .clientId(clinetId)
                 .build();
 
