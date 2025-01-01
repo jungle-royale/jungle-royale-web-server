@@ -15,6 +15,9 @@ spring:
     redis:
       host: 127.0.0.1
       port: 6379
+      cluster:
+        enabled: false
+
 redisson:
   address: redis://jungle-royale-redis-cache-ro.bgoupc.ng.0001.apn2.cache.amazonaws.com:6379
 

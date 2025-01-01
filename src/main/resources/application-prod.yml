@@ -13,8 +13,21 @@ spring:
     open-in-view: false
   data:
     redis:
-      host: jungle-royale-redis-cache-ro.bgoupc.ng.0001.apn2.cache.amazonaws.com
+      host: jungle-royale-redis-cache-001.bgoupc.0001.apn2.cache.amazonaws.com # Primary Endpoint
       port: 6379
+      cluster:
+        enabled: true
+        nodes:
+          - jungle-royale-redis-cache-001.bgoupc.0001.apn2.cache.amazonaws.com:6379
+          - jungle-royale-redis-cache-002.bgoupc.0001.apn2.cache.amazonaws.com:6379
+          - jungle-royale-redis-cache-003.bgoupc.0001.apn2.cache.amazonaws.com:6379
+      timeout: 3000 # 타임아웃 (ms)
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+
 redisson:
   address: redis://jungle-royale-redis-cache-ro.bgoupc.ng.0001.apn2.cache.amazonaws.com:6379
 
