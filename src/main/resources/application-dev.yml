@@ -13,10 +13,15 @@ spring:
     open-in-view: false
   data:
     redis:
+      mode: single
       host: 127.0.0.1
       port: 6379
+
 redisson:
-  address: redis://jungle-royale-redis-cache-ro.bgoupc.ng.0001.apn2.cache.amazonaws.com:6379
+  address: redis://127.0.0.1:6379
+
+
+
 
 base:
   url:

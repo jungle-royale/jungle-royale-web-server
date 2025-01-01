@@ -1,7 +1,7 @@
 spring:
   config:
     activate:
-      on-profile: prod
+      on-profile: dev
   jpa:
     hibernate:
       ddl-auto: none
@@ -13,10 +13,15 @@ spring:
     open-in-view: false
   data:
     redis:
-      host: jungle-royale-redis-cache-ro.bgoupc.ng.0001.apn2.cache.amazonaws.com
-      port: 6379
+      mode: master-slave
+      master: redis://jungle-royale-redis-cache-001.bgoupc.0001.apn2.cache.amazonaws.com:6379
+      replicas:
+        - redis://jungle-royale-redis-cache-002.bgoupc.0001.apn2.cache.amazonaws.com:6379
+        - redis://jungle-royale-redis-cache-003.bgoupc.0001.apn2.cache.amazonaws.com:6379
+
 redisson:
-  address: redis://jungle-royale-redis-cache-ro.bgoupc.ng.0001.apn2.cache.amazonaws.com:6379
+  address: redis://jungle-royale-redis-cache-001.bgoupc.0001.apn2.cache.amazonaws.com:6379
+
 
 kakao:
   client-id: e8304b2a6b5aeb5020ef6abeb405115b
