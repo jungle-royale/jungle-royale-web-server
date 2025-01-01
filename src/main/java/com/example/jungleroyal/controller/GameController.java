@@ -16,17 +16,43 @@ import org.springframework.web.bind.annotation.*;
 public class GameController {
     private final GameRoomService gameRoomService;
 
-    @PostMapping("/{roomId}/start")
-    public ResponseEntity<String> startGame(@PathVariable String roomUrl) {
+    /**
+     * 게임 시작 api
+     * @param roomUrl
+     * @return
+     */
+    @PostMapping("/start")
+    public ResponseEntity<String> startGame(@RequestParam String roomUrl) {
 
         gameRoomService.updateRoomStatusByRoomUrl(roomUrl, RoomStatus.RUNNING);
         return ResponseEntity.ok("ok");
     }
 
-    @PostMapping("/{roomId}/end")
-    public ResponseEntity<String> endGame(@PathVariable String roomUrl) {
+    /**
+     * 게임에서 나온 유저 정보 업데이트 api
+     * @param clientId
+     * @return
+     */
+    @PostMapping("/user/exit")
+    public ResponseEntity<String> exitUser(@RequestParam String clientId) {
+        // TODO: 유저 정보 업데이트
+
+        return ResponseEntity.ok("ok");
+    }
+
+    /**
+     * 게임 종료 업데이트 api
+     * @param roomUrl
+     * @param clientId
+     * @return
+     */
+    @PostMapping("/end")
+    public ResponseEntity<String> endGame(
+            @RequestParam String roomUrl,
+            @RequestParam String clientId) {
 
         gameRoomService.updateRoomStatusByRoomUrl(roomUrl, RoomStatus.END);
+        // TODO : 클라이언트 정보 업데이트
         return ResponseEntity.ok("ok");
     }
 
