@@ -5,7 +5,7 @@ import com.example.jungleroyal.domain.post.PageResponse;
 import com.example.jungleroyal.repository.PostJdbcRepository;
 import com.example.jungleroyal.domain.post.PostListResponse;
 import com.example.jungleroyal.domain.post.PostResponse;
-import com.example.jungleroyal.domain.user.UserJpaEntity;
+import com.example.jungleroyal.repository.UserJpaEntity;
 import com.example.jungleroyal.repository.PostJpaEntity;
 import com.example.jungleroyal.repository.PostRepository;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,19 +1,18 @@
 package com.example.jungleroyal.controller;
 
-import com.example.jungleroyal.common.pubsub.RedisPublisher;
 import com.example.jungleroyal.common.types.GameRoomStatus;
 import com.example.jungleroyal.common.types.RoomStatus;
+import com.example.jungleroyal.common.util.EncryptionUtil;
+import com.example.jungleroyal.common.util.GameServerClient;
 import com.example.jungleroyal.common.util.JwtTokenProvider;
-import com.example.jungleroyal.domain.dto.MessageCreateGameDto;
+import com.example.jungleroyal.domain.game.GameServerNotificationRequest;
+import com.example.jungleroyal.domain.game.GameServerNotificationResponse;
 import com.example.jungleroyal.domain.gameroom.*;
 import com.example.jungleroyal.domain.user.UserInfoUsingRoomListResponse;
 import com.example.jungleroyal.service.GameRoomService;
-import com.example.jungleroyal.service.RedisPubService;
-import com.example.jungleroyal.service.UserService;
 import com.example.jungleroyal.service.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,29 +26,47 @@ public class GameRoomController {
     private final GameRoomService gameRoomService;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserServiceImpl userService;
-    private final RedisPublisher redisPublisher;
+    private final GameServerClient gameServerClient;
     @PostMapping("/create")
-    public ResponseEntity<GameRoomResponse> createRoom(
+    public ResponseEntity<GameRoomCreateReponse> createRoom(
             @RequestBody GameRoomRequest gameRoomRequest,
             @RequestHeader("Authorization") String authorization) {
 
         String jwtToken = authorization.substring(7);
         String userId = jwtTokenProvider.extractSubject(jwtToken);
+
+        String clientId = gameRoomService.getRoomClientIdByUserId(userId);
         GameRoomDto room = gameRoomService.createRoom(GameRoomDto.fromRequest(gameRoomRequest, userId));
         log.info("room = " + room);
 
-        MessageCreateGameDto pubMsg = MessageCreateGameDto.builder()
-                .roomId(room.getId())
-                .userId(Long.parseLong(room.getHostId()))
-                .createdAt(room.getCreatedAt())
-                .build();
-        
-        redisPublisher.publish(new ChannelTopic("CreateGame"), pubMsg);
+        String roomUrl = gameRoomService.getRoomUrlById(room.getId());
+        // 게임서버에 HTTP 찌르고 기다렸다가 return
+        // 게임 서버와 통신
+        GameServerNotificationRequest gameServerNotificationRequest = new GameServerNotificationRequest(roomUrl);
+        GameServerNotificationResponse gameServerResponse = gameServerClient.notifyGameServer(gameServerNotificationRequest,userId);
 
-        return ResponseEntity.ok(GameRoomResponse.fromDto(room));
+        // 게임 서버 응답 확인
+        if (!gameServerResponse.isSuccess()) {
+            log.error("게임 서버 응답 실패");
+            gameRoomService.deleteRoomById(room.getId());
+            throw new IllegalStateException("게임 서버에서 방 생성을 허용하지 않았습니다.");
+        }
+
+        GameRoomCreateReponse response = GameRoomCreateReponse.builder()
+                .roomId(roomUrl)
+                .clientId(clientId)
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 
-
+    //        MessageCreateGameDto pubMsg = MessageCreateGameDto.builder()
+//                .roomId(room.getId())
+//                .userId(Long.parseLong(room.getHostId()))
+//                .createdAt(room.getCreatedAt())
+//                .build();
+//
+//        redisPublisher.publish(new ChannelTopic("CreateGame"), pubMsg);
     // TODO: 인게임에서 방 속성 변경 시 어떻게 처리할까? 추후 확인할 것
     @PutMapping("/update/{roomId}")
     public ResponseEntity<String> updateRoom(
@@ -109,4 +126,27 @@ public class GameRoomController {
         GameRoomStatus status = gameRoomService.checkRoomAvailability(roomId);
         return ResponseEntity.ok(status);
     }
+
+    @PostMapping("/{roomId}/join")
+    public ResponseEntity<GameRoomJoinReponse> joinGameRoom(
+            @RequestHeader("Authorization") String jwt,
+            @PathVariable Long roomId) {
+
+        String jwtToken = jwt.substring(7);
+        String userId = jwtTokenProvider.extractSubject(jwtToken);
+        gameRoomService.checkRoomAvailability(roomId);
+
+        String roomUrl = gameRoomService.getRoomUrlById(roomId);
+        String clinetId = gameRoomService.getRoomClientIdByUserId(userId);
+
+        GameRoomJoinReponse response = GameRoomJoinReponse.builder()
+                .roomId(roomUrl)
+                .clientId(clinetId)
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+
+
 }

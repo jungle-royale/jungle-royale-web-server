@@ -2,11 +2,13 @@ package com.example.jungleroyal.service;
 
 
 import com.example.jungleroyal.common.exceptions.DuplicateRoomException;
+import com.example.jungleroyal.common.exceptions.GameRoomException;
 import com.example.jungleroyal.common.exceptions.RoomByGameUrlFoundException;
 import com.example.jungleroyal.common.exceptions.RoomNotFoundException;
 import com.example.jungleroyal.common.types.GameRoomStatus;
 import com.example.jungleroyal.common.types.RoomStatus;
-import com.example.jungleroyal.domain.gameroom.GameRoom;
+import com.example.jungleroyal.common.util.EncryptionUtil;
+import com.example.jungleroyal.common.util.HashUtil;
 import com.example.jungleroyal.domain.gameroom.GameRoomDto;
 import com.example.jungleroyal.domain.gameroom.GameRoomJpaEntity;
 import com.example.jungleroyal.repository.GameRoomRepository;
@@ -46,8 +48,8 @@ public class GameRoomServiceImpl implements GameRoomService {
                 }
 
                 // 방 생성
-                String hashValue = UUID.randomUUID().toString();
-                gameRoomDto.setGameUrl(hashValue);
+                String gameUrl = HashUtil.encryptWithUUIDAndHash();
+                gameRoomDto.setGameUrl(gameUrl);
 
                 // TODO : gameRoomJpaEntity 의 세팅 메소드 생성 필요
                 GameRoomJpaEntity gameRoomJpaEntity = GameRoomJpaEntity.fromDto(gameRoomDto);
@@ -138,22 +140,40 @@ public class GameRoomServiceImpl implements GameRoomService {
     public GameRoomStatus checkRoomAvailability(Long roomId) {
         Optional<GameRoomJpaEntity> optionalRoom = gameRoomRepository.findById(roomId);
         if (optionalRoom.isEmpty()) {
-            return GameRoomStatus.GAME_ROOM_NOT_FOUND;
+            throw new GameRoomException("ROOM_NOT_FOUND", "존재하지 않는 방입니다.");
         }
 
         GameRoomJpaEntity room = optionalRoom.get();
-        // 게임 진행 여부 확인
+
         if (room.getStatus() == RoomStatus.RUNNING) {
-            return GameRoomStatus.GAME_ALREADY_STARTED;
+            throw new GameRoomException("GAME_ALREADY_STARTED", "게임이 이미 시작되었습니다.");
         }
 
-        // 방 정원 초과 여부 확인
         if (room.getCurrentPlayers() >= room.getMaxPlayers()) {
-            return GameRoomStatus.GAME_ROOM_FULL;
+            throw new GameRoomException("GAME_ROOM_FULL", "방 정원이 초과되었습니다.");
         }
 
         // 입장 가능
         return GameRoomStatus.GAME_JOIN_AVAILABLE;
+    }
+
+    @Override
+    public String getRoomClientIdByUserId(String userId) {
+        return EncryptionUtil.encrypt(userId);
+    }
+
+
+    @Override
+    public void deleteRoomById(Long id) {
+        GameRoomJpaEntity gameRoomJpaEntity = gameRoomRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Room not found"));
+
+        gameRoomRepository.delete(gameRoomJpaEntity);
+    }
+
+    @Override
+    public String getRoomUrlById(Long roomId) {
+        return gameRoomRepository.getGameUrlById(roomId);
     }
 
 

@@ -1,7 +1,7 @@
 package com.example.jungleroyal.service;
 
 import com.example.jungleroyal.domain.user.UserDto;
-import com.example.jungleroyal.domain.user.UserJpaEntity;
+import com.example.jungleroyal.repository.UserJpaEntity;
 import com.example.jungleroyal.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

@@ -15,6 +15,13 @@ spring:
 jwt:
   secret-key: j5ZeFFn6lVIEnpuLFNa8aao/nLy1ZRLFppPB98cBvowj8RDNepK+Swe33cHLOVWeM7VZkb2HqCdU2CBOk11b4A==
 
+security:
+  encryption:
+    secret-key: "jungleroyale1234" # 16바이트 길이의 AES 키
+
+game-server:
+  base-url: "http://game-api.eternalsnowman.com:8080/api"
+
 springdoc:
   swagger-ui:
     # swagger-ui 접근 경로. default 값은 /swagger-ui.html이다.

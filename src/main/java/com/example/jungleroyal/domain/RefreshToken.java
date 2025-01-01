@@ -1,6 +1,6 @@
 package com.example.jungleroyal.domain;
 
-import com.example.jungleroyal.domain.user.UserJpaEntity;
+import com.example.jungleroyal.repository.UserJpaEntity;
 import jakarta.persistence.*;
 import lombok.Data;
 

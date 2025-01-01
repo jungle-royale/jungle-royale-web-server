@@ -1,10 +1,6 @@
 package com.example.jungleroyal.domain.post;
 
-import com.example.jungleroyal.domain.user.UserJpaEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import com.example.jungleroyal.repository.UserJpaEntity;
 import lombok.Builder;
 import lombok.Data;
 

@@ -1,6 +1,5 @@
 package com.example.jungleroyal.repository;
 
-import com.example.jungleroyal.domain.user.UserJpaEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

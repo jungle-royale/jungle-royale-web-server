@@ -1,9 +1,8 @@
 package com.example.jungleroyal.controller;
 
 import com.example.jungleroyal.common.util.JwtTokenProvider;
-import com.example.jungleroyal.domain.user.UserJpaEntity;
+import com.example.jungleroyal.repository.UserJpaEntity;
 import com.example.jungleroyal.domain.user.UserGuestLoginResponse;
-import com.example.jungleroyal.service.UserService;
 import com.example.jungleroyal.service.UserServiceImpl;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
