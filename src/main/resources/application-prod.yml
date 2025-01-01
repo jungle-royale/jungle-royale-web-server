@@ -1,7 +1,7 @@
 spring:
   config:
     activate:
-      on-profile: dev
+      on-profile: prod
   jpa:
     hibernate:
       ddl-auto: none
@@ -15,7 +15,6 @@ spring:
 kakao:
   client-id: e8304b2a6b5aeb5020ef6abeb405115b
   redirect-uri: http://eternalsnowman.com/login
-
 
 base:
   url:
