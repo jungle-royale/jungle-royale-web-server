@@ -19,9 +19,9 @@ public class GameController {
     private final GameRoomService gameRoomService;
 
     @PostMapping("/start/{roomId}")
-    public ResponseEntity<String> startGame(@PathVariable Long roomId) {
+    public ResponseEntity<String> startGame(@PathVariable String roomUrl) {
 
-        gameRoomService.updateRoomStatus(roomId, RoomStatus.RUNNING);
+        gameRoomService.updateRoomStatusByRoomUrl(roomUrl, RoomStatus.RUNNING);
         return ResponseEntity.ok("ok");
 //        return ResponseEntity.ok(userJpaEntity.getUsername() + " has started the game");
     }

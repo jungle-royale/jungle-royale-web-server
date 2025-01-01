@@ -132,7 +132,7 @@ public class GameRoomServiceImpl implements GameRoomService {
     public GameRoomDto getRoomByIdOrThrow(Long roomId) {
         return gameRoomRepository.findById(roomId)
                 .map(GameRoomJpaEntity::toDto)
-                .orElseThrow(() -> new RoomNotFoundException(roomId));
+                .orElseThrow(() -> new RoomNotFoundException("id",roomId));
     }
 
     @Override
@@ -174,6 +174,14 @@ public class GameRoomServiceImpl implements GameRoomService {
     @Override
     public String getRoomUrlById(Long roomId) {
         return gameRoomRepository.getGameUrlById(roomId);
+    }
+
+    @Override
+    public void updateRoomStatusByRoomUrl(String roomUrl, RoomStatus roomStatus) {
+            GameRoomJpaEntity room = gameRoomRepository.findByGameUrl(roomUrl)
+                .orElseThrow(() -> new RoomNotFoundException("Room not found for URL: ",roomUrl));
+            room.setStatus(roomStatus);
+            room.setUpdatedAt(LocalDateTime.now());
     }
 
 

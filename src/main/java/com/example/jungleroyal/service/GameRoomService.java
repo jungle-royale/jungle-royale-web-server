@@ -27,4 +27,6 @@ public interface GameRoomService {
     void deleteRoomById(Long id);
 
     String getRoomUrlById(Long roomId);
+
+    void updateRoomStatusByRoomUrl(String roomUrl, RoomStatus roomStatus);
 }
