@@ -24,7 +24,7 @@ public class ItemServiceImpl implements ItemService{
     private static final String UPLOAD_DIR = "src/main/resources/static/uploads/items";
 //    private static final String baseUrl = "http://192.168.1.241:8080/uploads/items/";
 
-    @Value("${item.base.url}")
+    @Value("${base.url.item}")
     private String baseUrl;
 
     @Override
@@ -48,7 +48,7 @@ public class ItemServiceImpl implements ItemService{
     }
 
     @Override
-    public void updatePost(Long itemId, ItemUpdateRequest itemUpdateRequest) {
+    public void updateItem(Long itemId, ItemUpdateRequest itemUpdateRequest) {
         // 게시글 존재 여부 확인
         ItemJpaEntity itemJpaEntity = itemRepository.findById(itemId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 아이템을 찾을 수 없습니다."));

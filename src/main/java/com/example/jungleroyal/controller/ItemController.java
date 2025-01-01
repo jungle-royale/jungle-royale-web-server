@@ -26,7 +26,7 @@ public class ItemController {
             @PathVariable Long itemId,
             ItemUpdateRequest itemUpdateRequest
     ){
-        itemService.updatePost(itemId, itemUpdateRequest);
+        itemService.updateItem(itemId, itemUpdateRequest);
         return ResponseEntity.ok().build();
     }
 

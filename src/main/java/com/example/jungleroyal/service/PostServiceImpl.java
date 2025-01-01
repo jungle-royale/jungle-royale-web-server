@@ -8,6 +8,7 @@ import com.example.jungleroyal.repository.PostJpaEntity;
 import com.example.jungleroyal.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,7 +29,10 @@ public class PostServiceImpl implements PostService{
     private final JungleFileUtils fileUtils;
 
     private static final String UPLOAD_DIR = "src/main/resources/static/uploads";
-    private static final String baseUrl = "http://192.168.1.241:8080/uploads/";
+//    private static final String baseUrl = "http://192.168.1.241:8080/uploads/";
+
+    @Value("${base.url.post}")
+    private String baseUrl;
 
     @Override
     public void savePost(PostCreateResponse postCreateResponse, Long userId) {
