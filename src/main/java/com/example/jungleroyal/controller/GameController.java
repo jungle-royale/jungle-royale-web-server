@@ -14,16 +14,20 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/game")
 @RequiredArgsConstructor
 public class GameController {
-    private final UserServiceImpl userService;
-    private final GameService gameService;
     private final GameRoomService gameRoomService;
 
-    @PostMapping("/start/{roomId}")
+    @PostMapping("/{roomId}/start")
     public ResponseEntity<String> startGame(@PathVariable String roomUrl) {
 
         gameRoomService.updateRoomStatusByRoomUrl(roomUrl, RoomStatus.RUNNING);
         return ResponseEntity.ok("ok");
-//        return ResponseEntity.ok(userJpaEntity.getUsername() + " has started the game");
+    }
+
+    @PostMapping("/{roomId}/end")
+    public ResponseEntity<String> endGame(@PathVariable String roomUrl) {
+
+        gameRoomService.updateRoomStatusByRoomUrl(roomUrl, RoomStatus.END);
+        return ResponseEntity.ok("ok");
     }
 
 }
