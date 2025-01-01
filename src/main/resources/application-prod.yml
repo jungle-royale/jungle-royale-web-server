@@ -21,3 +21,7 @@ redisson:
 kakao:
   client-id: e8304b2a6b5aeb5020ef6abeb405115b
   redirect-uri: http://eternalsnowman.com/login
+
+item:
+  base:
+    url: "http://web-api.eternalsnowman.com:8080/uploads/items/"

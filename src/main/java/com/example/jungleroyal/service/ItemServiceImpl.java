@@ -8,6 +8,7 @@ import com.example.jungleroyal.domain.item.ItemUpdateRequest;
 import com.example.jungleroyal.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,8 +22,10 @@ public class ItemServiceImpl implements ItemService{
     private final JungleFileUtils fileUtils;
 
     private static final String UPLOAD_DIR = "src/main/resources/static/uploads/items";
-    private static final String baseUrl = "http://192.168.1.241:8080/uploads/items/";
+//    private static final String baseUrl = "http://192.168.1.241:8080/uploads/items/";
 
+    @Value("${item.base.url}")
+    private String baseUrl;
 
     @Override
     public ItemCreateResponse createItem(ItemCreateRequest itemCreateRequest) {
