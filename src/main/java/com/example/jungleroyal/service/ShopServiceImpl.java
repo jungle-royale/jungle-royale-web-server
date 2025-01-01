@@ -12,6 +12,7 @@ import com.example.jungleroyal.domain.user.UserShopPageResponse;
 import com.example.jungleroyal.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,8 +31,8 @@ public class ShopServiceImpl implements ShopService{
     private final OwnedItemRepository ownedItemRepository;
     private final JungleFileUtils fileUtils;
 
-    private static final String baseUrl = "http://192.168.1.241:8080/uploads/items/";
-
+    @Value("${base.url.shop}")
+    private String baseUrl;
     /**
      *
      * 상점페이지 조회
