@@ -19,6 +19,8 @@ redisson:
   address: redis://jungle-royale-redis-cache-ro.bgoupc.ng.0001.apn2.cache.amazonaws.com:6379
 
 kakao:
-  client-id: 9b5e1f47241e82beb559d44bd2a25377
-#  redirect-uri: http://localhost:5173/login
-  redirect-uri: http://192.168.1.241:8080/api/auth/kakao/callback
+#  client-id: 9b5e1f47241e82beb559d44bd2a25377  # 백엔드 서버
+  client-id: e8304b2a6b5aeb5020ef6abeb405115b # 프론트엔드 서버
+
+#  redirect-uri: http://192.168.1.241:8080/api/auth/kakao/callback  # 백엔드 개발 서버
+  redirect-uri: http://localhost:5173/login # 프론트엔드 개발 서버
