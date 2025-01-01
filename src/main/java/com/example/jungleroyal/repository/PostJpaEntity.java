@@ -81,7 +81,7 @@ public class PostJpaEntity {
                 .writer(writer)
                 .writerId(userId)
                 .views(views)
-                .createdAt(this.createdAt)
+                .createdAt(TimeUtils.convertUtcToKst(this.createdAt))
                 .build();
     }
 
