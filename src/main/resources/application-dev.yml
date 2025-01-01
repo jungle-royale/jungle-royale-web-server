@@ -17,3 +17,8 @@ spring:
       port: 6379
 redisson:
   address: redis://jungle-royale-redis-cache-ro.bgoupc.ng.0001.apn2.cache.amazonaws.com:6379
+
+kakao:
+  client-id: 9b5e1f47241e82beb559d44bd2a25377
+#  redirect-uri: http://localhost:5173/login
+  redirect-uri: http://192.168.1.241:8080/api/auth/kakao/callback
