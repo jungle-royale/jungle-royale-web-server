@@ -97,8 +97,6 @@ public class PostServiceImpl implements PostService{
         PostJpaEntity postJpaEntity = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다."));
 
-        // 삭제 처리
-        Files.deleteIfExists(Paths.get(postJpaEntity.getFilePath()));
         postRepository.delete(postJpaEntity);
     }
 
