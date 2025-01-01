@@ -21,7 +21,7 @@ redisson:
 base:
   url:
     item: "http://192.168.1.241:8080/uploads/items/"
-    post: "http://192.168.1.241:8080/uploads/"
+    post: "http://192.168.1.241:8080/uploads/posts/"
 
 kakao:
 #  client-id: 9b5e1f47241e82beb559d44bd2a25377  # 백엔드 서버
