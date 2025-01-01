@@ -37,10 +37,6 @@ public class SecurityConfig {
     public CorsFilter corsFilter() {
         // CorsConfiguration 생성
         CorsConfiguration config = new CorsConfiguration();
-//        config.setAllowCredentials(true); // 인증 정보 포함 허용
-//        config.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // 허용할 클라이언트 Origin
-//        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 허용할 HTTP 메서드
-//        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type")); // 허용할 요청 헤더
         config.setAllowCredentials(true); // 인증 정보 포함 허용
         config.addAllowedOriginPattern("*"); // 모든 Origin 허용
         config.addAllowedMethod("*"); // 모든 HTTP 메서드 허용
