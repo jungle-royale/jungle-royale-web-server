@@ -5,6 +5,7 @@ import com.example.jungleroyal.domain.OAuthKakaoToken;
 import com.example.jungleroyal.repository.BlackListRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +26,15 @@ public class AuthKakaoTokenGenerator {
 
     @Value("${kakao.redirect-uri}")
     private String redirectUri;
+
+
+    @PostConstruct
+    public void logKakaoConfig() {
+        log.info("Kakao Configuration:");
+        log.info("Client ID: {}", clientId);
+        log.info("Redirect URI: {}", redirectUri);
+    }
+
     private static final String BEARER_TYPE = "Bearer";
 
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60;       // 1시간
