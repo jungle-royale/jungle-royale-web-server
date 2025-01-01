@@ -15,6 +15,6 @@ public class PostResponse {
     private String writer;
     private Long writerId;
     private int views;
-    private String imageUrl;
+//    private String imageUrl;
     private LocalDateTime createdAt;
 }

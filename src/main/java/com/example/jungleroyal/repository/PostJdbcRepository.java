@@ -1,5 +1,6 @@
 package com.example.jungleroyal.repository;
 
+import com.example.jungleroyal.common.util.TimeUtils;
 import com.example.jungleroyal.domain.post.PostListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -42,7 +43,7 @@ public class PostJdbcRepository {
                 .content(rs.getString("content"))
                 .username(rs.getString("username")) // 작성자 이름
                 .views(rs.getInt("views"))
-                .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
+                .createdAt(TimeUtils.convertUtcToKst(rs.getTimestamp("created_at").toLocalDateTime())) // 간단 변환
                 .build();
     }
 }

@@ -8,6 +8,7 @@ import com.example.jungleroyal.repository.PostJpaEntity;
 import com.example.jungleroyal.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,7 +29,10 @@ public class PostServiceImpl implements PostService{
     private final JungleFileUtils fileUtils;
 
     private static final String UPLOAD_DIR = "src/main/resources/static/uploads";
-    private static final String baseUrl = "http://192.168.1.241:8080/uploads/";
+//    private static final String baseUrl = "http://192.168.1.241:8080/uploads/";
+
+    @Value("${base.url.post}")
+    private String baseUrl;
 
     @Override
     public void savePost(PostCreateResponse postCreateResponse, Long userId) {
@@ -93,26 +97,23 @@ public class PostServiceImpl implements PostService{
         PostJpaEntity postJpaEntity = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다."));
 
-        // 삭제 처리
-        Files.deleteIfExists(Paths.get(postJpaEntity.getFilePath()));
         postRepository.delete(postJpaEntity);
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public PostResponse getPostById(Long postId) {
         PostJpaEntity post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다."));
 
         // 조회수 증가
-        post.incrementViews();
-        postRepository.save(post); // 변경사항 저장
+        postRepository.incrementViewsByPostId(postId);
 
-        String imageUrl = fileUtils.generateImageUrl(post.getFilePath(),baseUrl); // 파일 경로를 URL로 변환
         String username = post.getUserJpaEntity().getUsername();
         Long userId = post.getUserJpaEntity().getId();
+        int views = post.getViews()+1;
 
-        return post.toPostResponse(username, userId, imageUrl);
+        return post.toPostResponse(username, userId, views);
     }
 
     @Override

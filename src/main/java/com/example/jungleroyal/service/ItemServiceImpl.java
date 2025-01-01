@@ -8,6 +8,7 @@ import com.example.jungleroyal.domain.item.ItemUpdateRequest;
 import com.example.jungleroyal.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,8 +22,10 @@ public class ItemServiceImpl implements ItemService{
     private final JungleFileUtils fileUtils;
 
     private static final String UPLOAD_DIR = "src/main/resources/static/uploads/items";
-    private static final String baseUrl = "http://192.168.1.241:8080/uploads/items/";
+//    private static final String baseUrl = "http://192.168.1.241:8080/uploads/items/";
 
+    @Value("${base.url.item}")
+    private String baseUrl;
 
     @Override
     public ItemCreateResponse createItem(ItemCreateRequest itemCreateRequest) {
@@ -45,7 +48,7 @@ public class ItemServiceImpl implements ItemService{
     }
 
     @Override
-    public void updatePost(Long itemId, ItemUpdateRequest itemUpdateRequest) {
+    public void updateItem(Long itemId, ItemUpdateRequest itemUpdateRequest) {
         // 게시글 존재 여부 확인
         ItemJpaEntity itemJpaEntity = itemRepository.findById(itemId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 아이템을 찾을 수 없습니다."));

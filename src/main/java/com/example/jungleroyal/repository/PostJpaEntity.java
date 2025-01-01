@@ -1,5 +1,6 @@
 package com.example.jungleroyal.repository;
 
+import com.example.jungleroyal.common.util.TimeUtils;
 import com.example.jungleroyal.domain.post.PostCreateResponse;
 import com.example.jungleroyal.domain.post.PostDto;
 import com.example.jungleroyal.domain.post.PostListResponse;
@@ -10,7 +11,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.*;
 
 @Entity
 @Table(name = "posts")
@@ -54,8 +55,8 @@ public class PostJpaEntity {
                 .views(views)
                 .username(userJpaEntity.getUsername())
                 .filePath(filePath)
-                .createdAt(createdAt)
-                .updatedAt(updatedAt)
+                .createdAt(TimeUtils.convertUtcToKst(createdAt)) // KST로 변환
+                .updatedAt(TimeUtils.convertUtcToKst(updatedAt)) // KST로 변환
                 .build();
     }
 
@@ -66,12 +67,12 @@ public class PostJpaEntity {
                 .content(postCreateResponse.getContent())
                 .views(0)
                 .filePath(filePath)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC)) // UTC 시간 저장
+                .updatedAt(LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC)) // UTC 시간 저장                .updatedAt(LocalDateTime.now())
                 .build();
     }
 
-    public PostResponse toPostResponse(String writer, Long userId, String imageUrl) {
+    public PostResponse toPostResponse(String writer, Long userId, int views) {
 
         return PostResponse.builder()
                 .id(this.id)
@@ -79,9 +80,8 @@ public class PostJpaEntity {
                 .content(this.content)
                 .writer(writer)
                 .writerId(userId)
-                .imageUrl(imageUrl)
-                .views(this.views)
-                .createdAt(this.createdAt)
+                .views(views)
+                .createdAt(TimeUtils.convertUtcToKst(this.createdAt))
                 .build();
     }
 

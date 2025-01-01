@@ -14,16 +14,46 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/game")
 @RequiredArgsConstructor
 public class GameController {
-    private final UserServiceImpl userService;
-    private final GameService gameService;
     private final GameRoomService gameRoomService;
 
-    @PostMapping("/start/{roomId}")
-    public ResponseEntity<String> startGame(@PathVariable Long roomId) {
+    /**
+     * 게임 시작 api
+     * @param roomUrl
+     * @return
+     */
+    @PostMapping("/start")
+    public ResponseEntity<String> startGame(@RequestParam String roomUrl) {
 
-        gameRoomService.updateRoomStatus(roomId, RoomStatus.RUNNING);
+        gameRoomService.updateRoomStatusByRoomUrl(roomUrl, RoomStatus.RUNNING);
         return ResponseEntity.ok("ok");
-//        return ResponseEntity.ok(userJpaEntity.getUsername() + " has started the game");
+    }
+
+    /**
+     * 게임에서 나온 유저 정보 업데이트 api
+     * @param clientId
+     * @return
+     */
+    @PostMapping("/user/exit")
+    public ResponseEntity<String> exitUser(@RequestParam String clientId) {
+        // TODO: 유저 정보 업데이트
+
+        return ResponseEntity.ok("ok");
+    }
+
+    /**
+     * 게임 종료 업데이트 api
+     * @param roomUrl
+     * @param clientId
+     * @return
+     */
+    @PostMapping("/end")
+    public ResponseEntity<String> endGame(
+            @RequestParam String roomUrl,
+            @RequestParam String clientId) {
+
+        gameRoomService.updateRoomStatusByRoomUrl(roomUrl, RoomStatus.END);
+        // TODO : 클라이언트 정보 업데이트
+        return ResponseEntity.ok("ok");
     }
 
 }
