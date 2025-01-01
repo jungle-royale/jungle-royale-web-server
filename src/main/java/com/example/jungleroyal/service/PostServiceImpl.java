@@ -101,20 +101,19 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public PostResponse getPostById(Long postId) {
         PostJpaEntity post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다."));
 
         // 조회수 증가
-        post.incrementViews();
-        postRepository.save(post); // 변경사항 저장
+        postRepository.incrementViewsByPostId(postId);
 
-        String imageUrl = fileUtils.generateImageUrl(post.getFilePath(),baseUrl); // 파일 경로를 URL로 변환
         String username = post.getUserJpaEntity().getUsername();
         Long userId = post.getUserJpaEntity().getId();
+        int views = post.getViews()+1;
 
-        return post.toPostResponse(username, userId, imageUrl);
+        return post.toPostResponse(username, userId, views);
     }
 
     @Override

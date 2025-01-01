@@ -72,7 +72,7 @@ public class PostJpaEntity {
                 .build();
     }
 
-    public PostResponse toPostResponse(String writer, Long userId, String imageUrl) {
+    public PostResponse toPostResponse(String writer, Long userId, int views) {
 
         return PostResponse.builder()
                 .id(this.id)
@@ -80,8 +80,7 @@ public class PostJpaEntity {
                 .content(this.content)
                 .writer(writer)
                 .writerId(userId)
-                .imageUrl(imageUrl)
-                .views(this.views)
+                .views(views)
                 .createdAt(this.createdAt)
                 .build();
     }
