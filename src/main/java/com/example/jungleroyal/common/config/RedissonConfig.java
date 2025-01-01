@@ -1,5 +1,6 @@
 package com.example.jungleroyal.common.config;
 
+import jakarta.annotation.PostConstruct;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
@@ -25,6 +26,15 @@ public class RedissonConfig {
 
     @Value("${spring.data.redis.replicas:}") // 배포 환경에서만 사용
     private String[] slaveAddresses;
+
+    @PostConstruct
+    public void checkRedisConfig() {
+        System.out.println("Redis Mode: " + redisMode);
+        System.out.println("Redis Host: " + redisHost);
+        System.out.println("Redis Port: " + redisPort);
+        System.out.println("Master Address: " + masterAddress);
+        System.out.println("Slave Addresses: " + (slaveAddresses != null ? String.join(", ", slaveAddresses) : "None"));
+    }
 
     @Bean
     public RedissonClient redissonClient() {
