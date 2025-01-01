@@ -1,13 +1,16 @@
 package com.example.jungleroyal.service;
 
 import com.example.jungleroyal.common.util.JungleFileUtils;
+import com.example.jungleroyal.common.util.TimeUtils;
 import com.example.jungleroyal.domain.post.PageResponse;
+import com.example.jungleroyal.domain.post.PostDto;
 import com.example.jungleroyal.repository.PostJdbcRepository;
 import com.example.jungleroyal.domain.post.PostListResponse;
 import com.example.jungleroyal.domain.post.PostResponse;
 import com.example.jungleroyal.repository.UserJpaEntity;
 import com.example.jungleroyal.repository.PostJpaEntity;
 import com.example.jungleroyal.repository.PostRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -19,7 +22,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,6 +48,23 @@ public class PostServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+    }
+
+    @Test
+    public void Post_DTO로_변경_시_UTC를_한국시간으로_변경O() {
+        // Given: UTC 시간
+        LocalDateTime utcNow = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC);
+
+        // When: DTO 변환 (KST 시간 변환 포함)
+        PostDto postDto = PostDto.builder()
+                .createdAt(TimeUtils.convertUtcToKst(utcNow))
+                .build();
+
+        // Then: 변환된 시간이 예상 시간과 일치하는지 확인
+        LocalDateTime kstTime = utcNow.atOffset(ZoneOffset.UTC)
+                .atZoneSameInstant(ZoneId.of("Asia/Seoul"))
+                .toLocalDateTime();
+        Assertions.assertEquals(postDto.getCreatedAt(), kstTime);
     }
 
     @Test
