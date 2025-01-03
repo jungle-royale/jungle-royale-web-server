@@ -26,7 +26,7 @@ public class KakaoAuthService {
     private final AuthKakaoTokenGenerator authKakaoTokenGenerator;
 
     private final RestTemplate restTemplate;
-    private final UserServiceImpl userService;
+    private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
 
     public KakaoLoginResponse getKakaoLoginResponse(String jwtToken, OAuthKakaoToken oAuthKakaoToken){

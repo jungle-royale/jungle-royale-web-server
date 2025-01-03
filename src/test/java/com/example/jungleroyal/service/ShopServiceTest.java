@@ -23,7 +23,7 @@ public class ShopServiceTest {
     private JwtTokenProvider jwtTokenProvider;
 
     @InjectMocks
-    private ShopServiceImpl shopService;
+    private ShopService shopService;
 
     @BeforeEach
     void setUp() {

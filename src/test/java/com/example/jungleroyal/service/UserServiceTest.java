@@ -17,7 +17,7 @@ public class UserServiceTest {
     private UserRepository userRepository;
 
     @InjectMocks
-    private UserServiceImpl userService;
+    private UserService userService;
 
     public UserServiceTest() {
         MockitoAnnotations.openMocks(this);

@@ -3,7 +3,7 @@ package com.example.jungleroyal.common.pubsub;
 import com.example.jungleroyal.common.types.RoomStatus;
 import com.example.jungleroyal.domain.dto.GameEndMessageDto;
 import com.example.jungleroyal.domain.dto.GameStartMessageDto;
-import com.example.jungleroyal.service.GameRoomServiceImpl;
+import com.example.jungleroyal.service.GameRoomService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 public class RedisSubscribeListener implements MessageListener {
     private final RedisTemplate<String, Object> template;
     private final ObjectMapper objectMapper;
-    private final GameRoomServiceImpl gameRoomService;
+    private final GameRoomService gameRoomService;
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
