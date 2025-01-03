@@ -22,7 +22,7 @@ public class InventoryService {
     private final JungleFileUtils fileUtils;
 
     @Value("${base.url.item}")
-    String baseUrl;
+    private String baseUrl;
 
     @Transactional(readOnly = true)
     public InventoryListReponse getItemsByJwt(String jwt) {
