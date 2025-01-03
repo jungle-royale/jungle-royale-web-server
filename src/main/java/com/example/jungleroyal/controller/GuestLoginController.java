@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/auth/guest")
 @Tag(name = "GuestLogin", description = "GuestLogin API")
 @RequiredArgsConstructor
 @Slf4j
@@ -21,7 +20,7 @@ public class GuestLoginController {
     private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
 
-    @PostMapping("/api/rooms/login")
+    @PostMapping("/api/auth/guest/login")
     public ResponseEntity<UserGuestLoginResponse> guestLogin() {
         // 1. 비회원 유저 생성
         UserJpaEntity guestUserJpaEntity = userService.registerGuest();
