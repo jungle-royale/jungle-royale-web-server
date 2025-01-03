@@ -5,6 +5,7 @@ import com.example.jungleroyal.domain.item.ItemCreateRequest;
 import com.example.jungleroyal.domain.item.ItemCreateResponse;
 import com.example.jungleroyal.repository.ItemJpaEntity;
 import com.example.jungleroyal.domain.item.ItemUpdateRequest;
+import com.example.jungleroyal.repository.ItemJpaRepository;
 import com.example.jungleroyal.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,8 @@ public class ItemService {
     private final ItemRepository itemRepository;
     private final JungleFileUtils fileUtils;
 
-    private static final String UPLOAD_DIR = "src/main/resources/static/uploads/items";
+    @Value("${upload.dir.item}")
+    private String UPLOAD_DIR;
 
     @Value("${base.url.item}")
     private String baseUrl;
