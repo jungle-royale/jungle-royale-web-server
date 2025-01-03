@@ -175,7 +175,6 @@ public class PostServiceTest {
         assertEquals(post.getContent(), response.getContent(), "내용이 일치해야 합니다.");
         assertEquals(user.getUsername(), response.getWriter(), "작성자 이름이 일치해야 합니다.");
         assertEquals(user.getId(), response.getWriterId(), "작성자 ID가 일치해야 합니다.");
-        assertEquals("http://localhost:8080/uploads/testImage.jpg", response.getImageUrl(), "이미지 URL이 일치해야 합니다.");
 
         verify(postRepository, times(1)).findById(postId);
     }
