@@ -32,13 +32,6 @@ public class UserService {
         return userRepository.findByKakaoId(kakaoId).isPresent();
     }
 
-    public String getKakaoIdByUserId(String userId){
-        Long id = Long.parseLong(userId);
-        UserJpaEntity userJpaEntity = userRepository.findById(id).orElse(new UserJpaEntity());
-        return userJpaEntity.getKakaoId();
-
-    }
-
     private void saveRefreshToken(UserJpaEntity userJpaEntity, String token, Integer expiresAt) {
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setUserJpaEntity(userJpaEntity);
@@ -69,7 +62,6 @@ public class UserService {
             String username = randomNicknameGenerator.generate();
             UserJpaEntity savedUserJpaEntity = saveKakaoUser(kakaoId, username);
 
-            System.out.println("savedUser = " + savedUserJpaEntity);
             saveRefreshToken(savedUserJpaEntity, oAuthKakaoToken.getRefresh_token(), oAuthKakaoToken.getRefresh_token_expires_in());
             // 유저 등록 및 refreshtoken 등록
         } else {
@@ -85,26 +77,11 @@ public class UserService {
      * 비회원 유저 생성
      * @return
      */
-    public UserJpaEntity registerGuest() {String randomNickname = randomNicknameGenerator.generate();
+    public UserJpaEntity registerGuest() {
+        String randomNickname = randomNicknameGenerator.generate();
         UserJpaEntity gueutUserJpaEntity = UserJpaEntity.createGueutUser(randomNickname);
 
         return userRepository.save(gueutUserJpaEntity);
-    }
-
-    /**
-     * 회원인지 비회원인지 판단
-     * @param kakaoId
-     * @return 회원 - 기존 유저 정보 호출, 비회원 - 임시 회원 정보 생성
-     */
-    public UserJpaEntity findOrRegisterGuest(String kakaoId) {
-        if (kakaoId == null || kakaoId.isEmpty()) {
-            // 비회원 처리
-            return registerGuest();
-        }
-
-        // 회원 데이터 조회
-        return userRepository.findByKakaoId(kakaoId)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found with Kakao ID: " + kakaoId));
     }
 
     public UserJpaEntity saveKakaoUser(String kakaoId, String username) {
@@ -123,13 +100,11 @@ public class UserService {
 
         return savedUser;
     }
-
     
     public String getUsernameById(String userId) {
         return userRepository.findUsernameById(Long.parseLong(userId));
     }
 
-    
     public void updateNickName(UserDto userDto) {
         // 사용자 정보 조회
         UserJpaEntity userJpaEntity = getUserJpaEntityById(userDto.getId());
@@ -138,6 +113,5 @@ public class UserService {
 
         // 데이터베이스에 저장
         userRepository.save(userJpaEntity);
-
     }
 }
