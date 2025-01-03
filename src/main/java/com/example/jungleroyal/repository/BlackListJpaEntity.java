@@ -1,14 +1,13 @@
-package com.example.jungleroyal.domain;
+package com.example.jungleroyal.repository;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class BlackList {
+public class BlackListJpaEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -16,7 +15,7 @@ public class BlackList {
     @Column(name = "invalid_refresh_token")
     private String invalidRefreshToken;
 
-    public BlackList(String invalidRefreshToken) {
+    public BlackListJpaEntity(String invalidRefreshToken) {
         this.invalidRefreshToken = invalidRefreshToken;
     }
 }
