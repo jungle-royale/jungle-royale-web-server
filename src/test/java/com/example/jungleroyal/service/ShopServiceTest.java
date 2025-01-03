@@ -1,8 +1,7 @@
 package com.example.jungleroyal.service;
 
 import com.example.jungleroyal.common.util.JwtTokenProvider;
-import com.example.jungleroyal.repository.UserJpaRepository;
-import com.example.jungleroyal.repository.UserRepository;
+import com.example.jungleroyal.infrastructure.UserJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

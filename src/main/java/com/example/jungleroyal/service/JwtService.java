@@ -1,7 +1,7 @@
 package com.example.jungleroyal.service;
 
-import com.example.jungleroyal.repository.BlackListJpaEntity;
-import com.example.jungleroyal.repository.BlackListRepository;
+import com.example.jungleroyal.infrastructure.BlackListJpaEntity;
+import com.example.jungleroyal.infrastructure.BlackListRepository;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;

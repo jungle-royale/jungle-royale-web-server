@@ -1,10 +1,8 @@
 package com.example.jungleroyal.controller;
 
 import com.example.jungleroyal.common.util.JwtTokenProvider;
-import com.example.jungleroyal.domain.BlackList;
-import com.example.jungleroyal.domain.gameroom.GameRoomRequest;
 import com.example.jungleroyal.domain.user.LogoutRequest;
-import com.example.jungleroyal.repository.BlackListRepository;
+import com.example.jungleroyal.infrastructure.BlackListRepository;
 import com.example.jungleroyal.service.JwtService;
 import com.example.jungleroyal.service.KakaoAuthService;
 import lombok.RequiredArgsConstructor;

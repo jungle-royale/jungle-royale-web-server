@@ -1,7 +1,7 @@
 package com.example.jungleroyal.common.util;
 
 import com.example.jungleroyal.common.exceptions.UnAuthorizationException;
-import com.example.jungleroyal.repository.BlackListRepository;
+import com.example.jungleroyal.infrastructure.BlackListRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

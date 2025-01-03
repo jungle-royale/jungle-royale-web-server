@@ -1,6 +1,6 @@
 package com.example.jungleroyal.domain.user;
 
-import com.example.jungleroyal.repository.UserJpaEntity;
+import com.example.jungleroyal.infrastructure.UserJpaEntity;
 import lombok.Builder;
 import lombok.Data;
 

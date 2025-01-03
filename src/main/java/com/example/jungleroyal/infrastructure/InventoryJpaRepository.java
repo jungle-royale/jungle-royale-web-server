@@ -1,4 +1,4 @@
-package com.example.jungleroyal.repository;
+package com.example.jungleroyal.infrastructure;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

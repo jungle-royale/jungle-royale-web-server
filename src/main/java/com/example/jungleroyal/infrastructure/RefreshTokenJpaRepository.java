@@ -1,4 +1,4 @@
-package com.example.jungleroyal.repository;
+package com.example.jungleroyal.infrastructure;
 
 import com.example.jungleroyal.domain.RefreshToken;
 import org.springframework.data.jpa.repository.JpaRepository;

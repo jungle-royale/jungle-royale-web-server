@@ -1,6 +1,6 @@
 package com.example.jungleroyal.domain.inventory;
 
-import com.example.jungleroyal.repository.ItemJpaEntity;
+import com.example.jungleroyal.infrastructure.ItemJpaEntity;
 import lombok.Builder;
 import lombok.Data;
 

@@ -2,7 +2,7 @@ package com.example.jungleroyal.service;
 
 import com.example.jungleroyal.common.util.JungleFileUtils;
 import com.example.jungleroyal.domain.post.*;
-import com.example.jungleroyal.repository.*;
+import com.example.jungleroyal.infrastructure.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

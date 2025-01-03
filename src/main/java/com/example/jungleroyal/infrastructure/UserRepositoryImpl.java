@@ -1,5 +1,6 @@
-package com.example.jungleroyal.repository;
+package com.example.jungleroyal.infrastructure;
 
+import com.example.jungleroyal.service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -7,7 +8,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class UserRepositoryImpl implements UserRepository{
+public class UserRepositoryImpl implements UserRepository {
     private final UserJpaRepository userJpaRepository;
     @Override
     public Optional<UserJpaEntity> findByKakaoId(String kakaoId) {

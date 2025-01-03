@@ -1,6 +1,5 @@
-package com.example.jungleroyal.repository;
+package com.example.jungleroyal.infrastructure;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 

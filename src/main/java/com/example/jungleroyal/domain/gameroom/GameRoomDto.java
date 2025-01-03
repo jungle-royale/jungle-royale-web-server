@@ -1,7 +1,7 @@
 package com.example.jungleroyal.domain.gameroom;
 
 import com.example.jungleroyal.common.types.RoomStatus;
-import com.example.jungleroyal.repository.GameRoomJpaEntity;
+import com.example.jungleroyal.infrastructure.GameRoomJpaEntity;
 import lombok.Builder;
 import lombok.Data;
 

@@ -1,4 +1,4 @@
-package com.example.jungleroyal.repository;
+package com.example.jungleroyal.infrastructure;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
