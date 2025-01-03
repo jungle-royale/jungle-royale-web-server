@@ -1,15 +1,22 @@
 package com.example.jungleroyal.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-
+import java.util.List;
 import java.util.Optional;
 
-public interface GameRoomRepository extends JpaRepository<GameRoomJpaEntity, Long> {
-    Optional<GameRoomJpaEntity> findByGameUrl(String gameUrl);
+public interface GameRoomRepository {
 
     boolean existsByHostId(String hostId);
 
-    @Query("SELECT gr.gameUrl FROM GameRoomJpaEntity gr WHERE gr.id = :roomId")
+    GameRoomJpaEntity save(GameRoomJpaEntity gameRoomJpaEntity);
+
+    Optional<GameRoomJpaEntity> findById(Long roomId);
+
+    Optional<GameRoomJpaEntity> findByGameUrl(String gameUrl);
+
+    void delete(GameRoomJpaEntity room);
+
+
     String getGameUrlById(Long roomId);
+
+    List<GameRoomJpaEntity> findAll();
 }

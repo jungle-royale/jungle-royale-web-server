@@ -11,6 +11,7 @@ import com.example.jungleroyal.common.util.EncryptionUtil;
 import com.example.jungleroyal.common.util.HashUtil;
 import com.example.jungleroyal.domain.gameroom.GameRoomDto;
 import com.example.jungleroyal.repository.GameRoomJpaEntity;
+import com.example.jungleroyal.repository.GameRoomJpaRepository;
 import com.example.jungleroyal.repository.GameRoomRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,8 +31,6 @@ import java.util.concurrent.TimeUnit;
 public class GameRoomService {
     private final GameRoomRepository gameRoomRepository;
     private final RedissonClient redissonClient;
-
-    // TODO: 의존성 문제 해결 -> redisTemplate를 감싸서 우리만의 클래스를 만들고, 우리 비즈니스 로직에 의존하도록 만들어야함.
 
     @Transactional
     public GameRoomDto createRoom(GameRoomDto gameRoomDto) {
@@ -68,14 +67,12 @@ public class GameRoomService {
 
     }
 
-    
     @Transactional
     public void updateRoom(GameRoomDto gameRoomDto) {
         gameRoomDto.setUpdatedAt(LocalDateTime.now());
         gameRoomRepository.save(GameRoomJpaEntity.fromDto(gameRoomDto));
     }
 
-    
     @Transactional
     public void updateRoomStatus(Long roomId, RoomStatus status) {
         GameRoomJpaEntity room = gameRoomRepository.findById(roomId)
@@ -85,14 +82,12 @@ public class GameRoomService {
         gameRoomRepository.save(room);
     }
 
-    
     public void deleteRoom(String gameUrl) {
         GameRoomJpaEntity room = gameRoomRepository.findByGameUrl(gameUrl)
                 .orElseThrow(() -> new RoomByGameUrlFoundException(gameUrl));
         gameRoomRepository.delete(room);
     }
 
-    
     @Transactional
     public List<GameRoomDto> listAllRooms() {
         log.info("(DB) 룸 리스트 조회 시작 :" + System.currentTimeMillis());
@@ -102,7 +97,6 @@ public class GameRoomService {
                 .toList();
     }
 
-    
     public Optional<GameRoomDto> getRoomById(Long roomId) {
         log.info("UserInfoUsingRoomListResponse 객체 생성 완료  :" + System.currentTimeMillis());
         return gameRoomRepository.findById(roomId).map(GameRoomJpaEntity::toDto);
@@ -114,7 +108,6 @@ public class GameRoomService {
                 .orElseThrow(() -> new RoomNotFoundException("id",roomId));
     }
 
-    
     @Transactional(readOnly = true)
     public GameRoomStatus checkRoomAvailability(Long roomId) {
         Optional<GameRoomJpaEntity> optionalRoom = gameRoomRepository.findById(roomId);
@@ -136,13 +129,10 @@ public class GameRoomService {
         return GameRoomStatus.GAME_JOIN_AVAILABLE;
     }
 
-    
     public String getRoomClientIdByUserId(String userId) {
         return EncryptionUtil.encrypt(userId);
     }
 
-
-    
     public void deleteRoomById(Long id) {
         GameRoomJpaEntity gameRoomJpaEntity = gameRoomRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Room not found"));
@@ -150,18 +140,14 @@ public class GameRoomService {
         gameRoomRepository.delete(gameRoomJpaEntity);
     }
 
-    
     public String getRoomUrlById(Long roomId) {
         return gameRoomRepository.getGameUrlById(roomId);
     }
 
-    
     public void updateRoomStatusByRoomUrl(String roomId, RoomStatus roomStatus) {
             GameRoomJpaEntity room = gameRoomRepository.findByGameUrl(roomId)
                 .orElseThrow(() -> new RoomNotFoundException("Room not found for URL: ",roomId));
             room.setStatus(roomStatus);
             room.setUpdatedAt(LocalDateTime.now());
     }
-
-
 }
