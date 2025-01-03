@@ -30,7 +30,6 @@ public class GuestLoginController {
 
         // 3. 응답 데이터 구성
         UserGuestLoginResponse response = UserGuestLoginResponse.createUserGuestLoginResponse(jwt);
-        log.info("response생성");
 
         return ResponseEntity.ok(response);
     }

@@ -93,26 +93,4 @@ public class JwtTokenProvider {
                 .getBody();
     }
 
-    public String generateToken(String subject, long expirationMillis) {
-        Date now = new Date();
-        Date expiration = new Date(now.getTime() + expirationMillis);
-
-        return Jwts.builder()
-                .setSubject(subject)
-                .setIssuedAt(now)
-                .setExpiration(expiration)
-                .signWith(key, SignatureAlgorithm.HS512)
-                .compact();
-    }
-
-    /**
-     * JWT 남은 유효기간 확인
-     */
-    public boolean isTokenExpiringSoon(String token, long thresholdMillis) {
-        Claims claims = parseClaims(token);
-        Date expiration = claims.getExpiration();
-        long timeRemaining = expiration.getTime() - System.currentTimeMillis();
-
-        return timeRemaining < thresholdMillis;
-    }
 }
