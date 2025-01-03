@@ -6,20 +6,25 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SecurityUtil {
-    public String getUserId(){
+    private CustomUserDetails getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication != null && authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
-            return String.valueOf(userDetails.getUserId());
-        } else {
-            return "anonymous";
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
+            return userDetails;
         }
+        return null;
+    }
+    public String getUserId() {
+        CustomUserDetails userDetails = getAuthenticatedUser();
+        return (userDetails != null) ? String.valueOf(userDetails.getUserId()) : "anonymous";
     }
 
     public String getUsername() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
-            return userDetails.getUsername();
-        }
-        return "anonymous";
+        CustomUserDetails userDetails = getAuthenticatedUser();
+        return (userDetails != null) ? userDetails.getUsername() : "anonymous";
+    }
+
+    public String getUserRole() {
+        CustomUserDetails userDetails = getAuthenticatedUser();
+        return (userDetails != null) ? userDetails.getUserRole().name() : "anonymous";
     }
 }
