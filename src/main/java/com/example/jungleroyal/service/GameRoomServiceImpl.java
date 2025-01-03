@@ -9,13 +9,24 @@ import com.example.jungleroyal.common.types.GameRoomStatus;
 import com.example.jungleroyal.common.types.RoomStatus;
 import com.example.jungleroyal.common.util.EncryptionUtil;
 import com.example.jungleroyal.common.util.HashUtil;
+import com.example.jungleroyal.domain.OAuthKakaoToken;
 import com.example.jungleroyal.domain.gameroom.GameRoomDto;
 import com.example.jungleroyal.domain.gameroom.GameRoomJpaEntity;
 import com.example.jungleroyal.repository.GameRoomRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,9 +43,9 @@ public class GameRoomServiceImpl implements GameRoomService {
     @Transactional
     public GameRoomDto createRoom(GameRoomDto gameRoomDto) {
         // 호스트 중복 확인
-        if (gameRoomRepository.existsByHostId(gameRoomDto.getHostId())) {
-            throw new DuplicateRoomException("호스트가 이미 방을 생성했습니다. Host ID: " + gameRoomDto.getHostId());
-        }
+//        if (gameRoomRepository.existsByHostId(gameRoomDto.getHostId())) {
+//            throw new DuplicateRoomException("호스트가 이미 방을 생성했습니다. Host ID: " + gameRoomDto.getHostId());
+//        }
 
         // 방 생성
         String gameUrl = HashUtil.encryptWithUUIDAndHash();
@@ -142,9 +153,9 @@ public class GameRoomServiceImpl implements GameRoomService {
     }
 
     @Override
-    public void updateRoomStatusByRoomUrl(String roomUrl, RoomStatus roomStatus) {
-            GameRoomJpaEntity room = gameRoomRepository.findByGameUrl(roomUrl)
-                .orElseThrow(() -> new RoomNotFoundException("Room not found for URL: ",roomUrl));
+    public void updateRoomStatusByRoomUrl(String roomId, RoomStatus roomStatus) {
+            GameRoomJpaEntity room = gameRoomRepository.findByGameUrl(roomId)
+                .orElseThrow(() -> new RoomNotFoundException("Room not found for URL: ",roomId));
             room.setStatus(roomStatus);
             room.setUpdatedAt(LocalDateTime.now());
     }

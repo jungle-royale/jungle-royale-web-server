@@ -13,7 +13,7 @@ public class GameRoomDto {
     private String title;
     private int minPlayers;
     private int maxPlayers;
-    private int maxGameTime;
+    private int maxGameTime; // 분
     private String map;
     private int currentPlayers;
     private Boolean secret;

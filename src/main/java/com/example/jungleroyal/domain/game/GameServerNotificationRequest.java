@@ -9,4 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class GameServerNotificationRequest {
     private String roomId;
+    private int minPlayers;
+    private int maxPlayTime; // seconds
 }
