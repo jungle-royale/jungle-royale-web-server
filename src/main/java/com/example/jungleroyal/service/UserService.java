@@ -4,6 +4,8 @@ import com.example.jungleroyal.common.util.RandomNicknameGenerator;
 import com.example.jungleroyal.domain.*;
 import com.example.jungleroyal.domain.user.UserDto;
 import com.example.jungleroyal.infrastructure.*;
+import com.example.jungleroyal.service.repository.InventoryRepository;
+import com.example.jungleroyal.service.repository.RefreshTokenRepository;
 import com.example.jungleroyal.service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

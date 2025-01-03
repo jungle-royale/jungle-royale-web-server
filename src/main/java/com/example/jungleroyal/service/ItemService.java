@@ -5,7 +5,7 @@ import com.example.jungleroyal.domain.item.ItemCreateRequest;
 import com.example.jungleroyal.domain.item.ItemCreateResponse;
 import com.example.jungleroyal.infrastructure.ItemJpaEntity;
 import com.example.jungleroyal.domain.item.ItemUpdateRequest;
-import com.example.jungleroyal.infrastructure.ItemRepository;
+import com.example.jungleroyal.service.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

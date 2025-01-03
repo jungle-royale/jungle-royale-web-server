@@ -1,5 +1,6 @@
 package com.example.jungleroyal.infrastructure;
 
+import com.example.jungleroyal.service.repository.GameRoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -8,7 +9,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class GameRoomRepositoryImpl implements GameRoomRepository{
+public class GameRoomRepositoryImpl implements GameRoomRepository {
     private final GameRoomJpaRepository gameRoomJpaRepository;
 
     @Override

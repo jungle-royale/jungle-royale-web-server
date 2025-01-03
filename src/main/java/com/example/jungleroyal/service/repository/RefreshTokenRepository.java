@@ -1,4 +1,4 @@
-package com.example.jungleroyal.infrastructure;
+package com.example.jungleroyal.service.repository;
 
 import com.example.jungleroyal.domain.RefreshToken;
 

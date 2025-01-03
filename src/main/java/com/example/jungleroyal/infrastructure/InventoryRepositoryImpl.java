@@ -1,5 +1,6 @@
 package com.example.jungleroyal.infrastructure;
 
+import com.example.jungleroyal.service.repository.InventoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -8,7 +9,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class InventoryRepositoryImpl implements InventoryRepository{
+public class InventoryRepositoryImpl implements InventoryRepository {
     private final InventoryJpaRepository inventoryJpaRepository;
 
     @Override

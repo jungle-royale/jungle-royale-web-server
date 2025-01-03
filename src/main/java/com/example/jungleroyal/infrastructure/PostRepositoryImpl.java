@@ -1,5 +1,6 @@
 package com.example.jungleroyal.infrastructure;
 
+import com.example.jungleroyal.service.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class PostRepositoryImpl implements PostRepository{
+public class PostRepositoryImpl implements PostRepository {
     private final PostJpaRepository postJpaRepository;
     @Override
     public void save(PostJpaEntity postJpaEntity) {

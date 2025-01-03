@@ -1,4 +1,6 @@
-package com.example.jungleroyal.repository;
+package com.example.jungleroyal.service.repository;
+
+import com.example.jungleroyal.infrastructure.UserJpaEntity;
 
 import java.util.Optional;
 

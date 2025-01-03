@@ -1,4 +1,6 @@
-package com.example.jungleroyal.infrastructure;
+package com.example.jungleroyal.service.repository;
+
+import com.example.jungleroyal.infrastructure.ItemJpaEntity;
 
 import java.util.List;
 import java.util.Optional;

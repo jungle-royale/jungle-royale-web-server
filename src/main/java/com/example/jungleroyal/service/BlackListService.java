@@ -1,6 +1,6 @@
 package com.example.jungleroyal.service;
 
-import com.example.jungleroyal.infrastructure.BlackListRepository;
+import com.example.jungleroyal.service.repository.BlackListRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
