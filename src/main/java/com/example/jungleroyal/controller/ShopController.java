@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/shops")
 @RequiredArgsConstructor
 public class ShopController {
     private final ShopService shopService;
@@ -21,7 +20,7 @@ public class ShopController {
      * @param jwt
      * @return ShopPageResponse
      */
-    @GetMapping("/items")
+    @GetMapping("/api/shops/items")
     public ResponseEntity<ShopPageResponse> getShopPage(@RequestHeader("Authorization") String jwt) {
         ShopPageResponse response = shopService.getShopPage(jwt);
         System.out.println("response = " + response);
@@ -34,7 +33,7 @@ public class ShopController {
      * @param itemCode
      * @return ShopPageResponse
      */
-    @PostMapping("/purchase")
+    @PostMapping("/api/shops/purchase")
     public ResponseEntity<ShopPageResponse> purchaseItem(
             @RequestHeader("Authorization") String jwt,
             @RequestParam Long itemCode) {

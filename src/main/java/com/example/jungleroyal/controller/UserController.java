@@ -21,21 +21,20 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/users")
 @Tag(name = "User", description = "User API")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
-    @PostMapping("/register")
+    @PostMapping("/api/users/register")
     public ResponseEntity<String> registerUser(@RequestBody UserJpaEntity userJpaEntity) {
         System.out.println("user = " + userJpaEntity.toString());
         userRepository.save(userJpaEntity);
         return ResponseEntity.ok("User registered successfully!");
     }
 
-    @GetMapping("/profile")
+    @GetMapping("/api/users/profile")
     public ResponseEntity<UserJpaEntity> getUserById(@RequestHeader("Authorization") String jwt) {
         String jwtToken = jwt.substring(7);
         String userId = jwtTokenProvider.extractSubject(jwtToken);
@@ -46,7 +45,7 @@ public class UserController {
     /**
      * 현재 사용자 추출
      */
-    @GetMapping("/current-user")
+    @GetMapping("/api/users/current-user")
     public ResponseEntity<Map<String, Object>> getCurrentUser() {
         String userId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Map<String, Object> response = new HashMap<>();
@@ -56,7 +55,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/current-info")
+    @GetMapping("/api/users/current-info")
     public ResponseEntity<Map<String, Object>> getCurrentUserInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || authentication.getCredentials() == null) {
@@ -75,7 +74,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/mypage")
+    @GetMapping("/api/users/mypage")
     public ResponseEntity<UserMyPageResponse> myPage(@RequestHeader("Authorization") String jwt){
         String jwtToken = jwt.substring(7);
         String userId = jwtTokenProvider.extractSubject(jwtToken);
@@ -87,7 +86,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/mypage")
+    @PutMapping("/api/users/mypage")
     public ResponseEntity<String> editMyPage(
             @RequestHeader("Authorization") String jwt,
             @RequestBody UserEditMyPageRequest userEditMyPageRequest){

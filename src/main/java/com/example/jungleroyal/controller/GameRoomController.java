@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/rooms")
 @RequiredArgsConstructor
 @Slf4j
 public class GameRoomController {
@@ -27,7 +26,7 @@ public class GameRoomController {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserServiceImpl userService;
     private final GameServerClient gameServerClient;
-    @PostMapping("/create")
+    @PostMapping("/api/rooms/create")
     public ResponseEntity<GameRoomCreateReponse> createRoom(
             @RequestBody GameRoomRequest gameRoomRequest,
             @RequestHeader("Authorization") String authorization) {
@@ -64,15 +63,8 @@ public class GameRoomController {
         return ResponseEntity.ok(response);
     }
 
-    //        MessageCreateGameDto pubMsg = MessageCreateGameDto.builder()
-//                .roomId(room.getId())
-//                .userId(Long.parseLong(room.getHostId()))
-//                .createdAt(room.getCreatedAt())
-//                .build();
-//
-//        redisPublisher.publish(new ChannelTopic("CreateGame"), pubMsg);
     // TODO: 인게임에서 방 속성 변경 시 어떻게 처리할까? 추후 확인할 것
-    @PutMapping("/update/{roomId}")
+    @PutMapping("/api/rooms/update/{roomId}")
     public ResponseEntity<String> updateRoom(
             @PathVariable Long roomId,
             @RequestBody GameRoomRequest gameRoomRequest) {
@@ -83,7 +75,7 @@ public class GameRoomController {
         return ResponseEntity.ok("ok");
     }
 
-    @PutMapping("/update/status/{roomId}")
+    @PutMapping("/api/rooms/update/status/{roomId}")
     public ResponseEntity<Void> updateRoomStatus(
             @PathVariable Long roomId,
             @RequestParam RoomStatus status) {
@@ -91,13 +83,13 @@ public class GameRoomController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/delete/{gameUrl}")
+    @DeleteMapping("/api/rooms/delete/{gameUrl}")
     public ResponseEntity<Void> deleteRoom(@PathVariable String gameUrl) {
         gameRoomService.deleteRoom(gameUrl);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/list")
+    @GetMapping("/api/rooms/list")
     public ResponseEntity<GameRoomListWithUserReponse> listAllRooms(@RequestHeader("Authorization") String authorization) {
         String jwtToken = authorization.substring(7);
         String userId = jwtTokenProvider.extractSubject(jwtToken);
@@ -112,7 +104,7 @@ public class GameRoomController {
         return ResponseEntity.ok(gameRoomListWithUserReponse);
     }
 
-    @GetMapping("/{roomId}")
+    @GetMapping("/api/rooms/{roomId}")
     public ResponseEntity<GameRoomResponse> getRoomById(@PathVariable Long roomId) {
         GameRoomDto roomDto = gameRoomService.getRoomByIdOrThrow(roomId);
         GameRoomResponse response = GameRoomResponse.fromDto(roomDto);
@@ -124,14 +116,14 @@ public class GameRoomController {
      * @param roomId
      * @return GameRoomStatus
      */
-    @PostMapping("/{roomId}/check")
+    @PostMapping("/api/rooms/{roomId}/check")
     public ResponseEntity<GameRoomStatus> checkRoomAvailability(@PathVariable Long roomId) {
         System.out.println("게임 입장 가능여부 확인 roomId = " + roomId);
         GameRoomStatus status = gameRoomService.checkRoomAvailability(roomId);
         return ResponseEntity.ok(status);
     }
 
-    @PostMapping("/{roomId}/join")
+    @PostMapping("/api/rooms/{roomId}/join")
     public ResponseEntity<GameRoomJoinReponse> joinGameRoom(
             @RequestHeader("Authorization") String jwt,
             @PathVariable Long roomId) {

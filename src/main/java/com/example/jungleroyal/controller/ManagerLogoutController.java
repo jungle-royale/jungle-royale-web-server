@@ -17,7 +17,6 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/auth")
 @Slf4j
 public class ManagerLogoutController {
     private final KakaoAuthService kakaoAuthService;
@@ -25,7 +24,7 @@ public class ManagerLogoutController {
     private final BlackListRepository blackListRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
-    @PostMapping("/logout")
+    @PostMapping("/api/auth/logout")
     public ResponseEntity<Map<String, String>> logout(
             @RequestHeader("Authorization") String authorization,
             @RequestBody LogoutRequest logoutRequest

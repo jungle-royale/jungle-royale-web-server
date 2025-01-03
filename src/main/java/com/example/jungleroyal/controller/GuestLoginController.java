@@ -21,7 +21,7 @@ public class GuestLoginController {
     private final UserServiceImpl userService;
     private final JwtTokenProvider jwtTokenProvider;
 
-    @PostMapping("/login")
+    @PostMapping("/api/rooms/login")
     public ResponseEntity<UserGuestLoginResponse> guestLogin() {
         // 1. 비회원 유저 생성
         UserJpaEntity guestUserJpaEntity = userService.registerGuest();
