@@ -3,7 +3,7 @@ package com.example.jungleroyal.service;
 import com.example.jungleroyal.common.exceptions.GameRoomException;
 import com.example.jungleroyal.common.types.GameRoomStatus;
 import com.example.jungleroyal.common.types.RoomStatus;
-import com.example.jungleroyal.domain.gameroom.GameRoomJpaEntity;
+import com.example.jungleroyal.repository.GameRoomJpaEntity;
 import com.example.jungleroyal.repository.GameRoomRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
