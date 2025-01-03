@@ -25,9 +25,9 @@ game-server:
 
 base:
   url:
-    item: "http://192.168.1.241:8080/uploads/items/"
-    post: "http://192.168.1.241:8080/uploads/posts/"
-    shop: "http://192.168.1.241:8080/uploads/items/"
+    item: "http://localhost:8080/uploads/items/"
+    post: "http://localhost:8080/uploads/posts/"
+    shop: "http://localhost:8080/uploads/items/"
 
 kakao:
 #  client-id: 9b5e1f47241e82beb559d44bd2a25377  # 백엔드 서버
