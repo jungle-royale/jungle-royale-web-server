@@ -1,5 +1,6 @@
 package com.example.jungleroyal.common.util;
 
+import com.example.jungleroyal.common.types.UserRole;
 import com.example.jungleroyal.domain.OAuthKakaoToken;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -32,21 +33,24 @@ public class JwtTokenProvider {
      * @param subject
      * @return
      */
-    public String generate(String subject) {
+    public String generate(String subject, String username, UserRole userRole) {
         Date expirationDate = new Date(System.currentTimeMillis() + JWT_EXPIRE_TIME);
         return Jwts.builder()
                 .setSubject(subject)
+                .claim("username", username)
+                .claim("role", userRole.name())
                 .setExpiration(expirationDate)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
     }
 
-    public String generateKakaoJwt(String userId, String kakaoId, OAuthKakaoToken oAuthKakaoToken) {
-        Date expirationDate = new Date(System.currentTimeMillis() + oAuthKakaoToken.getExpires_in() * 1000L);
-
+    public String generateKakaoJwt(String userId, String username, String userRole, String kakaoId) {
+        Date expirationDate = new Date(System.currentTimeMillis() + JWT_EXPIRE_TIME);
         return Jwts.builder()
                 .setSubject(userId)
+                .claim("username", username)
                 .claim("kakaoId", kakaoId)
+                .claim("role", userRole)
                 .setExpiration(expirationDate)
                 .setIssuedAt(Date.from(Instant.now())) // 발행 시간
                 .signWith(key, SignatureAlgorithm.HS512)
@@ -84,6 +88,15 @@ public class JwtTokenProvider {
         return claims.get("kakaoId", String.class);
     }
 
+    public String extractUsername(String token) {
+        return parseClaims(token).get("username", String.class);
+    }
+
+    public UserRole extractUserRole(String token) {
+        String role = parseClaims(token).get("role", String.class);
+        return UserRole.valueOf(role); // 문자열을 Enum으로 변환
+    }
+
 
     public Claims parseClaims(String accessToken) {
         return Jwts.parserBuilder()
@@ -92,5 +105,8 @@ public class JwtTokenProvider {
                 .parseClaimsJws(accessToken)
                 .getBody();
     }
+
+
+
 
 }
