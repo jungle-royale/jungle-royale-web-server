@@ -41,17 +41,20 @@ public class GameRoomController {
 
         String roomUrl = gameRoomService.getRoomUrlById(room.getId());
 
-        // 게임서버에 HTTP 찌르고 기다렸다가 return
+        int minPlayers = room.getMinPlayers();
+        int maxPlayTime = room.getMaxGameTime();
+
+        // TODO: 게임서버에 HTTP 찌르고 기다렸다가 return
         // 게임 서버와 통신
-//        GameServerNotificationRequest gameServerNotificationRequest = new GameServerNotificationRequest(roomUrl);
-//        GameServerNotificationResponse gameServerResponse = gameServerClient.notifyGameServer(gameServerNotificationRequest,userId);
-//
+        GameServerNotificationRequest gameServerNotificationRequest = new GameServerNotificationRequest(roomUrl, minPlayers, maxPlayTime);
+        GameServerNotificationResponse gameServerResponse = gameServerClient.notifyGameServer(gameServerNotificationRequest, userId);
+
 //        // 게임 서버 응답 확인
-//        if (!gameServerResponse.isSuccess()) {
-//            log.error("게임 서버 응답 실패");
-//            gameRoomService.deleteRoomById(room.getId());
-//            throw new IllegalStateException("게임 서버에서 방 생성을 허용하지 않았습니다.");
-//        }
+        if (!gameServerResponse.isSuccess()) {
+            log.error("게임 서버 응답 실패");
+            gameRoomService.deleteRoomById(room.getId());
+            throw new IllegalStateException("게임 서버에서 방 생성을 허용하지 않았습니다.");
+        }
 
         GameRoomCreateReponse response = GameRoomCreateReponse.builder()
                 .roomId(roomUrl)
