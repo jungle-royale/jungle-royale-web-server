@@ -26,6 +26,7 @@ security:
 upload:
   dir:
     item: "src/main/resources/static/uploads/items"
+    post: "src/main/resources/static/uploads"
 
 
 springdoc:

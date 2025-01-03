@@ -2,10 +2,7 @@ package com.example.jungleroyal.service;
 
 import com.example.jungleroyal.common.util.JungleFileUtils;
 import com.example.jungleroyal.domain.post.*;
-import com.example.jungleroyal.repository.UserJpaEntity;
-import com.example.jungleroyal.repository.PostJdbcRepository;
-import com.example.jungleroyal.repository.PostJpaEntity;
-import com.example.jungleroyal.repository.PostRepository;
+import com.example.jungleroyal.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,12 +23,13 @@ public class PostService {
     private final PostJdbcRepository postJdbcRepository;
     private final JungleFileUtils fileUtils;
 
-    private static final String UPLOAD_DIR = "src/main/resources/static/uploads";
+    @Value("${upload.dir.post}")
+    private String UPLOAD_DIR;
 
     @Value("${base.url.post}")
     private String baseUrl;
 
-    
+    @Transactional
     public void savePost(PostCreateResponse postCreateResponse, Long userId) {
         MultipartFile file = postCreateResponse.getImage();
 
@@ -45,7 +43,6 @@ public class PostService {
     }
 
     @Transactional
-    
     public List<PostDto> getPosts() {
         return postRepository.findAll()
                 .stream()

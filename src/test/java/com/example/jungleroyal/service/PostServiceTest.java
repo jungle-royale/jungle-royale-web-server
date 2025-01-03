@@ -9,7 +9,7 @@ import com.example.jungleroyal.domain.post.PostListResponse;
 import com.example.jungleroyal.domain.post.PostResponse;
 import com.example.jungleroyal.repository.UserJpaEntity;
 import com.example.jungleroyal.repository.PostJpaEntity;
-import com.example.jungleroyal.repository.PostRepository;
+import com.example.jungleroyal.repository.PostJpaRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,7 +34,7 @@ import static org.mockito.Mockito.*;
 
 public class PostServiceTest {
     @Mock
-    private PostRepository postRepository;
+    private PostJpaRepository postRepository;
 
     @Mock
     private PostJdbcRepository postJdbcRepository;
