@@ -1,6 +1,6 @@
 package com.example.jungleroyal.service;
 
-import com.example.jungleroyal.domain.BlackList;
+import com.example.jungleroyal.repository.BlackListJpaEntity;
 import com.example.jungleroyal.repository.BlackListRepository;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -14,12 +14,13 @@ import java.security.Key;
 @RequiredArgsConstructor
 public class JwtService {
     private final BlackListRepository blackListRepository;
-    public void invalidateToken(String accessToken) {
-        if (isTokenValid(accessToken)) {
+    public void invalidateToken(String refreshToken) {
+        if (isTokenValid(refreshToken)) {
             // 블랙리스트에 토큰 저장
-            blackListRepository.save(new BlackList(accessToken));
+
+            blackListRepository.save(BlackListJpaEntity.fromToken(refreshToken));
         } else {
-            throw new RuntimeException("Invalid JWT token.");
+            throw new RuntimeException("Invalid JWT Refresh token.");
         }
     }
 
