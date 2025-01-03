@@ -42,6 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     CustomUserDetails userDetails = new CustomUserDetails(
                             userId,
                             null,
+                            null,
                             null // 권한 정보가 필요하면 추가
                     );
 
