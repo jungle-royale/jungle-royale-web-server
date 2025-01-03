@@ -1,5 +1,6 @@
 package com.example.jungleroyal.domain.user;
 
+import com.example.jungleroyal.common.types.UserRole;
 import lombok.Builder;
 import lombok.Data;
 
@@ -11,6 +12,7 @@ public class UserDto {
     private Long id;
     private String kakaoId;
     private String username;
+    private UserRole userRole;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime lastLoginAt;

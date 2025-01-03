@@ -1,6 +1,8 @@
 package com.example.jungleroyal.controller;
 
+import com.example.jungleroyal.common.types.UserRole;
 import com.example.jungleroyal.common.util.JwtTokenProvider;
+import com.example.jungleroyal.common.util.SecurityUtil;
 import com.example.jungleroyal.infrastructure.UserJpaEntity;
 import com.example.jungleroyal.domain.user.UserGuestLoginResponse;
 import com.example.jungleroyal.service.UserService;
@@ -18,19 +20,22 @@ import org.springframework.web.bind.annotation.RestController;
 public class GuestLoginController {
     private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final SecurityUtil securityUtil;
 
     @PostMapping("/api/auth/guest/login")
     public ResponseEntity<UserGuestLoginResponse> guestLogin() {
+
         // 1. 비회원 유저 생성
         UserJpaEntity guestUserJpaEntity = userService.registerGuest();
         Long id = guestUserJpaEntity.getId();
+        String username = guestUserJpaEntity.getUsername();
+        UserRole userRole = guestUserJpaEntity.getRole();
         String userId = String.valueOf(id);
         // 2. JWT 생성
-        String jwt = jwtTokenProvider.generate(userId);
+        String jwt = jwtTokenProvider.generate(userId, username, userRole);
 
         // 3. 응답 데이터 구성
         UserGuestLoginResponse response = UserGuestLoginResponse.createUserGuestLoginResponse(jwt);
-        log.info("response생성");
 
         return ResponseEntity.ok(response);
     }
