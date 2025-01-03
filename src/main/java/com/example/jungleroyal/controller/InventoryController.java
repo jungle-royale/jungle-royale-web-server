@@ -10,11 +10,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/inventorys")
 @RequiredArgsConstructor
 public class InventoryController {
     private final InventoryService inventoryService;
-    @GetMapping("/items")
+    @GetMapping("/api/inventorys/items")
     public ResponseEntity<InventoryListReponse> getItems(@RequestHeader("Authorization") String jwt) {
         InventoryListReponse items = inventoryService.getItemsByJwt(jwt);
         return ResponseEntity.ok(items);

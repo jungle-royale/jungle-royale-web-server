@@ -12,12 +12,11 @@ import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/posts")
 @Slf4j
 public class PostController {
     private final PostService postService;
     private final JwtTokenProvider jwtTokenProvider;
-    @PostMapping("/create")
+    @PostMapping("/api/posts/create")
     public ResponseEntity<String> create(
             @RequestHeader("Authorization") String authorization,
             PostCreateResponse postCreateResponse
@@ -28,7 +27,7 @@ public class PostController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/list")
+    @GetMapping("/api/posts/list")
     public ResponseEntity<PageResponse<PostListResponse>> listAllPosts(
             @RequestParam int page,
             @RequestParam int limit) {
@@ -38,7 +37,7 @@ public class PostController {
 
     }
 
-    @GetMapping("/{postId}")
+    @GetMapping("/api/posts/{postId}")
     public ResponseEntity<PostResponse> getPost(
             @PathVariable Long postId
     ){
@@ -46,7 +45,7 @@ public class PostController {
         return ResponseEntity.ok().body(response);
     }
 
-    @PutMapping("/{postId}")
+    @PutMapping("/api/posts/{postId}")
     public ResponseEntity<String> update(
             @PathVariable Long postId,
             PostUpdateRequest postUpdateRequest
@@ -55,7 +54,7 @@ public class PostController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/{postId}")
+    @DeleteMapping("/api/posts/{postId}")
     public ResponseEntity<String> delete(
             @PathVariable Long postId
     ) throws IOException {
