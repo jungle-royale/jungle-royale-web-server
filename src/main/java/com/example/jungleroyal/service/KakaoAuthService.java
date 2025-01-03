@@ -124,9 +124,11 @@ public class KakaoAuthService {
         // 카카오회원 번호를 이용해서 jwt 생성
         UserDto userByKakaoId = userService.getUserByKakaoId(kakaoId);
         long userId = userByKakaoId.getId();
+        String username = userByKakaoId.getUsername();
+        String userRole = userByKakaoId.getUserRole().name();
         String kakaoId2 = userByKakaoId.getKakaoId();
 
-        String jwtToken = jwtTokenProvider.generateKakaoJwt(String.valueOf(userId), kakaoId2, oAuthKakaoToken);
+        String jwtToken = jwtTokenProvider.generateKakaoJwt(String.valueOf(userId), username, userRole, kakaoId2);
 
         return getKakaoLoginResponse(jwtToken, oAuthKakaoToken);
     }
