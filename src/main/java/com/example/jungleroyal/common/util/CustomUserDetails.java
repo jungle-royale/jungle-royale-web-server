@@ -7,32 +7,23 @@ import java.util.Collection;
 
 public class CustomUserDetails implements UserDetails {
 
-    private final Long userId;      // 우리 서버 회원 번호
-    private final String kakaoId;  // 카카오 회원 번호
-    private final String username;
+    private final Long userId;      // 서버 회원 번호
+    private final String username;  // 유저 닉네임
+    private final Collection<? extends GrantedAuthority> authorities;
 
-    public CustomUserDetails(Long userId, String kakaoId, String username) {
+    public CustomUserDetails(Long userId, String username, Collection<? extends GrantedAuthority> authorities) {
         this.userId = userId;
-        this.kakaoId = kakaoId;
         this.username = username;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
-    }
-
-    public Long getUserId(){
-        return userId;
-    }
-
-    public String getKakaoId(){
-        return kakaoId;
+        this.authorities = authorities;
     }
 
     @Override
     public String getPassword() {
         return null;
+    }
+
+    public Long getUserId() {
+        return userId;
     }
 
     @Override
@@ -41,22 +32,27 @@ public class CustomUserDetails implements UserDetails {
     }
 
     @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return authorities;
+    }
+
+    @Override
     public boolean isAccountNonExpired() {
-        return UserDetails.super.isAccountNonExpired();
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return UserDetails.super.isAccountNonLocked();
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return UserDetails.super.isCredentialsNonExpired();
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return UserDetails.super.isEnabled();
+        return true;
     }
 }
