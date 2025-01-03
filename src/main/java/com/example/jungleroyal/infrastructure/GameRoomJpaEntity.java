@@ -1,6 +1,7 @@
-package com.example.jungleroyal.domain.gameroom;
+package com.example.jungleroyal.infrastructure;
 
 import com.example.jungleroyal.common.types.RoomStatus;
+import com.example.jungleroyal.domain.gameroom.GameRoomDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

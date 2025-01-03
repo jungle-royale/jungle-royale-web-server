@@ -1,8 +1,8 @@
 package com.example.jungleroyal.service;
 
 import com.example.jungleroyal.domain.user.UserDto;
-import com.example.jungleroyal.repository.UserJpaEntity;
-import com.example.jungleroyal.repository.UserRepository;
+import com.example.jungleroyal.infrastructure.UserJpaEntity;
+import com.example.jungleroyal.infrastructure.UserJpaRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -14,7 +14,7 @@ import static org.mockito.Mockito.*;
 
 public class UserServiceTest {
     @Mock
-    private UserRepository userRepository;
+    private UserJpaRepository userRepository;
 
     @InjectMocks
     private UserService userService;

@@ -1,4 +1,4 @@
-package com.example.jungleroyal.repository;
+package com.example.jungleroyal.infrastructure;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

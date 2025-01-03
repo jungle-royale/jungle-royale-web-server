@@ -1,8 +1,8 @@
 package com.example.jungleroyal.service;
 
 import com.example.jungleroyal.common.util.CustomUserDetails;
-import com.example.jungleroyal.repository.UserJpaEntity;
-import com.example.jungleroyal.repository.UserRepository;
+import com.example.jungleroyal.infrastructure.UserJpaEntity;
+import com.example.jungleroyal.service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

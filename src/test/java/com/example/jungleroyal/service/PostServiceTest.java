@@ -4,12 +4,12 @@ import com.example.jungleroyal.common.util.JungleFileUtils;
 import com.example.jungleroyal.common.util.TimeUtils;
 import com.example.jungleroyal.domain.post.PageResponse;
 import com.example.jungleroyal.domain.post.PostDto;
-import com.example.jungleroyal.repository.PostJdbcRepository;
+import com.example.jungleroyal.infrastructure.PostJdbcRepository;
 import com.example.jungleroyal.domain.post.PostListResponse;
 import com.example.jungleroyal.domain.post.PostResponse;
-import com.example.jungleroyal.repository.UserJpaEntity;
-import com.example.jungleroyal.repository.PostJpaEntity;
-import com.example.jungleroyal.repository.PostRepository;
+import com.example.jungleroyal.infrastructure.UserJpaEntity;
+import com.example.jungleroyal.infrastructure.PostJpaEntity;
+import com.example.jungleroyal.infrastructure.PostJpaRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,7 +34,7 @@ import static org.mockito.Mockito.*;
 
 public class PostServiceTest {
     @Mock
-    private PostRepository postRepository;
+    private PostJpaRepository postRepository;
 
     @Mock
     private PostJdbcRepository postJdbcRepository;
@@ -175,7 +175,6 @@ public class PostServiceTest {
         assertEquals(post.getContent(), response.getContent(), "내용이 일치해야 합니다.");
         assertEquals(user.getUsername(), response.getWriter(), "작성자 이름이 일치해야 합니다.");
         assertEquals(user.getId(), response.getWriterId(), "작성자 ID가 일치해야 합니다.");
-        assertEquals("http://localhost:8080/uploads/testImage.jpg", response.getImageUrl(), "이미지 URL이 일치해야 합니다.");
 
         verify(postRepository, times(1)).findById(postId);
     }

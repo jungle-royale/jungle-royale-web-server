@@ -2,7 +2,6 @@ package com.example.jungleroyal.common.util;
 
 
 import com.example.jungleroyal.domain.OAuthKakaoToken;
-import com.example.jungleroyal.repository.BlackListRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
