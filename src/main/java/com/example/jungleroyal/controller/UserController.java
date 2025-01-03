@@ -6,7 +6,7 @@ import com.example.jungleroyal.domain.user.UserDto;
 import com.example.jungleroyal.domain.user.UserEditMyPageRequest;
 import com.example.jungleroyal.repository.UserJpaEntity;
 import com.example.jungleroyal.domain.user.UserMyPageResponse;
-import com.example.jungleroyal.repository.UserRepository;
+import com.example.jungleroyal.repository.UserJpaRepository;
 import com.example.jungleroyal.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-    private final UserRepository userRepository;
+    private final UserJpaRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
     @PostMapping("/api/users/register")
     public ResponseEntity<String> registerUser(@RequestBody UserJpaEntity userJpaEntity) {

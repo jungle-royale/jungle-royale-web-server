@@ -1,6 +1,7 @@
 package com.example.jungleroyal.service;
 
 import com.example.jungleroyal.common.util.JwtTokenProvider;
+import com.example.jungleroyal.repository.UserJpaRepository;
 import com.example.jungleroyal.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,7 @@ import static org.mockito.Mockito.*;
 
 public class ShopServiceTest {
     @Mock
-    private UserRepository userRepository;
+    private UserJpaRepository userRepository;
 
     @Mock
     private JwtTokenProvider jwtTokenProvider;
