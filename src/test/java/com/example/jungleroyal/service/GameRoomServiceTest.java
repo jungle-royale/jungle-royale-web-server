@@ -23,7 +23,7 @@ public class GameRoomServiceTest {
     private GameRoomRepository gameRoomRepository;
 
     @InjectMocks
-    private GameRoomServiceImpl gameRoomService;
+    private GameRoomService gameRoomService;
 
     @BeforeEach
     void setUp() {

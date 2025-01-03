@@ -43,7 +43,7 @@ public class PostServiceTest {
     private JungleFileUtils jungleFileUtils;
 
     @InjectMocks
-    private PostServiceImpl postService;
+    private PostService postService;
 
     @BeforeEach
     void setUp() {

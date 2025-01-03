@@ -2,7 +2,6 @@ package com.example.jungleroyal.controller;
 
 import com.example.jungleroyal.common.types.GameRoomStatus;
 import com.example.jungleroyal.common.types.RoomStatus;
-import com.example.jungleroyal.common.util.EncryptionUtil;
 import com.example.jungleroyal.common.util.GameServerClient;
 import com.example.jungleroyal.common.util.JwtTokenProvider;
 import com.example.jungleroyal.domain.game.GameServerNotificationRequest;
@@ -10,7 +9,7 @@ import com.example.jungleroyal.domain.game.GameServerNotificationResponse;
 import com.example.jungleroyal.domain.gameroom.*;
 import com.example.jungleroyal.domain.user.UserInfoUsingRoomListResponse;
 import com.example.jungleroyal.service.GameRoomService;
-import com.example.jungleroyal.service.UserServiceImpl;
+import com.example.jungleroyal.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +23,7 @@ import java.util.List;
 public class GameRoomController {
     private final GameRoomService gameRoomService;
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserServiceImpl userService;
+    private final UserService userService;
     private final GameServerClient gameServerClient;
     @PostMapping("/api/rooms/create")
     public ResponseEntity<GameRoomCreateReponse> createRoom(
