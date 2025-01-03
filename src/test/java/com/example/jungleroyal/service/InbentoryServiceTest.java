@@ -63,7 +63,7 @@ public class InbentoryServiceTest {
         when(fileUtils.generateImageUrl("image2.jpg", "http://mock.base.url")).thenReturn("http://mock.base.url/image2.jpg");
 
         // Set baseUrl value
-        inventoryService.baseUrl = "http://mock.base.url";
+//        inventoryService.baseUrl = "http://mock.base.url";
 
         // When
         InventoryListReponse response = inventoryService.getItemsByJwt(jwt);
