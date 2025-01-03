@@ -19,6 +19,10 @@ spring:
   redisson:
     address: redis://127.0.0.1:6379
 
+game-server:
+#  base-url: "http://game-api.eternalsnowman.com:8080/api"
+  base-url: "http://localhost:8000/api"
+
 base:
   url:
     item: "http://192.168.1.241:8080/uploads/items/"

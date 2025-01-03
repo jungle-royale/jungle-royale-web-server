@@ -22,6 +22,9 @@ spring:
     address: redis://jungle-royale-redis-cache-001.bgoupc.0001.apn2.cache.amazonaws.com:6379
 
 
+game-server:
+  base-url: "http://game-api.eternalsnowman.com:8080/api"
+
 kakao:
   client-id: e8304b2a6b5aeb5020ef6abeb405115b
   redirect-uri: http://eternalsnowman.com/login

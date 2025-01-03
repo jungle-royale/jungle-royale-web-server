@@ -157,9 +157,9 @@ public class GameRoomServiceImpl implements GameRoomService {
     }
 
     @Override
-    public void updateRoomStatusByRoomUrl(String roomUrl, RoomStatus roomStatus) {
-            GameRoomJpaEntity room = gameRoomRepository.findByGameUrl(roomUrl)
-                .orElseThrow(() -> new RoomNotFoundException("Room not found for URL: ",roomUrl));
+    public void updateRoomStatusByRoomUrl(String roomId, RoomStatus roomStatus) {
+            GameRoomJpaEntity room = gameRoomRepository.findByGameUrl(roomId)
+                .orElseThrow(() -> new RoomNotFoundException("Room not found for URL: ",roomId));
             room.setStatus(roomStatus);
             room.setUpdatedAt(LocalDateTime.now());
     }
