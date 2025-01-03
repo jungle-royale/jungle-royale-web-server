@@ -4,6 +4,7 @@ import com.example.jungleroyal.common.types.GameRoomStatus;
 import com.example.jungleroyal.common.types.RoomStatus;
 import com.example.jungleroyal.common.util.GameServerClient;
 import com.example.jungleroyal.common.util.JwtTokenProvider;
+import com.example.jungleroyal.common.util.SecurityUtil;
 import com.example.jungleroyal.domain.game.GameServerNotificationRequest;
 import com.example.jungleroyal.domain.game.GameServerNotificationResponse;
 import com.example.jungleroyal.domain.gameroom.*;
@@ -25,6 +26,8 @@ public class GameRoomController {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
     private final GameServerClient gameServerClient;
+    private final SecurityUtil securityUtil;
+
     @PostMapping("/api/rooms/create")
     public ResponseEntity<GameRoomCreateReponse> createRoom(
             @RequestBody GameRoomRequest gameRoomRequest,
@@ -89,11 +92,9 @@ public class GameRoomController {
     }
 
     @GetMapping("/api/rooms/list")
-    public ResponseEntity<GameRoomListWithUserReponse> listAllRooms(@RequestHeader("Authorization") String authorization) {
-        String jwtToken = authorization.substring(7);
-        String userId = jwtTokenProvider.extractSubject(jwtToken);
-        String username = userService.getUsernameById(userId);
-        UserInfoUsingRoomListResponse userInfoUsingRoomListResponse = UserInfoUsingRoomListResponse.createUserInfoUsingRoomListResponse(username);
+    public ResponseEntity<GameRoomListWithUserReponse> listAllRooms() {
+
+        UserInfoUsingRoomListResponse userInfoUsingRoomListResponse = UserInfoUsingRoomListResponse.createUserInfoUsingRoomListResponse(securityUtil.getUsername());
 
         List<GameRoomListResponse> responseList = gameRoomService.listAllRooms()
                 .stream()

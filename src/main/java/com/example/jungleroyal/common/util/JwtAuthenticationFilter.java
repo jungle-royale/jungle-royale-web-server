@@ -1,5 +1,6 @@
 package com.example.jungleroyal.common.util;
 
+import com.example.jungleroyal.common.types.UserRole;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -38,14 +39,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try{
                 if (jwtTokenProvider.isValidToken(jwtToken)) {
                     Long userId = Long.valueOf(jwtTokenProvider.extractSubject(jwtToken));
+                    String username = jwtTokenProvider.extractUsername(jwtToken);
+                    UserRole userRole = jwtTokenProvider.extractUserRole(jwtToken);
 
                     CustomUserDetails userDetails = new CustomUserDetails(
                             userId,
-                            null,
-                            null,
+                            username,
+                            userRole,
                             null // 권한 정보가 필요하면 추가
                     );
-
 
                     // 인증 정보를 SecurityContext에 설정
                     UsernamePasswordAuthenticationToken authentication =
