@@ -45,15 +45,7 @@ public class UserService {
     public UserDto getUserByKakaoId(String kakaoId) {
         UserJpaEntity userJpaEntity = userRepository.findByKakaoId(kakaoId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with Kakao ID: " + kakaoId));
-
-        return UserDto.builder()
-                .id(userJpaEntity.getId())
-                .kakaoId(userJpaEntity.getKakaoId())
-                .username(userJpaEntity.getUsername())
-                .createdAt(userJpaEntity.getCreatedAt())
-                .updatedAt(userJpaEntity.getUpdatedAt())
-                .lastLoginAt(userJpaEntity.getLastLoginAt())
-                .build();
+        return UserJpaEntity.toDto(userJpaEntity);
     }
 
     public void kakaoUserJoin(String kakaoId, OAuthKakaoToken oAuthKakaoToken) {

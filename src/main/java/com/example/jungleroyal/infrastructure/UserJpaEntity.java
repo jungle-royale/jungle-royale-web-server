@@ -1,6 +1,7 @@
 package com.example.jungleroyal.infrastructure;
 
 import com.example.jungleroyal.common.types.UserRole;
+import com.example.jungleroyal.domain.user.UserDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -53,6 +54,19 @@ public class UserJpaEntity {
         guestUserJpaEntity.setLastLoginAt(LocalDateTime.now());
 
         return guestUserJpaEntity;
+    }
+
+    public static UserDto toDto(UserJpaEntity userJpaEntity) {
+        return UserDto.builder()
+                .id(userJpaEntity.getId())
+                .kakaoId(userJpaEntity.getKakaoId())
+                .username(userJpaEntity.getUsername())
+                .userRole(userJpaEntity.getRole())
+                .createdAt(userJpaEntity.createdAt)
+                .updatedAt(userJpaEntity.updatedAt)
+                .gameMoney(userJpaEntity.getGameMoney())
+                .lastLoginAt(userJpaEntity.lastLoginAt)
+                .build();
     }
 
     public UserJpaEntity createKakaoUser(String kakaoId, String username){
