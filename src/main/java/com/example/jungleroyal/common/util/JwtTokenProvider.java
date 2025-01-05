@@ -54,6 +54,7 @@ public class JwtTokenProvider {
         // Refresh Token은 간단히 subject(사용자 ID)와 만료 시간만 설정
         String refresh = Jwts.builder()
                 .setSubject(String.valueOf(userId)) // 사용자 ID만 포함
+                .claim("category", "refresh")
                 .claim("username", username)
                 .claim("role", userRole.name())
                 .setExpiration(expirationDate) // 만료 시간
