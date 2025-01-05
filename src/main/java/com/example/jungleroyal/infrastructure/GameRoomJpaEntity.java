@@ -37,12 +37,6 @@ public class GameRoomJpaEntity {
     private int maxGameTime; // in minutes
 
     @Column(nullable = false)
-    private String map;
-
-    @Column(nullable = false)
-    private Boolean secret;
-
-    @Column(nullable = false)
     private int currentPlayers; // New field for tracking connected players
 
     @Column(nullable = false)
@@ -68,9 +62,7 @@ public class GameRoomJpaEntity {
                 .minPlayers(minPlayers)
                 .maxPlayers(maxPlayers)
                 .maxGameTime(maxGameTime)
-                .map(map)
                 .currentPlayers(currentPlayers)
-                .secret(secret)
                 .status(status)
                 .hostId(hostId)
                 .gameUrl(gameUrl)
@@ -84,9 +76,7 @@ public class GameRoomJpaEntity {
                 .minPlayers(dto.getMinPlayers())
                 .maxPlayers(dto.getMaxPlayers())
                 .maxGameTime(dto.getMaxGameTime())
-                .map(dto.getMap())
                 .currentPlayers(dto.getCurrentPlayers())
-                .secret(dto.getSecret())
                 .status(dto.getStatus())
                 .hostId(dto.getHostId())
                 .gameUrl(dto.getGameUrl())

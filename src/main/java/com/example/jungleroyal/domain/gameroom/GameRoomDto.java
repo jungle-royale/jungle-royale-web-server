@@ -52,8 +52,6 @@ public class GameRoomDto {
                 .minPlayers(request.getMinPlayers())
                 .maxPlayers(request.getMaxPlayers())
                 .maxGameTime(request.getMaxGameTime())
-                .map(request.getMap())
-                .secret(request.getSecret())
                 .currentPlayers(request.getCurrentPlayers())
                 .status(request.getStatus())
                 .hostId(request.getHostId())
