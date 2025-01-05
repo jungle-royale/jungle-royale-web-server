@@ -22,6 +22,7 @@ public class GameServerClient {
 
     public GameServerNotificationResponse notifyGameServer(GameServerNotificationRequest gameServerNotificationRequest, String userId) {
         log.info("Sending notification to game server , userId: [{}]", userId);
+        log.info("Sending notification to game server , url: [{}]", gameServerUrl);
 
         try {
             ResponseEntity<GameServerNotificationResponse> response = restTemplate.postForEntity(
