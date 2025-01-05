@@ -31,4 +31,8 @@ public class RefreshToken {
 
     private LocalDateTime updatedAt = LocalDateTime.now();
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    public void updateUpdatedAt(LocalDateTime utc) {
+        this.updatedAt = utc;
+    }
 }
