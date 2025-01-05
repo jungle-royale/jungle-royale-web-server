@@ -23,6 +23,6 @@ public class BlackListRepositoryImpl implements BlackListRepository {
 
     @Override
     public void save(BlackListJpaEntity blackListJpaEntity) {
-
+        blackListJpaRepository.save(blackListJpaEntity);
     }
 }

@@ -28,6 +28,11 @@ public class ManagerLogoutController {
             @RequestBody LogoutRequest logoutRequest
     ) {
         log.info("비회원 로그인 실행");
+        String refreshToken = logoutRequest.getRefreshToken();
+        String jwt = authorization.substring(7);
+
+        jwtService.saveBlackList(refreshToken);
+
 //        System.out.println("jwtToken = " + jwtToken);
 //        String userId = jwtTokenProvider.extractSubject(jwtToken);
 
