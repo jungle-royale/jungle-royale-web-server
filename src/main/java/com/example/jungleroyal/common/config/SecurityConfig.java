@@ -23,8 +23,8 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable()) // CSRF 비활성화
             .authorizeHttpRequests(auth -> auth
 //                    .requestMatchers("/api/").permitAll() // 인증 필요 없는 경로
-                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()  // 모든 OPTIONS 요청에 대해 인증을 요구하지 않음
-                    .requestMatchers("/api/users").authenticated()  // 인증이 필요한 경로
+//                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()  // 모든 OPTIONS 요청에 대해 인증을 요구하지 않음
+//                    .requestMatchers("/api/users").authenticated()  // 인증이 필요한 경로
                     .anyRequest().permitAll() // 모든 요청 인증 없이 허용
 //                    .anyRequest().authenticated()  // 인증 필요
             )

@@ -1,7 +1,8 @@
 package com.example.jungleroyal.common.util;
 
 import com.example.jungleroyal.common.types.UserRole;
-import com.example.jungleroyal.domain.OAuthKakaoToken;
+import com.example.jungleroyal.infrastructure.RefreshToken;
+import com.example.jungleroyal.infrastructure.UserJpaEntity;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Slf4j
@@ -19,7 +21,8 @@ public class JwtTokenProvider {
     private final Key key;
 
     public static final String AUTHORIZATION_HEADER = "Authorization";
-    private static final long JWT_EXPIRE_TIME = 1000 * 60 * 60;       // 1시간
+    private static final long JWT_EXPIRE_TIME = 1000 * 60 * 60 * 24;       // 24시간
+    private static final long JWT_REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;       // 7일
 
     public static final String TYPE = "Bearer";
 
@@ -30,18 +33,41 @@ public class JwtTokenProvider {
 
     /**
      *
-     * @param subject
+     * @param userId
      * @return
      */
-    public String generate(String subject, String username, UserRole userRole) {
+    public String generate(String userId, String username, UserRole userRole) {
         Date expirationDate = new Date(System.currentTimeMillis() + JWT_EXPIRE_TIME);
         return Jwts.builder()
-                .setSubject(subject)
+                .setSubject(userId)
                 .claim("username", username)
                 .claim("role", userRole.name())
                 .setExpiration(expirationDate)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
+    }
+
+    // 리프레시 토큰 생성 메서드
+    public RefreshToken generateRefreshToken(Long userId, String username, UserRole userRole) {
+        Date expirationDate = new Date(System.currentTimeMillis() + JWT_REFRESH_TOKEN_EXPIRE_TIME);
+
+        // Refresh Token은 간단히 subject(사용자 ID)와 만료 시간만 설정
+        String refresh = Jwts.builder()
+                .setSubject(String.valueOf(userId)) // 사용자 ID만 포함
+                .claim("category", "refresh")
+                .claim("username", username)
+                .claim("role", userRole.name())
+                .setExpiration(expirationDate) // 만료 시간
+                .signWith(key, SignatureAlgorithm.HS512) // 서명
+                .compact();
+
+        return RefreshToken.builder()
+                .refreshToken(refresh)
+                .createdAt(LocalDateTime.now())
+                .expiresAt(expirationDate)
+                .updatedAt(LocalDateTime.now())
+                .userId(userId)
+                .build();
     }
 
     public String generateKakaoJwt(String userId, String username, String userRole, String kakaoId) {
@@ -94,9 +120,9 @@ public class JwtTokenProvider {
 
     public UserRole extractUserRole(String token) {
         String role = parseClaims(token).get("role", String.class);
+        System.out.println("role = " + role);
         return UserRole.valueOf(role); // 문자열을 Enum으로 변환
     }
-
 
     public Claims parseClaims(String accessToken) {
         return Jwts.parserBuilder()
@@ -106,7 +132,17 @@ public class JwtTokenProvider {
                 .getBody();
     }
 
-
-
-
+    // 리프레시 토큰 검증 메서드
+    public boolean validateRefreshToken(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token); // 파싱 및 검증
+            return true;
+        } catch (Exception e) {
+            // 토큰이 유효하지 않음
+            return false;
+        }
+    }
 }

@@ -1,6 +1,7 @@
 package com.example.jungleroyal.common.util;
 
 import com.example.jungleroyal.common.types.UserRole;
+import com.example.jungleroyal.service.JwtService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -23,6 +24,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final JwtService jwtService;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
@@ -38,6 +40,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String jwtToken = authorizationHeader.substring(7);
             try{
                 if (jwtTokenProvider.isValidToken(jwtToken)) {
+                    if (jwtService.isBlacklisted(jwtToken)) {
+                        log.warn("Token is blacklisted");
+                        handleInvalidToken(response, "BLACKLISTED_TOKEN", "Token is blacklisted");
+                        return;
+                    }
+
                     Long userId = Long.valueOf(jwtTokenProvider.extractSubject(jwtToken));
                     String username = jwtTokenProvider.extractUsername(jwtToken);
                     UserRole userRole = jwtTokenProvider.extractUserRole(jwtToken);
@@ -56,11 +64,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 } else {
                     log.warn("Invalid JWT token");
+                    handleInvalidToken(response, "INVALID_TOKEN", "Invalid JWT token");
+                    return;
                 }
             } catch(ExpiredJwtException e) {
                 log.warn("Expired JWT token" , e);
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("JWT token has expired");
+                handleInvalidToken(response, "EXPIRED_TOKEN", "JWT token has expired");
+                return;
+            } catch (Exception e) {
+                handleInvalidToken(response, "UNKNOWN_ERROR", "Unexpected error with JWT token");
                 return;
             }
         } else {
@@ -68,5 +80,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    // 유효하지 않은 토큰 처리 메서드
+    private void handleInvalidToken(HttpServletResponse response, String errorCode, String message) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 Unauthorized
+        response.setContentType("application/json");
+        response.getWriter().write("{\"status\":401,\"errorCode\":\"" + errorCode + "\",\"message\":\"" + message + "\"}");
     }
 }

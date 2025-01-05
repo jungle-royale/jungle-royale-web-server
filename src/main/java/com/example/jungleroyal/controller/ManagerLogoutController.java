@@ -1,7 +1,7 @@
 package com.example.jungleroyal.controller;
 
 import com.example.jungleroyal.common.util.JwtTokenProvider;
-import com.example.jungleroyal.domain.user.LogoutRequest;
+import com.example.jungleroyal.domain.auth.LogoutRequest;
 import com.example.jungleroyal.service.repository.BlackListRepository;
 import com.example.jungleroyal.service.JwtService;
 import com.example.jungleroyal.service.KakaoAuthService;
@@ -28,6 +28,11 @@ public class ManagerLogoutController {
             @RequestBody LogoutRequest logoutRequest
     ) {
         log.info("비회원 로그인 실행");
+        String refreshToken = logoutRequest.getRefreshToken();
+        String jwt = authorization.substring(7);
+
+        jwtService.saveBlackList(refreshToken);
+
 //        System.out.println("jwtToken = " + jwtToken);
 //        String userId = jwtTokenProvider.extractSubject(jwtToken);
 
