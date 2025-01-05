@@ -93,10 +93,8 @@ public class GameRoomController {
 
     @GetMapping("/api/rooms/list")
     public ResponseEntity<GameRoomListWithUserReponse> listAllRooms() {
-
         UserInfoUsingRoomListResponse userInfoUsingRoomListResponse = UserInfoUsingRoomListResponse.createUserInfoUsingRoomListResponse(securityUtil.getUsername());
-
-        List<GameRoomListResponse> responseList = gameRoomService.listAllRooms()
+        List<GameRoomListResponse> responseList = gameRoomService.listOfShowableRoom()
                 .stream()
                 .map(GameRoomListResponse::fromDto) // GameRoomDto → GameRoomResponse 변환
                 .toList();

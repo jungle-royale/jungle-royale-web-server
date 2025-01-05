@@ -93,5 +93,8 @@ public class GameRoomJpaEntity {
                 .build();
     }
 
+    public boolean canShow() {
+        return status.canShow();
+    }
 
 }

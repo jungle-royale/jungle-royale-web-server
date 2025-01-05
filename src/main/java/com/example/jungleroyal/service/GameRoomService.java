@@ -38,10 +38,9 @@ public class GameRoomService {
         try {
             // 락을 획득. 최대 대기 시간 5초, 락 보유 시간 10초
             if (lock.tryLock(3, 5, TimeUnit.SECONDS)) {
-                // 호스트 중복 확인
-                if (gameRoomRepository.existsByHostId(gameRoomDto.getHostId())) {
-                    throw new DuplicateRoomException("호스트가 이미 방을 생성했습니다. Host ID: " + gameRoomDto.getHostId());
-                }
+
+                // TODO: 호스트 중복을 확인할 게 아니라, 현재 호스트가 참여했던 게임이 끝났는지를 확인해야 함
+
                 // 방 생성
                 String gameUrl = HashUtil.encryptWithUUIDAndHash();
                 gameRoomDto.setGameUrl(gameUrl);
@@ -92,6 +91,18 @@ public class GameRoomService {
         log.info("(DB) 룸 리스트 조회 시작 :" + System.currentTimeMillis());
         return gameRoomRepository.findAll()
                 .stream()
+                .map(GameRoomJpaEntity::toDto)
+                .toList();
+    }
+
+    @Transactional
+    public List<GameRoomDto> listOfShowableRoom() {
+        log.info("(DB) 룸 리스트 조회 시작 :" + System.currentTimeMillis());
+        return gameRoomRepository.findAll()
+                .stream()
+                .filter(room -> {
+                    return room.canShow();
+                })
                 .map(GameRoomJpaEntity::toDto)
                 .toList();
     }
