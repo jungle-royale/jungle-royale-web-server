@@ -34,7 +34,6 @@ public class AuthController {
         String username = jwtTokenProvider.extractUsername(refreshToken);
         UserRole userRole = jwtTokenProvider.extractUserRole(refreshToken);
 
-
         // jwt 생성
         String jwt = jwtTokenProvider.generate(userId, username, userRole);
         // jwt 리프레시토큰 생성
@@ -42,7 +41,7 @@ public class AuthController {
 
         // rotate refresh
         jwtService.removeRefreshToken(refreshToken);
-        jwtService.saveJwtRefreshToken(newRefreshToken);
+        jwtService.updateJwtRefreshToken(newRefreshToken);
 
         JwtReissueResponse response = JwtReissueResponse.createJwtReissueResponse(jwt, newRefreshToken.getRefreshToken());
 

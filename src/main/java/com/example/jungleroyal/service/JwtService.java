@@ -2,6 +2,7 @@ package com.example.jungleroyal.service;
 
 import com.example.jungleroyal.common.types.UserRole;
 import com.example.jungleroyal.common.util.JwtTokenProvider;
+import com.example.jungleroyal.common.util.TimeUtils;
 import com.example.jungleroyal.infrastructure.BlackListJpaEntity;
 import com.example.jungleroyal.infrastructure.RefreshToken;
 import com.example.jungleroyal.service.repository.BlackListRepository;
@@ -28,7 +29,7 @@ public class JwtService {
         if (isTokenValid(refreshToken)) {
             // 블랙리스트에 토큰 저장
 
-            blackListRepository.save(BlackListJpaEntity.fromToken(refreshToken));
+            blackListRepository.save(BlackListJpaEntity.createBlackList(refreshToken));
         } else {
             throw new RuntimeException("Invalid JWT Refresh token.");
         }
@@ -52,7 +53,14 @@ public class JwtService {
         return Keys.hmacShaKeyFor("your-secret-key".getBytes(StandardCharsets.UTF_8));
     }
 
+    @Transactional
     public void saveJwtRefreshToken(RefreshToken refreshToken) {
+        refreshTokenRepository.save(refreshToken);
+    }
+
+    @Transactional
+    public void updateJwtRefreshToken(RefreshToken refreshToken) {
+        refreshToken.updateUpdatedAt(TimeUtils.createUtc());
         refreshTokenRepository.save(refreshToken);
     }
 
@@ -61,4 +69,13 @@ public class JwtService {
         refreshTokenRepository.deleteByRefreshToken(refreshToken);
     }
 
+    public void saveBlackList(String refreshToken) {
+        BlackListJpaEntity blackListJpaEntity = BlackListJpaEntity.createBlackList(refreshToken);
+        blackListRepository.save(blackListJpaEntity);
+    }
+
+    public boolean isBlacklisted(String refreshToken) {
+
+        return blackListRepository.existsByInvalidRefreshToken(refreshToken);
+    }
 }
