@@ -1,7 +1,9 @@
 package com.example.jungleroyal.service;
 
+import com.example.jungleroyal.common.util.JwtTokenProvider;
 import com.example.jungleroyal.common.util.RandomNicknameGenerator;
 import com.example.jungleroyal.domain.*;
+import com.example.jungleroyal.infrastructure.RefreshToken;
 import com.example.jungleroyal.domain.user.UserDto;
 import com.example.jungleroyal.infrastructure.*;
 import com.example.jungleroyal.service.repository.InventoryRepository;
@@ -21,6 +23,7 @@ public class UserService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final RandomNicknameGenerator randomNicknameGenerator;
     private final InventoryRepository inventoryRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     public UserJpaEntity getUserJpaEntityById(Long userId){
         // UserJpaEntity 조회
@@ -32,15 +35,6 @@ public class UserService {
         return userRepository.findByKakaoId(kakaoId).isPresent();
     }
 
-    private void saveRefreshToken(UserJpaEntity userJpaEntity, String token, Integer expiresAt) {
-        RefreshToken refreshToken = new RefreshToken();
-        refreshToken.setUserJpaEntity(userJpaEntity);
-        refreshToken.setToken(token);
-        refreshToken.setRefreshToken(token);
-        refreshToken.setExpiresAt(expiresAt);
-
-        refreshTokenRepository.save(refreshToken);
-    }
 
     public UserDto getUserByKakaoId(String kakaoId) {
         UserJpaEntity userJpaEntity = userRepository.findByKakaoId(kakaoId)
@@ -54,14 +48,21 @@ public class UserService {
             String username = randomNicknameGenerator.generate();
             UserJpaEntity savedUserJpaEntity = saveKakaoUser(kakaoId, username);
 
-            saveRefreshToken(savedUserJpaEntity, oAuthKakaoToken.getRefresh_token(), oAuthKakaoToken.getRefresh_token_expires_in());
+            RefreshToken refreshToken = jwtTokenProvider.generateRefreshToken(savedUserJpaEntity.getId());
+
+            refreshTokenRepository.save(refreshToken);
             // 유저 등록 및 refreshtoken 등록
         } else {
             // 유저가 존재해 그럼 리프레시 토큰만 저장
             // refreshtoken 등록
             UserJpaEntity userJpaEntity = userRepository.findByKakaoId(kakaoId)
                     .orElse(new UserJpaEntity());
-            saveRefreshToken(userJpaEntity, oAuthKakaoToken.getRefresh_token(), oAuthKakaoToken.getRefresh_token_expires_in());
+            RefreshToken refreshToken = jwtTokenProvider.generateRefreshToken(userJpaEntity.getId());
+            RefreshToken byUser = refreshTokenRepository.findByUserId(userJpaEntity.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("리프레시토큰에 맞는 유저가 없다."));
+            byUser.setRefreshToken(refreshToken.getRefreshToken());
+
+            refreshTokenRepository.save(byUser);
         }
     }
 

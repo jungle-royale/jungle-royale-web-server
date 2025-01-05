@@ -32,8 +32,6 @@ public class GameRoomDto {
                 .minPlayers(request.getMinPlayers())
                 .maxPlayers(request.getMaxPlayers())
                 .maxGameTime(request.getMaxGameTime())
-                .map(request.getMap())
-                .secret(request.getSecret())
                 .build();
     }
 
@@ -43,8 +41,6 @@ public class GameRoomDto {
                 .minPlayers(request.getMinPlayers())
                 .maxPlayers(request.getMaxPlayers())
                 .maxGameTime(request.getMaxGameTime())
-                .map(request.getMap())
-                .secret(request.getSecret())
                 .hostId(hostId)
                 .build();
     }

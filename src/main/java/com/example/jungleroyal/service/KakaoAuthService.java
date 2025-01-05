@@ -2,10 +2,10 @@ package com.example.jungleroyal.service;
 
 import com.example.jungleroyal.domain.OAuthKakaoToken;
 import com.example.jungleroyal.domain.user.UserDto;
-import com.example.jungleroyal.common.types.UserRole;
-import com.example.jungleroyal.domain.dto.KakaoLoginResponse;
+import com.example.jungleroyal.domain.auth.KakaoLoginResponse;
 import com.example.jungleroyal.common.util.AuthKakaoTokenGenerator;
 import com.example.jungleroyal.common.util.JwtTokenProvider;
+import com.example.jungleroyal.infrastructure.RefreshToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.JWSVerifier;
@@ -28,14 +28,12 @@ public class KakaoAuthService {
     private final RestTemplate restTemplate;
     private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final JwtService jwtService;
 
     public KakaoLoginResponse getKakaoLoginResponse(String jwtToken, OAuthKakaoToken oAuthKakaoToken){
         KakaoLoginResponse response = KakaoLoginResponse.builder()
                 .jwtToken(jwtToken)
-                .accessToken(oAuthKakaoToken.getAccess_token())
-                .refreshToken(oAuthKakaoToken.getRefresh_token())
-                .expiresIn(String.valueOf(oAuthKakaoToken.getExpires_in()))
-                .role(UserRole.MEMBER)
+                .kakaoRefreshToken(oAuthKakaoToken.getRefresh_token())
                 .build();
         return response;
     }
@@ -116,19 +114,23 @@ public class KakaoAuthService {
 
     // TODO: login 관련 추상화 필요
     public KakaoLoginResponse loginWithKakao(String code) {
+        // 카카오 토큰 받기
         OAuthKakaoToken oAuthKakaoToken = getKakaoTokenUsingAccessCode(code);
 
         String kakaoId = getKakaoIdUsingToken(oAuthKakaoToken);
 
         userService.kakaoUserJoin(kakaoId, oAuthKakaoToken);
         // 카카오회원 번호를 이용해서 jwt 생성
-        UserDto userByKakaoId = userService.getUserByKakaoId(kakaoId);
-        long userId = userByKakaoId.getId();
-        String username = userByKakaoId.getUsername();
-        String userRole = userByKakaoId.getUserRole().name();
-        String kakaoId2 = userByKakaoId.getKakaoId();
+        UserDto user = userService.getUserByKakaoId(kakaoId);
+        long userId = user.getId();
+        String username = user.getUsername();
+        String userRole = user.getUserRole().name();
 
-        String jwtToken = jwtTokenProvider.generateKakaoJwt(String.valueOf(userId), username, userRole, kakaoId2);
+        // jwt 생성
+        String jwtToken = jwtTokenProvider.generateKakaoJwt(String.valueOf(userId), username, userRole, kakaoId);
+        // jwt 리프레시 토큰 생성
+        RefreshToken refreshToken = jwtTokenProvider.generateRefreshToken(user.getId());
+        jwtService.saveJwtRefreshToken(refreshToken);
 
         return getKakaoLoginResponse(jwtToken, oAuthKakaoToken);
     }

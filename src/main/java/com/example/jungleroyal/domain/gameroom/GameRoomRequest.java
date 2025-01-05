@@ -14,6 +14,4 @@ public class GameRoomRequest {
     private int minPlayers;
     private int maxPlayers;
     private int maxGameTime;
-    private String map;
-    private Boolean secret;
 }

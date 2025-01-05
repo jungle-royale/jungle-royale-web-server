@@ -1,8 +1,7 @@
 package com.example.jungleroyal.controller;
 
-import com.example.jungleroyal.common.types.UserRole;
 import com.example.jungleroyal.domain.OAuthKakaoToken;
-import com.example.jungleroyal.domain.dto.KakaoLoginResponse;
+import com.example.jungleroyal.domain.auth.KakaoLoginResponse;
 import com.example.jungleroyal.service.BlackListService;
 import com.example.jungleroyal.service.KakaoAuthService;
 import com.example.jungleroyal.common.util.JwtTokenProvider;

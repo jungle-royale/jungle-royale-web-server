@@ -1,4 +1,4 @@
-package com.example.jungleroyal.domain.dto;
+package com.example.jungleroyal.domain.auth;
 
 import com.example.jungleroyal.common.types.UserRole;
 import lombok.AllArgsConstructor;
@@ -12,8 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class KakaoLoginResponse {
     private String jwtToken;
-    private String accessToken;
-    private String refreshToken;
-    private String expiresIn;
-    private UserRole role;
+    private String kakaoRefreshToken;
+    private UserRole role = UserRole.MEMBER;
 }
