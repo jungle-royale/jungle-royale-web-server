@@ -1,5 +1,6 @@
 package com.example.jungleroyal.service;
 
+import com.example.jungleroyal.common.types.UserRole;
 import com.example.jungleroyal.domain.OAuthKakaoToken;
 import com.example.jungleroyal.domain.user.UserDto;
 import com.example.jungleroyal.domain.auth.KakaoLoginResponse;
@@ -29,14 +30,6 @@ public class KakaoAuthService {
     private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtService jwtService;
-
-    public KakaoLoginResponse getKakaoLoginResponse(String jwtToken, OAuthKakaoToken oAuthKakaoToken){
-        KakaoLoginResponse response = KakaoLoginResponse.builder()
-                .jwtToken(jwtToken)
-                .kakaoRefreshToken(oAuthKakaoToken.getRefresh_token())
-                .build();
-        return response;
-    }
 
     public OAuthKakaoToken getKakaoTokenUsingAccessCode(String accessCode){
         // REST API 호출로 카카오 토큰 요청 처리 (생략된 기존 코드 추가)
@@ -108,9 +101,6 @@ public class KakaoAuthService {
         }
     }
 
-    public OAuthKakaoToken getKakaoRefreshToken(String refreshToken) {
-        return authKakaoTokenGenerator.generateRefreshToken(refreshToken);
-    }
 
     // TODO: login 관련 추상화 필요
     public KakaoLoginResponse loginWithKakao(String code) {
@@ -132,6 +122,6 @@ public class KakaoAuthService {
         RefreshToken refreshToken = jwtTokenProvider.generateRefreshToken(user.getId());
         jwtService.saveJwtRefreshToken(refreshToken);
 
-        return getKakaoLoginResponse(jwtToken, oAuthKakaoToken);
+        return KakaoLoginResponse.createKakaoLoginResponse(jwtToken, refreshToken.getRefreshToken());
     }
 }
