@@ -20,8 +20,8 @@ spring:
     address: redis://127.0.0.1:6379
 
 game-server:
-#  base-url: "http://game-api.eternalsnowman.com:8080/api"
-  base-url: "http://localhost:8000/api"
+  base-url: "http://game-api.eternalsnowman.com:8080/api"
+#  base-url: "http://localhost:8000/api"
 
 base:
   url:
