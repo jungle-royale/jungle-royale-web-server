@@ -22,7 +22,7 @@ public class JwtTokenProvider {
 
     public static final String AUTHORIZATION_HEADER = "Authorization";
     private static final long JWT_EXPIRE_TIME = 1000 * 60 * 60 * 24;       // 24시간
-    private static final long JWT_REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24;       // 24시간
+    private static final long JWT_REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;       // 7일
 
     public static final String TYPE = "Bearer";
 
