@@ -1,6 +1,7 @@
 package com.example.jungleroyal.common.util;
 
 import com.example.jungleroyal.common.types.UserRole;
+import com.example.jungleroyal.service.JwtService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -23,6 +24,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final JwtService jwtService;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
@@ -38,6 +40,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String jwtToken = authorizationHeader.substring(7);
             try{
                 if (jwtTokenProvider.isValidToken(jwtToken)) {
+                    if (jwtService.isBlacklisted(jwtToken)) {
+                        log.warn("Token is blacklisted");
+                        handleInvalidToken(response, "BLACKLISTED_TOKEN", "Token is blacklisted");
+                        return;
+                    }
+
                     Long userId = Long.valueOf(jwtTokenProvider.extractSubject(jwtToken));
                     String username = jwtTokenProvider.extractUsername(jwtToken);
                     UserRole userRole = jwtTokenProvider.extractUserRole(jwtToken);
