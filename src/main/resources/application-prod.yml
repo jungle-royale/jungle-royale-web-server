@@ -13,14 +13,11 @@ spring:
     open-in-view: false
   data:
     redis:
-      mode: master-slave
-      master: redis://jungle-royale-redis-cache-001.bgoupc.0001.apn2.cache.amazonaws.com:6379
-      replicas:
-        - redis://jungle-royale-redis-cache-002.bgoupc.0001.apn2.cache.amazonaws.com:6379
-        - redis://jungle-royale-redis-cache-003.bgoupc.0001.apn2.cache.amazonaws.com:6379
+      mode: single
+      host: redis://jungle-royale-redis-cache-001.bgoupc.0001.apn2.cache.amazonaws.com
+      port: 6379
   redisson:
     address: redis://jungle-royale-redis-cache-001.bgoupc.0001.apn2.cache.amazonaws.com:6379
-
 
 game-server:
   base-url: "http://game-api.eternalsnowman.com:8080/api"
