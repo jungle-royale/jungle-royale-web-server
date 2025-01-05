@@ -1,5 +1,7 @@
 package com.example.jungleroyal.service;
 
+import com.example.jungleroyal.common.types.UserRole;
+import com.example.jungleroyal.common.util.JwtTokenProvider;
 import com.example.jungleroyal.infrastructure.BlackListJpaEntity;
 import com.example.jungleroyal.infrastructure.RefreshToken;
 import com.example.jungleroyal.service.repository.BlackListRepository;
@@ -9,15 +11,19 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class JwtService {
     private final BlackListRepository blackListRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final JwtTokenProvider jwtTokenProvider;
     public void invalidateToken(String refreshToken) {
         if (isTokenValid(refreshToken)) {
             // 블랙리스트에 토큰 저장
@@ -49,4 +55,10 @@ public class JwtService {
     public void saveJwtRefreshToken(RefreshToken refreshToken) {
         refreshTokenRepository.save(refreshToken);
     }
+
+    @Transactional
+    public void removeRefreshToken(String refreshToken) {
+        refreshTokenRepository.deleteByRefreshToken(refreshToken);
+    }
+
 }

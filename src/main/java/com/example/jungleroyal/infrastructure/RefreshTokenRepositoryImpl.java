@@ -3,6 +3,7 @@ package com.example.jungleroyal.infrastructure;
 import com.example.jungleroyal.service.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -24,5 +25,18 @@ public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
     @Override
     public void delete(RefreshToken refreshToken) {
         refreshTokenJpaRepository.delete(refreshToken);
+    }
+
+
+
+    @Override
+    public void deleteByRefreshToken(String refreshToken) {
+        refreshTokenJpaRepository.deleteByRefreshToken(refreshToken);
+    }
+
+    @Override
+    @Transactional
+    public boolean existsByRefreshToken(String refresh) {
+        return refreshTokenJpaRepository.findByRefreshToken(refresh).isPresent();
     }
 }

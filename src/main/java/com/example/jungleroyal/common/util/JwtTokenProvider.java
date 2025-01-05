@@ -48,12 +48,14 @@ public class JwtTokenProvider {
     }
 
     // 리프레시 토큰 생성 메서드
-    public RefreshToken generateRefreshToken(Long userId) {
+    public RefreshToken generateRefreshToken(Long userId, String username, UserRole userRole) {
         Date expirationDate = new Date(System.currentTimeMillis() + JWT_REFRESH_TOKEN_EXPIRE_TIME);
 
         // Refresh Token은 간단히 subject(사용자 ID)와 만료 시간만 설정
         String refresh = Jwts.builder()
                 .setSubject(String.valueOf(userId)) // 사용자 ID만 포함
+                .claim("username", username)
+                .claim("role", userRole.name())
                 .setExpiration(expirationDate) // 만료 시간
                 .signWith(key, SignatureAlgorithm.HS512) // 서명
                 .compact();
@@ -117,6 +119,7 @@ public class JwtTokenProvider {
 
     public UserRole extractUserRole(String token) {
         String role = parseClaims(token).get("role", String.class);
+        System.out.println("role = " + role);
         return UserRole.valueOf(role); // 문자열을 Enum으로 변환
     }
 
@@ -127,8 +130,6 @@ public class JwtTokenProvider {
                 .parseClaimsJws(accessToken)
                 .getBody();
     }
-
-
 
     // 리프레시 토큰 검증 메서드
     public boolean validateRefreshToken(String token) {

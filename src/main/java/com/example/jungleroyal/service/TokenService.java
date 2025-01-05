@@ -19,7 +19,7 @@ public class TokenService {
         // 기존 토큰 제거
         refreshTokenRepository.findByUserId(user.getId()).ifPresent(refreshTokenRepository::delete);
 
-        RefreshToken refreshToken = jwtTokenProvider.generateRefreshToken(user.getId());
+        RefreshToken refreshToken = jwtTokenProvider.generateRefreshToken(user.getId(), user.getUsername(), user.getRole());
 
         return refreshTokenRepository.save(refreshToken);
     }

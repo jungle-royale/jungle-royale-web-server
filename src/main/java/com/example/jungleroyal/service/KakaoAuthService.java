@@ -114,12 +114,12 @@ public class KakaoAuthService {
         UserDto user = userService.getUserByKakaoId(kakaoId);
         long userId = user.getId();
         String username = user.getUsername();
-        String userRole = user.getUserRole().name();
+        UserRole userRole = user.getUserRole();
 
         // jwt 생성
-        String jwtToken = jwtTokenProvider.generateKakaoJwt(String.valueOf(userId), username, userRole, kakaoId);
+        String jwtToken = jwtTokenProvider.generateKakaoJwt(String.valueOf(userId), username, userRole.name(), kakaoId);
         // jwt 리프레시 토큰 생성
-        RefreshToken refreshToken = jwtTokenProvider.generateRefreshToken(user.getId());
+        RefreshToken refreshToken = jwtTokenProvider.generateRefreshToken(user.getId(), username, userRole);
         jwtService.saveJwtRefreshToken(refreshToken);
 
         return KakaoLoginResponse.createKakaoLoginResponse(jwtToken, refreshToken.getRefreshToken());

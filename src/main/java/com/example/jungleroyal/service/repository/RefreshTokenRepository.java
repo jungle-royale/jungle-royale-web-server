@@ -12,4 +12,9 @@ public interface RefreshTokenRepository {
     Optional<RefreshToken> findByUserId(Long userId);
 
     void delete(RefreshToken refreshToken);
+
+    void deleteByRefreshToken(String refreshToken);
+
+    // refreshToken으로 RefreshToken 엔티티 조회
+    boolean existsByRefreshToken(String refresh);
 }

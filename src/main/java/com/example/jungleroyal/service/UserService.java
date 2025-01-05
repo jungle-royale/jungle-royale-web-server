@@ -48,7 +48,7 @@ public class UserService {
             String username = randomNicknameGenerator.generate();
             UserJpaEntity savedUserJpaEntity = saveKakaoUser(kakaoId, username);
 
-            RefreshToken refreshToken = jwtTokenProvider.generateRefreshToken(savedUserJpaEntity.getId());
+            RefreshToken refreshToken = jwtTokenProvider.generateRefreshToken(savedUserJpaEntity.getId(), username, savedUserJpaEntity.getRole());
 
             refreshTokenRepository.save(refreshToken);
             // 유저 등록 및 refreshtoken 등록
@@ -57,7 +57,7 @@ public class UserService {
             // refreshtoken 등록
             UserJpaEntity userJpaEntity = userRepository.findByKakaoId(kakaoId)
                     .orElse(new UserJpaEntity());
-            RefreshToken refreshToken = jwtTokenProvider.generateRefreshToken(userJpaEntity.getId());
+            RefreshToken refreshToken = jwtTokenProvider.generateRefreshToken(userJpaEntity.getId(), userJpaEntity.getUsername(), userJpaEntity.getRole());
             RefreshToken byUser = refreshTokenRepository.findByUserId(userJpaEntity.getId())
                     .orElseThrow(() -> new IllegalArgumentException("리프레시토큰에 맞는 유저가 없다."));
             byUser.setRefreshToken(refreshToken.getRefreshToken());

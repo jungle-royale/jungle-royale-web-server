@@ -40,16 +40,16 @@ public class KakaoLoginController {
         return ResponseEntity.ok(kakaoLoginResponse);
     }
 
-//    @PostMapping("/api/auth/kakao/verify-jwt")
-//    public ResponseEntity<Map<String, Object>> verifyJwt(@RequestBody Map<String, String> payload) {
-//        String jwtToken = payload.get("jwt_token");
-//
-//        System.out.println("여기가 jwt 검증구간입니다.");
-//        jwtTokenProvider.isValidToken(jwtToken);
-//        Map<String, Object> responseBody = new HashMap<>();
-//
-//        return ResponseEntity.ok(responseBody);
-//    }
+    @PostMapping("/api/auth/kakao/verify-jwt")
+    public ResponseEntity<Map<String, Object>> verifyJwt(@RequestBody Map<String, String> payload) {
+        String jwtToken = payload.get("jwt_token");
+
+        System.out.println("여기가 jwt 검증구간입니다.");
+        jwtTokenProvider.isValidToken(jwtToken);
+        Map<String, Object> responseBody = new HashMap<>();
+
+        return ResponseEntity.ok(responseBody);
+    }
 
     /**
      * RefreshToken 발급

@@ -37,7 +37,7 @@ public class GuestLoginController {
 
         // 2. JWT 생성
         String jwt = jwtTokenProvider.generate(userId, username, userRole);
-        RefreshToken refreshToken = jwtTokenProvider.generateRefreshToken(guestUserJpaEntity.getId());
+        RefreshToken refreshToken = jwtTokenProvider.generateRefreshToken(guestUserJpaEntity.getId(), username, userRole);
 
         // 3. 응답 데이터 구성
         UserGuestLoginResponse response = UserGuestLoginResponse.createUserGuestLoginResponse(jwt, refreshToken.getRefreshToken());

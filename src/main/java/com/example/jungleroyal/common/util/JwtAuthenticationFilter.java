@@ -56,11 +56,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 } else {
                     log.warn("Invalid JWT token");
+                    handleInvalidToken(response, "INVALID_TOKEN", "Invalid JWT token");
+                    return;
                 }
             } catch(ExpiredJwtException e) {
                 log.warn("Expired JWT token" , e);
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("JWT token has expired");
+                handleInvalidToken(response, "EXPIRED_TOKEN", "JWT token has expired");
+                return;
+            } catch (Exception e) {
+                handleInvalidToken(response, "UNKNOWN_ERROR", "Unexpected error with JWT token");
                 return;
             }
         } else {
@@ -68,5 +72,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    // 유효하지 않은 토큰 처리 메서드
+    private void handleInvalidToken(HttpServletResponse response, String errorCode, String message) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 Unauthorized
+        response.setContentType("application/json");
+        response.getWriter().write("{\"status\":401,\"errorCode\":\"" + errorCode + "\",\"message\":\"" + message + "\"}");
     }
 }
