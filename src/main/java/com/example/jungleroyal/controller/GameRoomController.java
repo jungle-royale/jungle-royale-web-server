@@ -31,7 +31,8 @@ public class GameRoomController {
     @PostMapping("/api/rooms/create")
     public ResponseEntity<GameRoomCreateReponse> createRoom(
             @RequestBody GameRoomRequest gameRoomRequest,
-            @RequestHeader("Authorization") String authorization) {
+            @RequestHeader("Authorization") String authorization
+    ) {
 
         String jwtToken = authorization.substring(7);
         String userId = jwtTokenProvider.extractSubject(jwtToken);
@@ -47,10 +48,14 @@ public class GameRoomController {
 
         // TODO: 게임서버에 HTTP 찌르고 기다렸다가 return
         // 게임 서버와 통신
-        GameServerNotificationRequest gameServerNotificationRequest = new GameServerNotificationRequest(roomUrl, minPlayers, maxPlayTime);
-        GameServerNotificationResponse gameServerResponse = gameServerClient.notifyGameServer(gameServerNotificationRequest, userId);
+        GameServerNotificationRequest gameServerNotificationRequest
+                = new GameServerNotificationRequest(roomUrl, minPlayers, maxPlayTime);
+        log.info("🍎request:" + gameServerNotificationRequest.toString());
+        GameServerNotificationResponse gameServerResponse
+                = gameServerClient.notifyGameServer(gameServerNotificationRequest, userId);
+        log.info("🍎response:" + gameServerResponse.toString());
 
-//        // 게임 서버 응답 확인
+        // 게임 서버 응답 확인
         if (!gameServerResponse.isSuccess()) {
             log.error("게임 서버 응답 실패");
             gameRoomService.deleteRoomById(room.getId());
