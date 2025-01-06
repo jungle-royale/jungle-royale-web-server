@@ -51,7 +51,7 @@ public class UserJpaEntity {
 
     @Column
     @Enumerated(EnumType.STRING)
-    private UserStatus userStatus;
+    private UserStatus userStatus;  // 현재 유저 상태 : WAITING || IN_GAME
 
     // 게임머니 필드 추가
     @Column(nullable = false)
@@ -76,6 +76,9 @@ public class UserJpaEntity {
                 .kakaoId(userJpaEntity.getKakaoId())
                 .username(userJpaEntity.getUsername())
                 .userRole(userJpaEntity.getRole())
+                .userStatus(userJpaEntity.getUserStatus())
+                .currentGameUrl(userJpaEntity.getCurrentGameUrl())
+                .clientId(userJpaEntity.getClientId())
                 .createdAt(userJpaEntity.createdAt)
                 .updatedAt(userJpaEntity.updatedAt)
                 .gameMoney(userJpaEntity.getGameMoney())
@@ -84,12 +87,14 @@ public class UserJpaEntity {
     }
 
     public UserJpaEntity createKakaoUser(String kakaoId, String username){
-        UserJpaEntity kakaoUserJpaEntity = new UserJpaEntity();
-        kakaoUserJpaEntity.setKakaoId(kakaoId); // GUEST 고유 ID 생성
-        kakaoUserJpaEntity.setUsername(username);
-        kakaoUserJpaEntity.setRole(UserRole.MEMBER);
-        kakaoUserJpaEntity.setLastLoginAt(LocalDateTime.now());
-
-        return kakaoUserJpaEntity;
+        return UserJpaEntity.builder()
+                .kakaoId(kakaoId)
+                .username(username)
+                .role(UserRole.MEMBER)
+                .userStatus(UserStatus.WAITING)
+                .createdAt(TimeUtils.createUtc())
+                .updatedAt(TimeUtils.createUtc())
+                .lastLoginAt(TimeUtils.createUtc())
+                .build();
     }
 }
