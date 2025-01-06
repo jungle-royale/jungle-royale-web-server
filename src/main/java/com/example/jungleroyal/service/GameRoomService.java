@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -158,5 +159,26 @@ public class GameRoomService {
         room.setUpdatedAt(LocalDateTime.now());
 
         gameRoomRepository.save(room);
+    }
+
+    /**
+     * 60초마다 currentPlayers가 0이고 RoomStatus가 WAITING인 방을 삭제
+     */
+    @Scheduled(fixedRate = 10000) // 60초 간격
+    @Transactional
+    public void cleanUpEmptyRooms() {
+        log.info("빈 방을 조회중...");
+
+        // 조건에 맞는 빈 방 조회
+        List<GameRoomJpaEntity> emptyRooms = gameRoomRepository.findAllByStatusAndCurrentPlayers(RoomStatus.WAITING, 0);
+
+        if (emptyRooms.isEmpty()) {
+            log.info("빈 방이 없습니다.");
+            return;
+        }
+
+        // 빈 방 삭제
+        gameRoomRepository.deleteAll(emptyRooms);
+        log.info("{} 개의 방을 삭제했습니다.", emptyRooms.size());
     }
 }
