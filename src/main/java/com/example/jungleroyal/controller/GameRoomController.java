@@ -2,12 +2,14 @@ package com.example.jungleroyal.controller;
 
 import com.example.jungleroyal.common.types.GameRoomStatus;
 import com.example.jungleroyal.common.types.RoomStatus;
+import com.example.jungleroyal.common.types.UserStatus;
 import com.example.jungleroyal.common.util.GameServerClient;
 import com.example.jungleroyal.common.util.JwtTokenProvider;
 import com.example.jungleroyal.common.util.SecurityUtil;
 import com.example.jungleroyal.domain.game.GameServerNotificationRequest;
 import com.example.jungleroyal.domain.game.GameServerNotificationResponse;
 import com.example.jungleroyal.domain.gameroom.*;
+import com.example.jungleroyal.domain.user.UserDto;
 import com.example.jungleroyal.domain.user.UserInfoUsingRoomListResponse;
 import com.example.jungleroyal.infrastructure.UserJpaEntity;
 import com.example.jungleroyal.service.GameRoomService;
@@ -134,6 +136,7 @@ public class GameRoomController {
             @PathVariable Long roomId) {
 
         String userId = securityUtil.getUserId();
+        UserDto user = userService.getUserDtoById(Long.parseLong(userId));
 
         userService.getUserJpaEntityById(Long.parseLong(userId));
 
@@ -142,13 +145,17 @@ public class GameRoomController {
 
         // roomUrl, clientId 획득
         String roomUrl = gameRoomService.getRoomUrlById(roomId);
-        String clinetId = userService.getClientId();
+        String clientId = user.getClientId(); // 기본값은 기존 clientId 유지
 
-        userService.updateUserConnectionDetails(Long.parseLong(userId), roomUrl, clinetId);
+        // 같은 방이 아닌 경우에만 clientId 갱신
+        if (user.getCurrentGameUrl() == null || !user.getCurrentGameUrl().equals(roomUrl)) {
+            clientId = userService.getClientId(); // 새로운 clientId 생성
+            userService.updateUserConnectionDetails(Long.parseLong(userId), roomUrl, clientId);
+        }
 
         GameRoomJoinReponse response = GameRoomJoinReponse.builder()
                 .roomId(roomUrl)
-                .clientId(clinetId)
+                .clientId(clientId)
                 .build();
 
         return ResponseEntity.ok(response);
