@@ -13,6 +13,6 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, Long> {
     @Query("SELECT u.username FROM UserJpaEntity u WHERE u.id = :userId")
     String findUsernameById(@Param("userId") Long userId);
 
-    List<UserJpaEntity> findAllByClientIds(List<String> clientIds);
+    List<UserJpaEntity> findAllByClientIdIn(List<String> clientIds);
 
 }

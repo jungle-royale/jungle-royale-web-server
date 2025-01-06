@@ -32,17 +32,12 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public List<UserJpaEntity> findAllById(List<String> clientIds) {
-        return userJpaRepository.findAllByClientIds(clientIds);
-    }
-
-    @Override
     public void saveAll(List<UserJpaEntity> users) {
         userJpaRepository.saveAll(users);
     }
 
     @Override
     public List<UserJpaEntity> findAllByClientIds(List<String> clientIds) {
-        return userJpaRepository.findAllByClientIds(clientIds);
+        return userJpaRepository.findAllByClientIdIn(clientIds);
     }
 }

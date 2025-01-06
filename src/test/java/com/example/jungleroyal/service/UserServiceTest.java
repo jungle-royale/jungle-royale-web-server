@@ -152,7 +152,7 @@ public class UserServiceTest {
                 })
                 .toList();
 
-        when(userRepository.findAllById(userIds)).thenReturn(users);
+        when(userRepository.findAllByClientIds(userIds)).thenReturn(users);
 
         // when
         userService.updateUsersToInGame(userIds);
@@ -174,7 +174,7 @@ public class UserServiceTest {
         inGameUser.setId(2L);
         inGameUser.setUserStatus(UserStatus.IN_GAME);
 
-        when(userRepository.findAllById(clientIds)).thenReturn(List.of(waitingUser, inGameUser));
+        when(userRepository.findAllByClientIds(clientIds)).thenReturn(List.of(waitingUser, inGameUser));
 
         // when & then
         assertThatThrownBy(() -> userService.updateUsersToInGame(clientIds))

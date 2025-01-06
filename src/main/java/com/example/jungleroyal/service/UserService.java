@@ -134,7 +134,7 @@ public class UserService {
      */
     @Transactional
     public void updateUsersToInGame(List<String> clientIds) {
-        List<UserJpaEntity> users = userRepository.findAllById(clientIds);
+        List<UserJpaEntity> users = userRepository.findAllByClientIds(clientIds);
 
         if (users.isEmpty()) {
             throw new IllegalArgumentException("No users found for the given IDs");
