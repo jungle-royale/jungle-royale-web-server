@@ -131,14 +131,13 @@ public class GameRoomService {
         UserJpaEntity user = userRepository.findById(Long.parseLong(userId))
                 .orElseThrow(() -> new IllegalArgumentException("존재하지않는 유저입니다."));
 
-
         // 방 상태가 종료된 경우 예외 처리
         if (room.getStatus() == RoomStatus.END) {
             throw new GameRoomException("GAME_ROOM_ENDED", "이미 종료된 방입니다.");
         }
 
         // 방 상태가 RUNNING인 경우 같은 방에서 나왔으면 입장 가능
-        if (room.getStatus() == RoomStatus.RUNNING && user.getCurrentGameUrl().equals(room.getGameUrl()) && room.getCurrentPlayers() != 0 && room.getCurrentPlayers() < room.getMaxPlayers()) {
+        if (room.getStatus() == RoomStatus.RUNNING && room.getGameUrl().equals(user.getCurrentGameUrl()) && room.getCurrentPlayers() != 0 && room.getCurrentPlayers() < room.getMaxPlayers()) {
             return GameRoomStatus.GAME_JOIN_AVAILABLE;
         }
 
