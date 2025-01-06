@@ -94,6 +94,7 @@ public class JwtTokenProvider {
             log.info("Invalid JWT Token", e);
         } catch (ExpiredJwtException e) {
             log.info("Expired JWT Token", e);
+            throw e;
         } catch (UnsupportedJwtException e) {
             log.info("Unsupported JWT Token", e);
         } catch (IllegalArgumentException e) {
@@ -143,6 +144,20 @@ public class JwtTokenProvider {
         } catch (Exception e) {
             // 토큰이 유효하지 않음
             return false;
+        }
+    }
+
+    public boolean isRefreshTokenExpired(String refreshToken) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(refreshToken); // 토큰 검증
+            return false; // 유효한 토큰
+        } catch (ExpiredJwtException e) {
+            return true; // 만료된 토큰
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid refresh token", e);
         }
     }
 }
