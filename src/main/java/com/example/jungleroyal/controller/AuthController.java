@@ -1,8 +1,11 @@
 package com.example.jungleroyal.controller;
 
+import com.example.jungleroyal.common.exceptions.BlacklistTokenException;
+import com.example.jungleroyal.common.exceptions.TokenExpiredException;
 import com.example.jungleroyal.common.types.UserRole;
 import com.example.jungleroyal.common.util.JwtTokenProvider;
 import com.example.jungleroyal.domain.auth.JwtReissueResponse;
+import com.example.jungleroyal.domain.dto.JwtTokenUserInfoDto;
 import com.example.jungleroyal.infrastructure.RefreshToken;
 import com.example.jungleroyal.service.JwtService;
 import com.example.jungleroyal.service.repository.RefreshTokenRepository;
@@ -22,44 +25,44 @@ public class AuthController {
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtService jwtService;
     @PostMapping("/api/auth/refresh")
-    public ResponseEntity<JwtReissueResponse> refreshToken(@RequestHeader(value = "Authorization", required = false) String refresh) {
+    public ResponseEntity<JwtReissueResponse> refreshToken(
+            @RequestHeader(value = "Authorization", required = false) String refresh) {
 
         if (refresh == null || !refresh.startsWith("Bearer ")) {
-            log.warn("Authorization 헤더가 없거나 잘못된 형식입니다.");
-            return new ResponseEntity("Authorization header is missing or invalid", HttpStatus.BAD_REQUEST);
+            throw new IllegalArgumentException("Authorization 헤더가 없거나 잘못된 형식입니다.");
         }
 
         String refreshToken = refresh.substring(7);
 
-        // Check if refresh token is null
         if (refreshToken.isBlank()) {
-            return new ResponseEntity("Refresh token is null", HttpStatus.BAD_REQUEST);
+            throw new IllegalArgumentException("Refresh token is null");
         }
 
-        // check if refresh is valid
-        if (!refreshTokenRepository.existsByRefreshToken(refreshToken))
-            return new ResponseEntity("invalid refresh token", HttpStatus.BAD_REQUEST);
+        if (!refreshTokenRepository.existsByRefreshToken(refreshToken)) {
+            throw new IllegalArgumentException("Invalid refresh token");
+        }
 
-        // Check if refresh token is expired
+        if (jwtService.isBlacklisted(refreshToken)) {
+            throw new BlacklistTokenException("Refresh token is blacklisted");
+        }
+
         if (jwtTokenProvider.isRefreshTokenExpired(refreshToken)) {
-            log.warn("Refresh token has expired.");
-            return new ResponseEntity("Refresh token has expired. Please log in again.", HttpStatus.UNAUTHORIZED);
+            throw new TokenExpiredException("Refresh token has expired. Please log in again.");
         }
 
-        String userId = jwtTokenProvider.extractSubject(refreshToken);
-        String username = jwtTokenProvider.extractUsername(refreshToken);
-        UserRole userRole = jwtTokenProvider.extractUserRole(refreshToken);
+        JwtTokenUserInfoDto jwtTokenUserInfoDto = jwtService.extractUserInfo(refreshToken);
 
+        jwtService.generateJwtToken(jwtTokenUserInfoDto);
         // jwt 생성
-        String jwt = jwtTokenProvider.generate(userId, username, userRole);
+        String jwtToken = jwtService.generateJwtToken(jwtTokenUserInfoDto);
+        RefreshToken newRefreshToken = jwtService.generateJwtRefreshToken(jwtTokenUserInfoDto);
         // jwt 리프레시토큰 생성
-        RefreshToken newRefreshToken = jwtTokenProvider.generateRefreshToken(Long.parseLong(userId), username, userRole);
 
         // rotate refresh
         jwtService.removeRefreshToken(refreshToken);
         jwtService.updateJwtRefreshToken(newRefreshToken);
 
-        JwtReissueResponse response = JwtReissueResponse.createJwtReissueResponse(jwt, newRefreshToken.getRefreshToken());
+        JwtReissueResponse response = JwtReissueResponse.createJwtReissueResponse(jwtToken, newRefreshToken.getRefreshToken());
 
         return ResponseEntity.ok(response);
     }
