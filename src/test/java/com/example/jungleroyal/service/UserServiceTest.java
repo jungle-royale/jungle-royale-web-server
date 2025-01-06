@@ -1,26 +1,30 @@
 package com.example.jungleroyal.service;
 
+import com.example.jungleroyal.common.types.UserRole;
+import com.example.jungleroyal.common.util.RandomNicknameGenerator;
 import com.example.jungleroyal.domain.user.UserDto;
 import com.example.jungleroyal.infrastructure.UserJpaEntity;
-import com.example.jungleroyal.infrastructure.UserJpaRepository;
+import com.example.jungleroyal.service.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.Mockito;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 public class UserServiceTest {
-    @Mock
-    private UserJpaRepository userRepository;
 
-    @InjectMocks
     private UserService userService;
+    private UserRepository userRepository;
+    private RandomNicknameGenerator randomNicknameGenerator;
 
-    public UserServiceTest() {
-        MockitoAnnotations.openMocks(this);
+    @BeforeEach
+    void setUp() {
+        userRepository = mock(UserRepository.class);
+        randomNicknameGenerator = mock(RandomNicknameGenerator.class);
+        userService = new UserService(userRepository, null, randomNicknameGenerator, null, null);
     }
 
     @Test
@@ -89,5 +93,24 @@ public class UserServiceTest {
         assertEquals("User not found", exception.getMessage(), "존재하지 않는 사용자의 경우 예외 메시지가 일치해야 합니다.");
         verify(userRepository, times(1)).findById(userId);
         verify(userRepository, never()).save(any());
+    }
+
+
+    @Test
+    void 비회원_유저를_생성하고_저장한다() {
+        // given
+        String randomNickname = "Guest123";
+        when(randomNicknameGenerator.generate()).thenReturn(randomNickname);
+        UserJpaEntity mockUser = UserJpaEntity.createGueutUser(randomNickname);
+        when(userRepository.save(Mockito.any(UserJpaEntity.class))).thenReturn(mockUser);
+
+        // when
+        UserJpaEntity createdUser = userService.registerGuest();
+
+        // then
+        assertThat(createdUser).isNotNull();
+        assertThat(createdUser.getUsername()).isEqualTo(randomNickname);
+        assertThat(createdUser.getRole()).isEqualTo(UserRole.GUEST);
+        verify(userRepository, times(1)).save(Mockito.any(UserJpaEntity.class));
     }
 }
