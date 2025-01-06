@@ -15,6 +15,7 @@ import com.example.jungleroyal.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -121,8 +122,9 @@ public class GameRoomController {
      */
     @PostMapping("/api/rooms/{roomId}/check")
     public ResponseEntity<GameRoomStatus> checkRoomAvailability(@PathVariable Long roomId) {
+        String userId = securityUtil.getUserId();
         System.out.println("게임 입장 가능여부 확인 roomId = " + roomId);
-        GameRoomStatus status = gameRoomService.checkRoomAvailability(roomId);
+        GameRoomStatus status = gameRoomService.checkRoomAvailability(roomId,userId);
         return ResponseEntity.ok(status);
     }
 
@@ -136,7 +138,7 @@ public class GameRoomController {
         userService.getUserJpaEntityById(Long.parseLong(userId));
 
         // 게임 접속 가능 여부
-        gameRoomService.checkRoomAvailability(roomId);
+        gameRoomService.checkRoomAvailability(roomId,userId);
 
         // roomUrl, clientId 획득
         String roomUrl = gameRoomService.getRoomUrlById(roomId);
