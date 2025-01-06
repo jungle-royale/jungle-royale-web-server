@@ -35,13 +35,13 @@ public class UserJpaEntity {
     private UserRole role = UserRole.GUEST; // 유저 기본 타입 : GUEST
 
     @Column(nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt = TimeUtils.createUtc();
 
     @Column(nullable = false)
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private LocalDateTime updatedAt = TimeUtils.createUtc();
 
     @Column(nullable = false)
-    private LocalDateTime lastLoginAt = LocalDateTime.now();
+    private LocalDateTime lastLoginAt = TimeUtils.createUtc();
 
     @Column
     private String currentGameUrl; // 현재 위치하고있는 게임룸 url
@@ -51,7 +51,7 @@ public class UserJpaEntity {
 
     @Column
     @Enumerated(EnumType.STRING)
-    private UserStatus userStatus;  // 현재 유저 상태 : WAITING || IN_GAME
+    private UserStatus status;  // 현재 유저 상태 : WAITING || IN_GAME
 
     // 게임머니 필드 추가
     @Column(nullable = false)
@@ -63,7 +63,8 @@ public class UserJpaEntity {
                 .kakaoId("GUEST_" + System.currentTimeMillis())
                 .username(randomNickname)
                 .role(UserRole.GUEST)
-                .userStatus(UserStatus.WAITING)
+                .status(UserStatus.WAITING)
+                .gameMoney(100000000)
                 .createdAt(TimeUtils.createUtc())
                 .updatedAt(TimeUtils.createUtc())
                 .lastLoginAt(TimeUtils.createUtc())
@@ -76,7 +77,7 @@ public class UserJpaEntity {
                 .kakaoId(userJpaEntity.getKakaoId())
                 .username(userJpaEntity.getUsername())
                 .userRole(userJpaEntity.getRole())
-                .userStatus(userJpaEntity.getUserStatus())
+                .userStatus(userJpaEntity.getStatus())
                 .currentGameUrl(userJpaEntity.getCurrentGameUrl())
                 .clientId(userJpaEntity.getClientId())
                 .createdAt(userJpaEntity.createdAt)
@@ -91,7 +92,7 @@ public class UserJpaEntity {
                 .kakaoId(kakaoId)
                 .username(username)
                 .role(UserRole.MEMBER)
-                .userStatus(UserStatus.WAITING)
+                .status(UserStatus.WAITING)
                 .createdAt(TimeUtils.createUtc())
                 .updatedAt(TimeUtils.createUtc())
                 .lastLoginAt(TimeUtils.createUtc())
