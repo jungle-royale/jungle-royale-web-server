@@ -1,5 +1,6 @@
 package com.example.jungleroyal.service.repository;
 
+import com.example.jungleroyal.common.types.RoomStatus;
 import com.example.jungleroyal.infrastructure.GameRoomJpaEntity;
 
 import java.util.List;
@@ -21,4 +22,8 @@ public interface GameRoomRepository {
     String getGameUrlById(Long roomId);
 
     List<GameRoomJpaEntity> findAll();
+
+    List<GameRoomJpaEntity> findAllByStatusAndCurrentPlayers(RoomStatus roomStatus, int currentPlayers);
+
+    void deleteAll(List<GameRoomJpaEntity> emptyRooms);
 }

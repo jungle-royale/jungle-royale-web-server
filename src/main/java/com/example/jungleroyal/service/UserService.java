@@ -1,6 +1,9 @@
 package com.example.jungleroyal.service;
 
+import com.example.jungleroyal.common.exceptions.GameRoomException;
 import com.example.jungleroyal.common.exceptions.UserAlreadyInGameException;
+import com.example.jungleroyal.common.types.GameRoomStatus;
+import com.example.jungleroyal.common.types.RoomStatus;
 import com.example.jungleroyal.common.types.UserStatus;
 import com.example.jungleroyal.common.util.HashUtil;
 import com.example.jungleroyal.common.util.JwtTokenProvider;
@@ -10,6 +13,7 @@ import com.example.jungleroyal.domain.*;
 import com.example.jungleroyal.infrastructure.RefreshToken;
 import com.example.jungleroyal.domain.user.UserDto;
 import com.example.jungleroyal.infrastructure.*;
+import com.example.jungleroyal.service.repository.GameRoomRepository;
 import com.example.jungleroyal.service.repository.InventoryRepository;
 import com.example.jungleroyal.service.repository.RefreshTokenRepository;
 import com.example.jungleroyal.service.repository.UserRepository;
@@ -20,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +35,7 @@ public class UserService {
     private final RandomNicknameGenerator randomNicknameGenerator;
     private final InventoryRepository inventoryRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final GameRoomRepository gameRoomRepository;
 
     public UserJpaEntity getUserJpaEntityById(Long userId){
         // UserJpaEntity 조회
@@ -114,9 +120,26 @@ public class UserService {
         UserJpaEntity user = userRepository.findById(userId)
             .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
 
+        GameRoomJpaEntity room = gameRoomRepository.findByGameUrl(gameRoomUrl)
+                .orElseThrow(() -> new GameRoomException("ROOM_NOT_FOUND", "존재하지 않는 방입니다."));
+
         // 유저 상태 확인
         if (user.getStatus() == UserStatus.IN_GAME) {
             throw new UserAlreadyInGameException("User is already in a game. Game URL: " + user.getCurrentGameUrl());
+        }
+
+        // 방 정원이 초과되지 않았는지 확인
+        if (room.getCurrentPlayers() >= room.getMaxPlayers()) {
+            throw new GameRoomException("GAME_ROOM_FULL", "방 정원이 초과되었습니다.");
+        }
+
+        // 방 상태가 RUNNING인 경우 같은 방에서 나왔으면 입장 가능
+        if (!room.getGameUrl().equals(user.getCurrentGameUrl())) {
+            room.setCurrentPlayers(room.getCurrentPlayers() + 1);
+            room.setUpdatedAt(TimeUtils.createUtc());
+
+            // 업데이트된 방 저장
+            gameRoomRepository.save(room);
         }
 
         // 필드값 갱신
@@ -125,6 +148,7 @@ public class UserService {
         user.setClientId(clientId);
 
         userRepository.save(user);
+
     }
 
     /**
@@ -175,5 +199,11 @@ public class UserService {
 
         userRepository.saveAll(users);
         log.info("Reverted users to WAITING by clientIds: {}", clientIds);
+    }
+
+    public UserDto getUserDtoById(long userId) {
+        return userRepository.findById(userId)
+                .map(UserJpaEntity::toDto) // UserJpaEntity를 UserDto로 변환
+                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
     }
 }

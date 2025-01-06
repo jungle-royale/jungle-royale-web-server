@@ -1,7 +1,9 @@
 package com.example.jungleroyal.infrastructure;
 
+import com.example.jungleroyal.common.types.RoomStatus;
 import com.example.jungleroyal.service.repository.GameRoomRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -44,6 +46,16 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
 
     @Override
     public List<GameRoomJpaEntity> findAll() {
-        return gameRoomJpaRepository.findAll();
+        return gameRoomJpaRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));   // 최신순 정렬
+    }
+
+    @Override
+    public List<GameRoomJpaEntity> findAllByStatusAndCurrentPlayers(RoomStatus roomStatus, int currentPlayers) {
+        return gameRoomJpaRepository.findAllByStatusAndCurrentPlayers(roomStatus, currentPlayers);
+    }
+
+    @Override
+    public void deleteAll(List<GameRoomJpaEntity> emptyRooms) {
+        gameRoomJpaRepository.deleteAll(emptyRooms);
     }
 }

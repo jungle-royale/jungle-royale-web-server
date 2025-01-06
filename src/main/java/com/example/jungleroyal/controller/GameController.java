@@ -59,8 +59,6 @@ public class GameController {
 
         gameService.endGame(roomId, endGameRequest.getRankings());
 
-        gameRoomService.updateRoomStatusByRoomUrl(roomId, RoomStatus.END);
-
         return ResponseEntity.ok("ok");
     }
 
