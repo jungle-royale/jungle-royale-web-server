@@ -152,9 +152,11 @@ public class GameRoomService {
     }
 
     public void updateRoomStatusByRoomUrl(String roomId, RoomStatus roomStatus) {
-            GameRoomJpaEntity room = gameRoomRepository.findByGameUrl(roomId)
-                .orElseThrow(() -> new RoomNotFoundException("Room not found for URL: ",roomId));
-            room.setStatus(roomStatus);
-            room.setUpdatedAt(LocalDateTime.now());
+        GameRoomJpaEntity room = gameRoomRepository.findByGameUrl(roomId)
+            .orElseThrow(() -> new RoomNotFoundException("Room not found for URL: ",roomId));
+        room.setStatus(roomStatus);
+        room.setUpdatedAt(LocalDateTime.now());
+
+        gameRoomRepository.save(room);
     }
 }

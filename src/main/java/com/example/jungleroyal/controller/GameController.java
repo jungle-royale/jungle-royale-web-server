@@ -6,6 +6,7 @@ import com.example.jungleroyal.domain.game.StartGameRequest;
 import com.example.jungleroyal.service.GameRoomService;
 import com.example.jungleroyal.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +16,7 @@ import java.util.Map;
 @RestController
 @RequestMapping
 @RequiredArgsConstructor
+@Slf4j
 public class GameController {
     private final GameRoomService gameRoomService;
     private final UserService userService;
@@ -25,7 +27,7 @@ public class GameController {
      * @return
      */
     @PostMapping("/api/game/start")
-    public ResponseEntity<String> startGame(StartGameRequest startGameRequest) {
+    public ResponseEntity<String> startGame(@RequestBody StartGameRequest startGameRequest) {
         String roomId = startGameRequest.getRoomId();
         gameRoomService.updateRoomStatusByRoomUrl(roomId, RoomStatus.RUNNING);
         userService.updateUsersToInGame(startGameRequest.getClientIds());
