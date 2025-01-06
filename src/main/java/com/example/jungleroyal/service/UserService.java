@@ -151,4 +151,29 @@ public class UserService {
         userRepository.saveAll(users);
         log.info("Updated users to IN_GAME: {}", clientIds);
     }
+
+    /**
+     * 게임 실패 시 clientId 기반으로 유저 상태를 WAITING으로 복구
+     *
+     * @param clientIds 상태를 복구할 유저 clientId 목록
+     */
+    @Transactional
+    public void revertUsersToWaitingByClientIds(List<String> clientIds) {
+        List<UserJpaEntity> users = userRepository.findAllByClientIds(clientIds);
+
+        if (users.isEmpty()) {
+            throw new IllegalArgumentException("No users found for the given clientIds");
+        }
+
+        users.forEach(user -> {
+            if (user.getUserStatus() != UserStatus.IN_GAME) {
+                throw new IllegalStateException("User is not in IN_GAME status: " + user.getClientId());
+            }
+            user.setUserStatus(UserStatus.WAITING);
+            user.setUpdatedAt(LocalDateTime.now());
+        });
+
+        userRepository.saveAll(users);
+        log.info("Reverted users to WAITING by clientIds: {}", clientIds);
+    }
 }

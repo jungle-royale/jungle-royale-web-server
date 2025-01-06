@@ -182,4 +182,27 @@ public class UserServiceTest {
                 .hasMessageContaining("User is not in WAITING status");
     }
 
+    @Test
+    void 게임_실패_시_clientId로_유저_상태를_WAITING으로_복구한다() {
+        // given
+        List<String> clientIds = List.of("client1", "client2");
+        List<UserJpaEntity> users = clientIds.stream()
+                .map(clientId -> {
+                    UserJpaEntity user = new UserJpaEntity();
+                    user.setClientId(clientId);
+                    user.setUserStatus(UserStatus.IN_GAME);
+                    return user;
+                })
+                .toList();
+
+        when(userRepository.findAllByClientIds(clientIds)).thenReturn(users);
+
+        // when
+        userService.revertUsersToWaitingByClientIds(clientIds);
+
+        // then
+        assertThat(users).allMatch(user -> user.getUserStatus() == UserStatus.WAITING);
+        verify(userRepository, times(1)).saveAll(users);
+    }
+
 }

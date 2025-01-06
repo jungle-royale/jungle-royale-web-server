@@ -16,4 +16,6 @@ public interface UserRepository {
     List<UserJpaEntity> findAllById(List<String> userIds);
 
     void saveAll(List<UserJpaEntity> users);
+
+    List<UserJpaEntity> findAllByClientIds(List<String> clientIds);
 }

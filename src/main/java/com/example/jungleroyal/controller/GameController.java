@@ -55,4 +55,16 @@ public class GameController {
         return ResponseEntity.ok("ok");
     }
 
+    /**
+     * 게임 실패 시 유저 상태 복구
+     *
+     * @param clientIds 복구할 유저 clientId 목록
+     * @return 성공 여부
+     */
+    @PostMapping("/failure-signal")
+    public ResponseEntity<String> handleGameFailureSignal(@RequestBody List<String> clientIds) {
+        userService.revertUsersToWaitingByClientIds(clientIds);
+        return ResponseEntity.ok("Users reverted to WAITING");
+    }
+
 }
