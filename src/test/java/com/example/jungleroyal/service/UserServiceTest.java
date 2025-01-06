@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -137,4 +138,48 @@ public class UserServiceTest {
         assertThat(createdUser.getRole()).isEqualTo(UserRole.GUEST);
         verify(userRepository, times(1)).save(Mockito.any(UserJpaEntity.class));
     }
+
+    @Test
+    void 게임_시작_시_유저_상태를_IN_GAME으로_변경한다() {
+        // given
+        List<String> userIds = List.of("a", "b", "c");
+        List<UserJpaEntity> users = userIds.stream()
+                .map(id -> {
+                    UserJpaEntity user = new UserJpaEntity();
+                    user.setClientId(id);
+                    user.setUserStatus(UserStatus.WAITING);
+                    return user;
+                })
+                .toList();
+
+        when(userRepository.findAllById(userIds)).thenReturn(users);
+
+        // when
+        userService.updateUsersToInGame(userIds);
+
+        // then
+        assertThat(users).allMatch(user -> user.getUserStatus() == UserStatus.IN_GAME);
+        verify(userRepository, times(1)).saveAll(users);
+    }
+
+    @Test
+    void 대기_중이_아닌_유저가_있으면_예외를_발생시킨다() {
+        // given
+        List<String> clientIds = List.of("a", "b");
+        UserJpaEntity waitingUser = new UserJpaEntity();
+        waitingUser.setId(1L);
+        waitingUser.setUserStatus(UserStatus.WAITING);
+
+        UserJpaEntity inGameUser = new UserJpaEntity();
+        inGameUser.setId(2L);
+        inGameUser.setUserStatus(UserStatus.IN_GAME);
+
+        when(userRepository.findAllById(clientIds)).thenReturn(List.of(waitingUser, inGameUser));
+
+        // when & then
+        assertThatThrownBy(() -> userService.updateUsersToInGame(clientIds))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("User is not in WAITING status");
+    }
+
 }

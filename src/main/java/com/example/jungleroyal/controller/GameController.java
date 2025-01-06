@@ -2,10 +2,12 @@ package com.example.jungleroyal.controller;
 
 import com.example.jungleroyal.common.types.RoomStatus;
 import com.example.jungleroyal.service.GameRoomService;
+import com.example.jungleroyal.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -13,6 +15,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class GameController {
     private final GameRoomService gameRoomService;
+    private final UserService userService;
 
     /**
      * 게임 시작 api
@@ -20,9 +23,11 @@ public class GameController {
      * @return
      */
     @PostMapping("/api/game/start")
-    public ResponseEntity<String> startGame(@RequestBody Map<String, Object> body) {
+    public ResponseEntity<String> startGame(@RequestBody Map<String, Object> body,
+                                            @RequestBody List<String> clientIds) {
         String roomId = (String) body.get("roomId"); // roomId 추출
         gameRoomService.updateRoomStatusByRoomUrl(roomId, RoomStatus.RUNNING);
+        userService.updateUsersToInGame(clientIds);
         return ResponseEntity.ok("ok");
     }
 

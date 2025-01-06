@@ -4,6 +4,7 @@ import com.example.jungleroyal.service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -28,5 +29,15 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public String findUsernameById(long userId) {
         return userJpaRepository.findUsernameById(userId);
+    }
+
+    @Override
+    public List<UserJpaEntity> findAllById(List<String> clientIds) {
+        return userJpaRepository.findAllByClientId(clientIds);
+    }
+
+    @Override
+    public void saveAll(List<UserJpaEntity> users) {
+        userJpaRepository.saveAll(users);
     }
 }

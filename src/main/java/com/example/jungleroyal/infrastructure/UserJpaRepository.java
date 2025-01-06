@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserJpaRepository extends JpaRepository<UserJpaEntity, Long> {
@@ -11,4 +12,6 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, Long> {
 
     @Query("SELECT u.username FROM UserJpaEntity u WHERE u.id = :userId")
     String findUsernameById(@Param("userId") Long userId);
+
+    List<UserJpaEntity> findAllByClientId(List<String> clientIds);
 }

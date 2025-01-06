@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -106,6 +107,7 @@ public class UserService {
      * @param userId       갱신할 유저의 ID
      * @param clientId     새로 설정할 clientId
      * @param gameRoomUrl  새로 설정할 gameRoomUrl
+     * @exception UserAlreadyInGameException 유저가 이미 게임중이거나 참여한 게임이 아직 끝나지 않았다.
      */
     @Transactional
     public void updateUserConnectionDetails(long userId, String gameRoomUrl, String clientId) {
@@ -123,5 +125,30 @@ public class UserService {
         user.setClientId(clientId);
 
         userRepository.save(user);
+    }
+
+    /**
+     * 게임 시작 시 유저 상태를 IN_GAME으로 변경
+     *
+     * @param clientIds 게임에 참가할 유저 ID 목록
+     */
+    @Transactional
+    public void updateUsersToInGame(List<String> clientIds) {
+        List<UserJpaEntity> users = userRepository.findAllById(clientIds);
+
+        if (users.isEmpty()) {
+            throw new IllegalArgumentException("No users found for the given IDs");
+        }
+
+        users.forEach(user -> {
+            if (user.getUserStatus() != UserStatus.WAITING) {
+                throw new IllegalStateException("User is not in WAITING status: " + user.getId());
+            }
+            user.setUserStatus(UserStatus.IN_GAME);
+            user.setUpdatedAt(LocalDateTime.now());
+        });
+
+        userRepository.saveAll(users);
+        log.info("Updated users to IN_GAME: {}", clientIds);
     }
 }
