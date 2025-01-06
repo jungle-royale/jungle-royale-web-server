@@ -6,5 +6,5 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class LogoutRequest {
-    private String jwtRefreshToken;
+    private String refreshToken;
 }
