@@ -115,7 +115,7 @@ public class UserService {
             .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
 
         // 유저 상태 확인
-        if (user.getUserStatus() == UserStatus.IN_GAME) {
+        if (user.getStatus() == UserStatus.IN_GAME) {
             throw new UserAlreadyInGameException("User is already in a game. Game URL: " + user.getCurrentGameUrl());
         }
 
@@ -141,10 +141,10 @@ public class UserService {
         }
 
         users.forEach(user -> {
-            if (user.getUserStatus() != UserStatus.WAITING) {
+            if (user.getStatus() != UserStatus.WAITING) {
                 throw new IllegalStateException("User is not in WAITING status: " + user.getId());
             }
-            user.setUserStatus(UserStatus.IN_GAME);
+            user.setStatus(UserStatus.IN_GAME);
             user.setUpdatedAt(LocalDateTime.now());
         });
 
@@ -166,10 +166,10 @@ public class UserService {
         }
 
         users.forEach(user -> {
-            if (user.getUserStatus() != UserStatus.IN_GAME) {
+            if (user.getStatus() != UserStatus.IN_GAME) {
                 throw new IllegalStateException("User is not in IN_GAME status: " + user.getClientId());
             }
-            user.setUserStatus(UserStatus.WAITING);
+            user.setStatus(UserStatus.WAITING);
             user.setUpdatedAt(LocalDateTime.now());
         });
 

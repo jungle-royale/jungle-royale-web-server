@@ -41,7 +41,7 @@ public class UserServiceTest {
         String newGameRoomUrl = "room123";
         UserJpaEntity user = new UserJpaEntity();
         user.setId(userId);
-        user.setUserStatus(UserStatus.IN_GAME);
+        user.setStatus(UserStatus.IN_GAME);
         user.setCurrentGameUrl("existingRoom123");
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
@@ -147,7 +147,7 @@ public class UserServiceTest {
                 .map(id -> {
                     UserJpaEntity user = new UserJpaEntity();
                     user.setClientId(id);
-                    user.setUserStatus(UserStatus.WAITING);
+                    user.setStatus(UserStatus.WAITING);
                     return user;
                 })
                 .toList();
@@ -158,7 +158,7 @@ public class UserServiceTest {
         userService.updateUsersToInGame(userIds);
 
         // then
-        assertThat(users).allMatch(user -> user.getUserStatus() == UserStatus.IN_GAME);
+        assertThat(users).allMatch(user -> user.getStatus() == UserStatus.IN_GAME);
         verify(userRepository, times(1)).saveAll(users);
     }
 
@@ -168,11 +168,11 @@ public class UserServiceTest {
         List<String> clientIds = List.of("a", "b");
         UserJpaEntity waitingUser = new UserJpaEntity();
         waitingUser.setId(1L);
-        waitingUser.setUserStatus(UserStatus.WAITING);
+        waitingUser.setStatus(UserStatus.WAITING);
 
         UserJpaEntity inGameUser = new UserJpaEntity();
         inGameUser.setId(2L);
-        inGameUser.setUserStatus(UserStatus.IN_GAME);
+        inGameUser.setStatus(UserStatus.IN_GAME);
 
         when(userRepository.findAllByClientIds(clientIds)).thenReturn(List.of(waitingUser, inGameUser));
 
@@ -190,7 +190,7 @@ public class UserServiceTest {
                 .map(clientId -> {
                     UserJpaEntity user = new UserJpaEntity();
                     user.setClientId(clientId);
-                    user.setUserStatus(UserStatus.IN_GAME);
+                    user.setStatus(UserStatus.IN_GAME);
                     return user;
                 })
                 .toList();
@@ -201,7 +201,7 @@ public class UserServiceTest {
         userService.revertUsersToWaitingByClientIds(clientIds);
 
         // then
-        assertThat(users).allMatch(user -> user.getUserStatus() == UserStatus.WAITING);
+        assertThat(users).allMatch(user -> user.getStatus() == UserStatus.WAITING);
         verify(userRepository, times(1)).saveAll(users);
     }
 
