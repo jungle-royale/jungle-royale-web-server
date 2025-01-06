@@ -1,6 +1,8 @@
 package com.example.jungleroyal.controller;
 
+import com.example.jungleroyal.common.types.GameRoomStatus;
 import com.example.jungleroyal.common.types.RoomStatus;
+import com.example.jungleroyal.domain.game.StartGameRequest;
 import com.example.jungleroyal.service.GameRoomService;
 import com.example.jungleroyal.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -19,15 +21,14 @@ public class GameController {
 
     /**
      * 게임 시작 api
-     * @param body
+     * @param  startGameRequest
      * @return
      */
     @PostMapping("/api/game/start")
-    public ResponseEntity<String> startGame(@RequestBody Map<String, Object> body,
-                                            @RequestBody List<String> clientIds) {
-        String roomId = (String) body.get("roomId"); // roomId 추출
+    public ResponseEntity<String> startGame(StartGameRequest startGameRequest) {
+        String roomId = startGameRequest.getRoomId();
         gameRoomService.updateRoomStatusByRoomUrl(roomId, RoomStatus.RUNNING);
-        userService.updateUsersToInGame(clientIds);
+        userService.updateUsersToInGame(startGameRequest.getClientIds());
         return ResponseEntity.ok("ok");
     }
 
