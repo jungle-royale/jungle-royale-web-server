@@ -9,6 +9,7 @@ import com.example.jungleroyal.domain.game.GameServerNotificationRequest;
 import com.example.jungleroyal.domain.game.GameServerNotificationResponse;
 import com.example.jungleroyal.domain.gameroom.*;
 import com.example.jungleroyal.domain.user.UserInfoUsingRoomListResponse;
+import com.example.jungleroyal.infrastructure.UserJpaEntity;
 import com.example.jungleroyal.service.GameRoomService;
 import com.example.jungleroyal.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -36,8 +37,7 @@ public class GameRoomController {
 
         String jwtToken = authorization.substring(7);
         String userId = jwtTokenProvider.extractSubject(jwtToken);
-
-        String clientId = gameRoomService.getRoomClientIdByUserId(userId);
+        String clientId = userService.getClientId();
         GameRoomDto room = gameRoomService.createRoom(GameRoomDto.fromRequest(gameRoomRequest, userId));
         log.info("room = " + room);
 
@@ -131,12 +131,18 @@ public class GameRoomController {
             @RequestHeader("Authorization") String jwt,
             @PathVariable Long roomId) {
 
-        String jwtToken = jwt.substring(7);
-        String userId = jwtTokenProvider.extractSubject(jwtToken);
+        String userId = securityUtil.getUserId();
+
+        userService.getUserJpaEntityById(Long.parseLong(userId));
+
+        // 게임 접속 가능 여부
         gameRoomService.checkRoomAvailability(roomId);
 
+        // roomUrl, clientId 획득
         String roomUrl = gameRoomService.getRoomUrlById(roomId);
-        String clinetId = gameRoomService.getRoomClientIdByUserId(userId);
+        String clinetId = userService.getClientId();
+
+        userService.updateUserConnectionDetails(Long.parseLong(userId), roomUrl, clinetId);
 
         GameRoomJoinReponse response = GameRoomJoinReponse.builder()
                 .roomId(roomUrl)

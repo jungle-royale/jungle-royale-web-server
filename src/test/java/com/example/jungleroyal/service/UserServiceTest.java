@@ -1,6 +1,8 @@
 package com.example.jungleroyal.service;
 
+import com.example.jungleroyal.common.exceptions.UserAlreadyInGameException;
 import com.example.jungleroyal.common.types.UserRole;
+import com.example.jungleroyal.common.types.UserStatus;
 import com.example.jungleroyal.common.util.RandomNicknameGenerator;
 import com.example.jungleroyal.domain.user.UserDto;
 import com.example.jungleroyal.infrastructure.UserJpaEntity;
@@ -9,7 +11,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -25,6 +30,25 @@ public class UserServiceTest {
         userRepository = mock(UserRepository.class);
         randomNicknameGenerator = mock(RandomNicknameGenerator.class);
         userService = new UserService(userRepository, null, randomNicknameGenerator, null, null);
+    }
+
+    @Test
+    void 이미_다른_게임에_접속중인_경우_예외를_발생시킨다() {
+        // given
+        Long userId = 1L;
+        String newClientId = "client123";
+        String newGameRoomUrl = "room123";
+        UserJpaEntity user = new UserJpaEntity();
+        user.setId(userId);
+        user.setUserStatus(UserStatus.IN_GAME);
+        user.setCurrentGameUrl("existingRoom123");
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        // when & then
+        assertThatThrownBy(() -> userService.updateUserConnectionDetails(userId, newClientId, newGameRoomUrl))
+                .isInstanceOf(UserAlreadyInGameException.class)
+                .hasMessageContaining("User is already in a game");
     }
 
     @Test

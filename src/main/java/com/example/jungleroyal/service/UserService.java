@@ -1,8 +1,11 @@
 package com.example.jungleroyal.service;
 
+import com.example.jungleroyal.common.exceptions.UserAlreadyInGameException;
+import com.example.jungleroyal.common.types.UserStatus;
 import com.example.jungleroyal.common.util.HashUtil;
 import com.example.jungleroyal.common.util.JwtTokenProvider;
 import com.example.jungleroyal.common.util.RandomNicknameGenerator;
+import com.example.jungleroyal.common.util.TimeUtils;
 import com.example.jungleroyal.domain.*;
 import com.example.jungleroyal.infrastructure.RefreshToken;
 import com.example.jungleroyal.domain.user.UserDto;
@@ -97,5 +100,28 @@ public class UserService {
         String key = HashUtil.encryptWithUUIDAndHash();
         return HashUtil.hash(key);
     }
+    /**
+     * 유저의 clientId와 gameRoomUrl을 갱신
+     *
+     * @param userId       갱신할 유저의 ID
+     * @param clientId     새로 설정할 clientId
+     * @param gameRoomUrl  새로 설정할 gameRoomUrl
+     */
+    @Transactional
+    public void updateUserConnectionDetails(long userId, String gameRoomUrl, String clientId) {
+        UserJpaEntity user = userRepository.findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
 
+        // 유저 상태 확인
+        if (user.getUserStatus() == UserStatus.IN_GAME) {
+            throw new UserAlreadyInGameException("User is already in a game. Game URL: " + user.getCurrentGameUrl());
+        }
+
+        // 필드값 갱신
+        user.setUpdatedAt(TimeUtils.createUtc());
+        user.setCurrentGameUrl(gameRoomUrl);
+        user.setClientId(clientId);
+
+        userRepository.save(user);
+    }
 }
