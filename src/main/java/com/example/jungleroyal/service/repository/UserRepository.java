@@ -2,6 +2,7 @@ package com.example.jungleroyal.service.repository;
 
 import com.example.jungleroyal.infrastructure.UserJpaEntity;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository {
@@ -12,4 +13,8 @@ public interface UserRepository {
     UserJpaEntity save(UserJpaEntity user);
 
     String findUsernameById(long userId);
+
+    void saveAll(List<UserJpaEntity> users);
+
+    List<UserJpaEntity> findAllByClientIds(List<String> clientIds);
 }

@@ -1,6 +1,8 @@
 package com.example.jungleroyal.infrastructure;
 
 import com.example.jungleroyal.common.types.UserRole;
+import com.example.jungleroyal.common.types.UserStatus;
+import com.example.jungleroyal.common.util.TimeUtils;
 import com.example.jungleroyal.domain.user.UserDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -33,27 +35,40 @@ public class UserJpaEntity {
     private UserRole role = UserRole.GUEST; // 유저 기본 타입 : GUEST
 
     @Column(nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt = TimeUtils.createUtc();
 
     @Column(nullable = false)
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private LocalDateTime updatedAt = TimeUtils.createUtc();
 
     @Column(nullable = false)
-    private LocalDateTime lastLoginAt = LocalDateTime.now();
+    private LocalDateTime lastLoginAt = TimeUtils.createUtc();
+
+    @Column
+    private String currentGameUrl; // 현재 위치하고있는 게임룸 url
+
+    @Column
+    private String clientId; // 방에 접속할 때 사용할 clientId
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private UserStatus status;  // 현재 유저 상태 : WAITING || IN_GAME
 
     // 게임머니 필드 추가
     @Column(nullable = false)
     private Integer gameMoney = 100000000; // 기본값 0
 
-
     public static UserJpaEntity createGueutUser(String randomNickname){
-        UserJpaEntity guestUserJpaEntity = new UserJpaEntity();
-        guestUserJpaEntity.setKakaoId("GUEST_" + System.currentTimeMillis()); // GUEST 고유 ID 생성
-        guestUserJpaEntity.setUsername(randomNickname);
-        guestUserJpaEntity.setRole(UserRole.GUEST);
-        guestUserJpaEntity.setLastLoginAt(LocalDateTime.now());
 
-        return guestUserJpaEntity;
+        return UserJpaEntity.builder()
+                .kakaoId("GUEST_" + System.currentTimeMillis())
+                .username(randomNickname)
+                .role(UserRole.GUEST)
+                .status(UserStatus.WAITING)
+                .gameMoney(100000000)
+                .createdAt(TimeUtils.createUtc())
+                .updatedAt(TimeUtils.createUtc())
+                .lastLoginAt(TimeUtils.createUtc())
+                .build();
     }
 
     public static UserDto toDto(UserJpaEntity userJpaEntity) {
@@ -62,6 +77,9 @@ public class UserJpaEntity {
                 .kakaoId(userJpaEntity.getKakaoId())
                 .username(userJpaEntity.getUsername())
                 .userRole(userJpaEntity.getRole())
+                .userStatus(userJpaEntity.getStatus())
+                .currentGameUrl(userJpaEntity.getCurrentGameUrl())
+                .clientId(userJpaEntity.getClientId())
                 .createdAt(userJpaEntity.createdAt)
                 .updatedAt(userJpaEntity.updatedAt)
                 .gameMoney(userJpaEntity.getGameMoney())
@@ -70,12 +88,14 @@ public class UserJpaEntity {
     }
 
     public UserJpaEntity createKakaoUser(String kakaoId, String username){
-        UserJpaEntity kakaoUserJpaEntity = new UserJpaEntity();
-        kakaoUserJpaEntity.setKakaoId(kakaoId); // GUEST 고유 ID 생성
-        kakaoUserJpaEntity.setUsername(username);
-        kakaoUserJpaEntity.setRole(UserRole.MEMBER);
-        kakaoUserJpaEntity.setLastLoginAt(LocalDateTime.now());
-
-        return kakaoUserJpaEntity;
+        return UserJpaEntity.builder()
+                .kakaoId(kakaoId)
+                .username(username)
+                .role(UserRole.MEMBER)
+                .status(UserStatus.WAITING)
+                .createdAt(TimeUtils.createUtc())
+                .updatedAt(TimeUtils.createUtc())
+                .lastLoginAt(TimeUtils.createUtc())
+                .build();
     }
 }

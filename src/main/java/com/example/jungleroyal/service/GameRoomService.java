@@ -139,9 +139,6 @@ public class GameRoomService {
         return GameRoomStatus.GAME_JOIN_AVAILABLE;
     }
 
-    public String getRoomClientIdByUserId(String userId) {
-        return EncryptionUtil.encrypt(userId);
-    }
 
     public void deleteRoomById(Long id) {
         GameRoomJpaEntity gameRoomJpaEntity = gameRoomRepository.findById(id)
@@ -155,9 +152,11 @@ public class GameRoomService {
     }
 
     public void updateRoomStatusByRoomUrl(String roomId, RoomStatus roomStatus) {
-            GameRoomJpaEntity room = gameRoomRepository.findByGameUrl(roomId)
-                .orElseThrow(() -> new RoomNotFoundException("Room not found for URL: ",roomId));
-            room.setStatus(roomStatus);
-            room.setUpdatedAt(LocalDateTime.now());
+        GameRoomJpaEntity room = gameRoomRepository.findByGameUrl(roomId)
+            .orElseThrow(() -> new RoomNotFoundException("Room not found for URL: ",roomId));
+        room.setStatus(roomStatus);
+        room.setUpdatedAt(LocalDateTime.now());
+
+        gameRoomRepository.save(room);
     }
 }

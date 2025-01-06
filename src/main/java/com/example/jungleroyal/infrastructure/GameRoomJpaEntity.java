@@ -83,6 +83,21 @@ public class GameRoomJpaEntity {
                 .build();
     }
 
+    public static GameRoomJpaEntity createDummy() {
+        return GameRoomJpaEntity.builder()
+                .title("Temporary Room") // 기본 제목
+                .hostId("host_" + System.currentTimeMillis()) // 기본 호스트 ID
+                .minPlayers(2) // 최소 플레이어 기본값
+                .maxPlayers(10) // 최대 플레이어 기본값
+                .maxGameTime(30) // 기본 게임 시간 (30분)
+                .currentPlayers(1) // 기본 현재 플레이어 수는 0
+                .status(RoomStatus.WAITING) // 기본 상태는 WAITING
+                .gameUrl("game_" + System.currentTimeMillis()) // 기본 URL
+                .createdAt(LocalDateTime.now()) // 현재 시간
+                .updatedAt(LocalDateTime.now()) // 현재 시간
+                .build();
+    }
+
     public boolean canShow() {
         return status.canShow();
     }
