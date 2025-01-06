@@ -19,27 +19,15 @@ import java.util.Map;
 @Slf4j
 public class LogoutController {
     private final JwtService jwtService;
-    private final SecurityUtil securityUtil;
-    private final KakaoAuthService kakaoAuthService;
 
     @PostMapping("/api/auth/logout")
     public ResponseEntity<Map<String, String>> logout(
             @RequestHeader("Authorization") String authorization,
             @RequestBody LogoutRequest logoutRequest
     ) {
-        String userRole = securityUtil.getUserRole();
         String refreshToken = logoutRequest.getRefreshToken();
 
         jwtService.saveBlackList(refreshToken);
-
-        String userId = securityUtil.getUserId();
-
-        if(userRole == UserRole.MEMBER.name()){
-            AuthTokensDto authTokens = kakaoAuthService.getAuthTokens(userId);
-
-            // 카카오 서버 로그아웃 요청
-            kakaoAuthService.logoutFromKakao(authTokens.getAccessToken());
-        }
 
         Map<String, String> responseBody = new HashMap<>();
         responseBody.put("success", "true");
