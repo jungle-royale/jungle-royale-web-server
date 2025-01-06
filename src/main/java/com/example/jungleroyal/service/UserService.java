@@ -1,5 +1,6 @@
 package com.example.jungleroyal.service;
 
+import com.example.jungleroyal.common.util.HashUtil;
 import com.example.jungleroyal.common.util.JwtTokenProvider;
 import com.example.jungleroyal.common.util.RandomNicknameGenerator;
 import com.example.jungleroyal.domain.*;
@@ -12,6 +13,7 @@ import com.example.jungleroyal.service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -90,4 +92,10 @@ public class UserService {
         // 데이터베이스에 저장
         userRepository.save(userJpaEntity);
     }
+
+    public String getClientId() {
+        String key = HashUtil.encryptWithUUIDAndHash();
+        return HashUtil.hash(key);
+    }
+
 }

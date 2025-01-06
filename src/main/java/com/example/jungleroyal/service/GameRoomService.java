@@ -139,9 +139,6 @@ public class GameRoomService {
         return GameRoomStatus.GAME_JOIN_AVAILABLE;
     }
 
-    public String getRoomClientIdByUserId(String userId) {
-        return EncryptionUtil.encrypt(userId);
-    }
 
     public void deleteRoomById(Long id) {
         GameRoomJpaEntity gameRoomJpaEntity = gameRoomRepository.findById(id)
