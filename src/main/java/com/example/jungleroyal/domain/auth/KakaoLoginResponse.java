@@ -13,13 +13,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class KakaoLoginResponse {
     private String jwtToken;
-    private String kakaoRefreshToken;
+    private String refreshToken;
     private UserRole role = UserRole.MEMBER;
 
-    public static KakaoLoginResponse createKakaoLoginResponse(String jwtToken, String refreshToken){
+    public static KakaoLoginResponse createKakaoLoginResponse(String jwtToken, String jwtRefreshToken, String authRefreshToken){
         return KakaoLoginResponse.builder()
                 .jwtToken(jwtToken)
-                .kakaoRefreshToken(refreshToken)
+                .refreshToken(jwtRefreshToken)
                 .role(UserRole.MEMBER)
                 .build();
     }
