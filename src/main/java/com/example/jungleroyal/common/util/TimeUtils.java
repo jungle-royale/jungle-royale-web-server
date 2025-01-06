@@ -22,4 +22,8 @@ public class TimeUtils {
                 .withZoneSameInstant(ZoneOffset.UTC) // UTC로 변환
                 .toLocalDateTime(); // LocalDateTime 반환
     }
+
+    public static LocalDateTime setExpiredAt(int expiresInSeconds) {
+        return LocalDateTime.now(ZoneId.of("UTC")).plusSeconds(expiresInSeconds);
+    }
 }

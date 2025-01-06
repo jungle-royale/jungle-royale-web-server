@@ -42,28 +42,12 @@ public class UserService {
         return UserJpaEntity.toDto(userJpaEntity);
     }
 
-    public void kakaoUserJoin(String kakaoId, OAuthKakaoToken oAuthKakaoToken) {
-        // 유저가 존재하지않으면 회원, 리프레시 토큰 저장
-        if (!isUserExistsByKakaoId(kakaoId)) {
-            String username = randomNicknameGenerator.generate();
-            UserJpaEntity savedUserJpaEntity = saveKakaoUser(kakaoId, username);
+    public UserDto kakaoUserJoin(String kakaoId) {
+        String username = randomNicknameGenerator.generate();
+        UserJpaEntity savedUserJpaEntity = saveKakaoUser(kakaoId, username);
 
-            RefreshToken refreshToken = jwtTokenProvider.generateRefreshToken(savedUserJpaEntity.getId(), username, savedUserJpaEntity.getRole());
+        return UserJpaEntity.toDto(savedUserJpaEntity);
 
-            refreshTokenRepository.save(refreshToken);
-            // 유저 등록 및 refreshtoken 등록
-        } else {
-            // 유저가 존재해 그럼 리프레시 토큰만 저장
-            // refreshtoken 등록
-            UserJpaEntity userJpaEntity = userRepository.findByKakaoId(kakaoId)
-                    .orElse(new UserJpaEntity());
-            RefreshToken refreshToken = jwtTokenProvider.generateRefreshToken(userJpaEntity.getId(), userJpaEntity.getUsername(), userJpaEntity.getRole());
-            RefreshToken byUser = refreshTokenRepository.findByUserId(userJpaEntity.getId())
-                    .orElseThrow(() -> new IllegalArgumentException("리프레시토큰에 맞는 유저가 없다."));
-            byUser.setRefreshToken(refreshToken.getRefreshToken());
-
-            refreshTokenRepository.save(byUser);
-        }
     }
 
     /**
@@ -81,7 +65,6 @@ public class UserService {
         UserJpaEntity userJpaEntity = userRepository.findByKakaoId(kakaoId)
                 .orElse(new UserJpaEntity());
         UserJpaEntity savedUser = userRepository.save(userJpaEntity.createKakaoUser(kakaoId, username));
-
 
         // 회원 가입 후 인벤토리 생성
         InventoryJpaEntity inventory = InventoryJpaEntity.builder()
