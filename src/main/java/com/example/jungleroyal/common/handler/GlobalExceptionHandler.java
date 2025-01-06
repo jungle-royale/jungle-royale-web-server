@@ -12,6 +12,15 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(UserAlreadyInGameException.class)
+    public ResponseEntity<Map<String, Object>> handleUserAlreadyInGameException(UserAlreadyInGameException e) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", HttpStatus.CONFLICT.value());
+        response.put("error", "USER_ALREADY_IN_GAME");
+        response.put("message", e.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
     @ExceptionHandler(DuplicateRoomException.class)
     public ResponseEntity<ErrorResponse> handleDuplicateRoomException(DuplicateRoomException e) {
         return ResponseEntity
