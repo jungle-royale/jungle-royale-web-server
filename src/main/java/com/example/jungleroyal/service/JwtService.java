@@ -3,6 +3,7 @@ package com.example.jungleroyal.service;
 import com.example.jungleroyal.common.types.UserRole;
 import com.example.jungleroyal.common.util.JwtTokenProvider;
 import com.example.jungleroyal.common.util.TimeUtils;
+import com.example.jungleroyal.domain.dto.JwtTokenUserInfoDto;
 import com.example.jungleroyal.infrastructure.BlackListJpaEntity;
 import com.example.jungleroyal.infrastructure.RefreshToken;
 import com.example.jungleroyal.service.repository.BlackListRepository;
@@ -77,5 +78,26 @@ public class JwtService {
     public boolean isBlacklisted(String refreshToken) {
 
         return blackListRepository.existsByInvalidRefreshToken(refreshToken);
+    }
+
+    public JwtTokenUserInfoDto extractUserInfo(String refreshToken) {
+        String userId = jwtTokenProvider.extractSubject(refreshToken);
+        String username = jwtTokenProvider.extractUsername(refreshToken);
+        UserRole userRole = jwtTokenProvider.extractUserRole(refreshToken);
+
+        return JwtTokenUserInfoDto.builder()
+                .userId(userId)
+                .username(username)
+                .userRole(userRole)
+                .build();
+    }
+
+    public String generateJwtToken(JwtTokenUserInfoDto jwtTokenUserInfoDto) {
+        return jwtTokenProvider.generate(jwtTokenUserInfoDto.getUserId(), jwtTokenUserInfoDto.getUsername(), jwtTokenUserInfoDto.getUserRole());
+    }
+
+    public RefreshToken generateJwtRefreshToken(JwtTokenUserInfoDto jwtTokenUserInfoDto) {
+        return jwtTokenProvider.generateRefreshToken(Long.parseLong(jwtTokenUserInfoDto.getUserId()), jwtTokenUserInfoDto.getUsername(),
+                jwtTokenUserInfoDto.getUserRole());
     }
 }
