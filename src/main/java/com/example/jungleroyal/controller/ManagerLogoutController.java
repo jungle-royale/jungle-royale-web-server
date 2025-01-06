@@ -1,6 +1,7 @@
 package com.example.jungleroyal.controller;
 
 import com.example.jungleroyal.common.util.JwtTokenProvider;
+import com.example.jungleroyal.common.util.SecurityUtil;
 import com.example.jungleroyal.domain.auth.LogoutRequest;
 import com.example.jungleroyal.service.repository.BlackListRepository;
 import com.example.jungleroyal.service.JwtService;
@@ -17,44 +18,22 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Slf4j
 public class ManagerLogoutController {
-    private final KakaoAuthService kakaoAuthService;
     private final JwtService jwtService;
-    private final BlackListRepository blackListRepository;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final SecurityUtil securityUtil;
 
     @PostMapping("/api/auth/logout")
     public ResponseEntity<Map<String, String>> logout(
             @RequestHeader("Authorization") String authorization,
             @RequestBody LogoutRequest logoutRequest
     ) {
-        log.info("비회원 로그인 실행");
-        String refreshToken = logoutRequest.getRefreshToken();
-        String jwt = authorization.substring(7);
+        String refreshToken = logoutRequest.getJwtRefreshToken();
 
         jwtService.saveBlackList(refreshToken);
 
-//        System.out.println("jwtToken = " + jwtToken);
-//        String userId = jwtTokenProvider.extractSubject(jwtToken);
-
-//        return ResponseEntity.ok("전달완료!");
-//        // Authorization 헤더에서 Bearer 제거
-//        String realRefreshToken = refreshToken.substring(7);
-//
-//        // 2. JWT 토큰 무효화 처리
-////        jwtService.invalidateToken(jwtToken);
-//
-//        // 1. 카카오 로그아웃 요청
-//        kakaoAuthService.logoutFromKakao(realAccessToken);
-//        // 2. Refresh Token 블랙리스트 저장
-//        if (realRefreshToken != null && !realRefreshToken.isEmpty()) {
-//            blackListRepository.save(new BlackList(realRefreshToken));
-//        } else {
-//            throw new IllegalArgumentException("Invalid refresh token. Cannot save to blacklist.");
-//        }
-//
-        log.info("비회원 로그인 실행 완료");
         Map<String, String> responseBody = new HashMap<>();
         responseBody.put("success", "true");
         return ResponseEntity.ok(responseBody);
+
     }
+
 }
