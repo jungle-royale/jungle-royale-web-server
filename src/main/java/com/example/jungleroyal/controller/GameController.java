@@ -43,13 +43,9 @@ public class GameController {
      */
     @PostMapping("/api/game/end")
     public ResponseEntity<String> endGame(@RequestBody(required = false) EndGameRequest endGameRequest) {
-        if (endGameRequest == null) {
-            // 요청 본문이 없을 경우 처리
-            return ResponseEntity.badRequest().body("Request body is missing.");
-        }
-        String roomId = endGameRequest.getRoomId(); // roomId 추출
-
-        gameService.endGame(roomId, endGameRequest.getRankings());
+//        String roomId = endGameRequest.getRoomId(); // roomId 추출
+//
+//        gameService.endGame(roomId, endGameRequest.getRankings());
 
         return ResponseEntity.ok("ok");
     }
