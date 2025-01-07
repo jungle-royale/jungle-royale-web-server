@@ -49,9 +49,7 @@ public class GameController {
      */
     @PostMapping("/api/game/end")
     public ResponseEntity<String> endGame(@RequestBody(required = false) EndGameRequest endGameRequest) {
-//        String roomId = endGameRequest.getRoomId(); // roomId 추출
-//
-//        gameService.endGame(roomId, endGameRequest.getRankings());
+        gameService.endGame(endGameRequest);
 
         return ResponseEntity.ok("ok");
     }
