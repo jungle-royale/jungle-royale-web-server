@@ -82,7 +82,7 @@ public class UserJpaEntity {
                 .clientId(userJpaEntity.getClientId())
                 .createdAt(userJpaEntity.createdAt)
                 .updatedAt(userJpaEntity.updatedAt)
-                .gameMoney(userJpaEntity.getGameMoney())
+                .gameMoney(100000000)
                 .lastLoginAt(userJpaEntity.lastLoginAt)
                 .build();
     }
