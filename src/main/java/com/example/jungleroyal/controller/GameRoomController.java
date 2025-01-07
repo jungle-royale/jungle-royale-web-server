@@ -139,35 +139,7 @@ public class GameRoomController {
             @RequestHeader(value = "Authorization", required = false) String jwt,
             @PathVariable Long roomId) {
 
-        String userId;
-
-        if(jwt == null){
-            UserJpaEntity userJpaEntity = userService.registerGuest();
-            userId = String.valueOf(userJpaEntity.getId());
-        } else {
-            userId = securityUtil.getUserId();
-        }
-
-        UserDto user = userService.getUserDtoById(Long.parseLong(userId));
-
-        // 게임 접속 가능 여부
-        gameRoomService.checkRoomAvailability(roomId,userId);
-
-        // roomUrl, clientId 획득
-        String roomUrl = gameRoomService.getRoomUrlById(roomId);
-        String clientId = user.getClientId(); // 기본값은 기존 clientId 유지
-
-        // 같은 방이 아닌 경우에만 clientId 갱신
-        if (!roomUrl.equals(user.getCurrentGameUrl())) {
-            clientId = userService.getClientId(); // 새로운 clientId 생성
-            userService.updateUserConnectionDetails(Long.parseLong(userId), roomUrl, clientId, false);
-        }
-
-        GameRoomJoinReponse response = GameRoomJoinReponse.builder()
-                .roomId(roomUrl)
-                .clientId(clientId)
-                .build();
-
+        GameRoomJoinReponse response = gameRoomService.joinGameRoom(roomId, jwt);
         return ResponseEntity.ok(response);
     }
 }
