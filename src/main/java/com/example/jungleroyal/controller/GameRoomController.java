@@ -1,5 +1,6 @@
 package com.example.jungleroyal.controller;
 
+import com.example.jungleroyal.common.exceptions.GameRoomException;
 import com.example.jungleroyal.common.types.GameRoomStatus;
 import com.example.jungleroyal.common.types.RoomStatus;
 import com.example.jungleroyal.common.types.UserStatus;
@@ -27,7 +28,6 @@ import java.util.List;
 @Slf4j
 public class GameRoomController {
     private final GameRoomService gameRoomService;
-    private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
     private final GameServerClient gameServerClient;
     private final SecurityUtil securityUtil;
@@ -37,10 +37,14 @@ public class GameRoomController {
             @RequestBody GameRoomRequest gameRoomRequest,
             @RequestHeader("Authorization") String authorization
     ) {
+        String userId = securityUtil.getUserId();
+        UserDto user = userService.getUserDtoById(Long.parseLong(userId));
 
-        String jwtToken = authorization.substring(7);
-        String userId = jwtTokenProvider.extractSubject(jwtToken);
-        String clientId = userService.getClientId();
+        // 방 상태가 WAITING인데 유저 상태가 IN_GAME인 경우 예외 처리
+        if (user.getUserStatus() == UserStatus.IN_GAME) {
+            throw new GameRoomException("INVALID_USER_STATE", "유저가 현재 다른 게임에 참여중입니다.");
+        }
+
         GameRoomDto room = gameRoomService.createRoom(GameRoomDto.fromRequest(gameRoomRequest, userId));
         log.info("room = " + room);
 
@@ -49,7 +53,6 @@ public class GameRoomController {
         int minPlayers = room.getMinPlayers();
         int maxPlayTime = room.getMaxGameTime();
 
-        // TODO: 게임서버에 HTTP 찌르고 기다렸다가 return
         // 게임 서버와 통신
         GameServerNotificationRequest gameServerNotificationRequest
                 = new GameServerNotificationRequest(roomUrl, minPlayers, maxPlayTime);
@@ -65,6 +68,10 @@ public class GameRoomController {
             throw new IllegalStateException("게임 서버에서 방 생성을 허용하지 않았습니다.");
         }
 
+        // 유저, 게임룸 정보 갱신
+        String clientId = userService.getClientId(); // 새로운 clientId 생성
+        userService.updateUserConnectionDetailsAtCreateRoom(Long.parseLong(userId), roomUrl, clientId);
+
         GameRoomCreateReponse response = GameRoomCreateReponse.builder()
                 .roomId(roomUrl)
                 .clientId(clientId)
@@ -73,7 +80,6 @@ public class GameRoomController {
         return ResponseEntity.ok(response);
     }
 
-    // TODO: 인게임에서 방 속성 변경 시 어떻게 처리할까? 추후 확인할 것
     @PutMapping("/api/rooms/update/{roomId}")
     public ResponseEntity<String> updateRoom(
             @PathVariable Long roomId,
