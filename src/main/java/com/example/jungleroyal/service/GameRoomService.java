@@ -112,11 +112,6 @@ public class GameRoomService {
                 .toList();
     }
 
-    public Optional<GameRoomDto> getRoomById(Long roomId) {
-        log.info("UserInfoUsingRoomListResponse 객체 생성 완료  :" + System.currentTimeMillis());
-        return gameRoomRepository.findById(roomId).map(GameRoomJpaEntity::toDto);
-    }
-
     public GameRoomDto getRoomByIdOrThrow(Long roomId) {
         return gameRoomRepository.findById(roomId)
                 .map(GameRoomJpaEntity::toDto)
