@@ -1,6 +1,6 @@
 package com.example.jungleroyal.common.handler;
 
-import com.example.jungleroyal.common.exceptions.*;
+import com.example.jungleroyal.common.exception.*;
 import com.example.jungleroyal.domain.error.ErrorResponse;
 import org.hibernate.exception.SQLGrammarException;
 import org.springframework.http.HttpStatus;

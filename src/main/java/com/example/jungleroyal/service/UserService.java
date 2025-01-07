@@ -1,21 +1,17 @@
 package com.example.jungleroyal.service;
 
-import com.example.jungleroyal.common.exceptions.GameRoomException;
-import com.example.jungleroyal.common.exceptions.UserAlreadyInGameException;
-import com.example.jungleroyal.common.types.GameRoomStatus;
-import com.example.jungleroyal.common.types.RoomStatus;
+import com.example.jungleroyal.common.exception.GameRoomException;
+import com.example.jungleroyal.common.exception.UserAlreadyInGameException;
 import com.example.jungleroyal.common.types.UserStatus;
 import com.example.jungleroyal.common.util.HashUtil;
-import com.example.jungleroyal.common.util.JwtTokenProvider;
 import com.example.jungleroyal.common.util.RandomNicknameGenerator;
 import com.example.jungleroyal.common.util.TimeUtils;
-import com.example.jungleroyal.domain.*;
-import com.example.jungleroyal.infrastructure.RefreshToken;
 import com.example.jungleroyal.domain.user.UserDto;
-import com.example.jungleroyal.infrastructure.*;
+import com.example.jungleroyal.infrastructure.GameRoomJpaEntity;
+import com.example.jungleroyal.infrastructure.InventoryJpaEntity;
+import com.example.jungleroyal.infrastructure.UserJpaEntity;
 import com.example.jungleroyal.service.repository.GameRoomRepository;
 import com.example.jungleroyal.service.repository.InventoryRepository;
-import com.example.jungleroyal.service.repository.RefreshTokenRepository;
 import com.example.jungleroyal.service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,17 +20,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class UserService {
     private final UserRepository userRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
     private final RandomNicknameGenerator randomNicknameGenerator;
     private final InventoryRepository inventoryRepository;
-    private final JwtTokenProvider jwtTokenProvider;
     private final GameRoomRepository gameRoomRepository;
 
     public UserJpaEntity getUserJpaEntityById(Long userId){
@@ -108,15 +101,17 @@ public class UserService {
         return HashUtil.hash(key);
     }
     /**
-     * 유저의 clientId와 gameRoomUrl을 갱신
+     * 유저의 clientId와 gameRoomUrl을 갱신합니다.
      *
      * @param userId       갱신할 유저의 ID
-     * @param clientId     새로 설정할 clientId
      * @param gameRoomUrl  새로 설정할 gameRoomUrl
-     * @exception UserAlreadyInGameException 유저가 이미 게임중이거나 참여한 게임이 아직 끝나지 않았다.
+     * @param clientId     새로 설정할 clientId
+     * @param isCreatingRoom 방 생성 여부 (true: 방 생성 시 처리, false: 일반 입장 시 처리)
+     * @exception UserAlreadyInGameException 유저가 이미 게임중이거나 참여한 게임이 아직 끝나지 않았을 때 발생
+     * @exception GameRoomException 방이 존재하지 않거나 정원이 초과된 경우 발생
      */
     @Transactional
-    public void updateUserConnectionDetails(long userId, String gameRoomUrl, String clientId) {
+    public void updateUserConnectionDetails(long userId, String gameRoomUrl, String clientId, boolean isCreatingRoom) {
         UserJpaEntity user = userRepository.findById(userId)
             .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
 
@@ -134,7 +129,7 @@ public class UserService {
         }
 
         // 방 상태가 RUNNING인 경우 같은 방에서 나왔으면 입장 가능
-        if (!room.getGameUrl().equals(user.getCurrentGameUrl())) {
+        if (!isCreatingRoom && !room.getGameUrl().equals(user.getCurrentGameUrl())) {
             room.setCurrentPlayers(room.getCurrentPlayers() + 1);
             room.setUpdatedAt(TimeUtils.createUtc());
 

@@ -10,5 +10,4 @@ import java.util.List;
 public class StartGameRequest {
     private String roomId;
     private List<String> clientIds;
-
 }

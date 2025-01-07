@@ -1,15 +1,14 @@
 package com.example.jungleroyal.service;
 
 
-import com.example.jungleroyal.common.exceptions.DuplicateRoomException;
-import com.example.jungleroyal.common.exceptions.GameRoomException;
-import com.example.jungleroyal.common.exceptions.RoomByGameUrlFoundException;
-import com.example.jungleroyal.common.exceptions.RoomNotFoundException;
+import com.example.jungleroyal.common.exception.GameRoomException;
+import com.example.jungleroyal.common.exception.RoomByGameUrlFoundException;
+import com.example.jungleroyal.common.exception.RoomNotFoundException;
 import com.example.jungleroyal.common.types.GameRoomStatus;
 import com.example.jungleroyal.common.types.RoomStatus;
-import com.example.jungleroyal.common.types.UserStatus;
-import com.example.jungleroyal.common.util.EncryptionUtil;
 import com.example.jungleroyal.common.util.HashUtil;
+import com.example.jungleroyal.common.util.RoomValidator;
+import com.example.jungleroyal.common.util.SecurityUtil;
 import com.example.jungleroyal.domain.gameroom.GameRoomDto;
 import com.example.jungleroyal.infrastructure.GameRoomJpaEntity;
 import com.example.jungleroyal.infrastructure.UserJpaEntity;
@@ -25,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -35,6 +33,7 @@ public class GameRoomService {
     private final GameRoomRepository gameRoomRepository;
     private final RedissonClient redissonClient;
     private final UserRepository userRepository;
+    private final SecurityUtil securityUtil;
 
     @Transactional
     public GameRoomDto createRoom(GameRoomDto gameRoomDto) {
@@ -44,7 +43,6 @@ public class GameRoomService {
             // 락을 획득. 최대 대기 시간 5초, 락 보유 시간 10초
             if (lock.tryLock(3, 5, TimeUnit.SECONDS)) {
 
-                // TODO: 호스트 중복을 확인할 게 아니라, 현재 호스트가 참여했던 게임이 끝났는지를 확인해야 함
 
                 // 방 생성
                 String gameUrl = HashUtil.encryptWithUUIDAndHash();
@@ -112,11 +110,6 @@ public class GameRoomService {
                 .toList();
     }
 
-    public Optional<GameRoomDto> getRoomById(Long roomId) {
-        log.info("UserInfoUsingRoomListResponse 객체 생성 완료  :" + System.currentTimeMillis());
-        return gameRoomRepository.findById(roomId).map(GameRoomJpaEntity::toDto);
-    }
-
     public GameRoomDto getRoomByIdOrThrow(Long roomId) {
         return gameRoomRepository.findById(roomId)
                 .map(GameRoomJpaEntity::toDto)
@@ -131,35 +124,17 @@ public class GameRoomService {
         UserJpaEntity user = userRepository.findById(Long.parseLong(userId))
                 .orElseThrow(() -> new IllegalArgumentException("존재하지않는 유저입니다."));
 
-        // 방 상태가 종료된 경우 예외 처리
-        if (room.getStatus() == RoomStatus.END) {
-            throw new GameRoomException("GAME_ROOM_ENDED", "이미 종료된 방입니다.");
-        }
+        RoomValidator.validateRoomNotEnded(room);
 
         // 방 상태가 RUNNING인 경우 같은 방에서 나왔으면 입장 가능
         if (room.getStatus() == RoomStatus.RUNNING && room.getGameUrl().equals(user.getCurrentGameUrl()) && room.getCurrentPlayers() != 0 && room.getCurrentPlayers() < room.getMaxPlayers()) {
             return GameRoomStatus.GAME_JOIN_AVAILABLE;
         }
 
-        // 방 상태가 WAITING인데 유저 상태가 IN_GAME인 경우 예외 처리
-        if (room.getStatus() == RoomStatus.WAITING && user.getStatus() == UserStatus.IN_GAME) {
-            throw new GameRoomException("INVALID_USER_STATE", "방이 대기중이나 유저가 현재 [IN_GAME] 상태입니다.");
-        }
-
-        // 방 상태가 RUNNING인 경우 예외 처리
-        if (room.getStatus() == RoomStatus.RUNNING) {
-            throw new GameRoomException("GAME_ALREADY_STARTED", "게임이 이미 시작되었습니다.");
-        }
-
-        // 방 정원이 초과된 경우 예외 처리
-        if (room.getCurrentPlayers() >= room.getMaxPlayers()) {
-            throw new GameRoomException("GAME_ROOM_FULL", "방 정원이 초과되었습니다.");
-        }
-
-        // 방에 현재 플레이어가 없을 경우 예외 처리
-        if (room.getCurrentPlayers() == 0) {
-            throw new GameRoomException("NO_PLAYERS_IN_ROOM", "방에 플레이어가 없어 입장할 수 없습니다.");
-        }
+        RoomValidator.validateUserNotInGameDuringWaiting(room, user);
+        RoomValidator.validateRoomNotRunning(room);
+        RoomValidator.validateRoomCapacity(room);
+        RoomValidator.validateRoomNotEmpty(room);
         // 입장 가능
         return GameRoomStatus.GAME_JOIN_AVAILABLE;
     }
@@ -206,18 +181,39 @@ public class GameRoomService {
     }
 
     /**
-     * 방 접속 가능 여부를 검증
+     * 유저가 게임방에서 나갈 때, 대기 상태(WAITING)일 경우에만 참가 인원을 감소시킵니다.
      *
-     * @param roomUrl 접속하려는 방 URL
-     * @throws IllegalStateException 방이 0명인 경우 예외 발생
+     * @param gameUrl 방의 고유 식별자인 gameUrl
+     * @throws GameRoomException 방을 찾을 수 없을 때 발생
+     * @throws IllegalStateException 참가자가 없는 방에서 호출되었을 때 발생
      */
-    public void validateRoomForJoin(String roomUrl) {
-        GameRoomJpaEntity gameRoom = gameRoomRepository.findByGameUrl(roomUrl)
-                .orElseThrow(() -> new IllegalArgumentException("Room not found: " + roomUrl));
+    @Transactional
+    public void handlePlayerLeave(String gameUrl) {
+        // 방 정보를 gameUrl로 조회
+        GameRoomJpaEntity room = gameRoomRepository.findByGameUrl(gameUrl)
+                .orElseThrow(() -> new GameRoomException("ROOM_NOT_FOUND", "존재하지 않는 방입니다."));
 
-        // 방에 플레이어가 0명일 경우 예외 처리
-        if (gameRoom.getCurrentPlayers() == 0) {
-            throw new IllegalStateException("Cannot join the room. No players in the room: " + roomUrl);
+        // WAITING 상태에서만 참가 인원 감소
+        if (room.getStatus() == RoomStatus.WAITING) {
+            if (room.getCurrentPlayers() > 0) {
+                room.setCurrentPlayers(room.getCurrentPlayers() - 1);
+                room.setUpdatedAt(LocalDateTime.now());
+                gameRoomRepository.save(room);
+            } else {
+                throw new IllegalStateException("참가자가 없는 방에서 나갈 수 없습니다.");
+            }
         }
+        // RUNNING 또는 END 상태에서는 참가 인원을 줄이지 않음
+    }
+
+    /**
+     *
+     * @return
+     */
+    public GameRoomDto getRoomByGameUrl(String gameUrl) {
+        GameRoomJpaEntity room = gameRoomRepository.findByGameUrl(gameUrl)
+                .orElseThrow(() -> new GameRoomException("ROOM_NOT_FOUND", "존재하지 않는 방입니다."));
+
+        return GameRoomDto.fromGameRoomJpaEntity(room);
     }
 }
