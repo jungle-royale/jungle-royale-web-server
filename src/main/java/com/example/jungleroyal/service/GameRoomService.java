@@ -206,18 +206,28 @@ public class GameRoomService {
     }
 
     /**
-     * 방 접속 가능 여부를 검증
+     * 유저가 게임방에서 나갈 때, 대기 상태(WAITING)일 경우에만 참가 인원을 감소시킵니다.
      *
-     * @param roomUrl 접속하려는 방 URL
-     * @throws IllegalStateException 방이 0명인 경우 예외 발생
+     * @param gameUrl 방의 고유 식별자인 gameUrl
+     * @throws GameRoomException 방을 찾을 수 없을 때 발생
+     * @throws IllegalStateException 참가자가 없는 방에서 호출되었을 때 발생
      */
-    public void validateRoomForJoin(String roomUrl) {
-        GameRoomJpaEntity gameRoom = gameRoomRepository.findByGameUrl(roomUrl)
-                .orElseThrow(() -> new IllegalArgumentException("Room not found: " + roomUrl));
+    @Transactional
+    public void handlePlayerLeave(String gameUrl) {
+        // 방 정보를 gameUrl로 조회
+        GameRoomJpaEntity room = gameRoomRepository.findByGameUrl(gameUrl)
+                .orElseThrow(() -> new GameRoomException("ROOM_NOT_FOUND", "존재하지 않는 방입니다."));
 
-        // 방에 플레이어가 0명일 경우 예외 처리
-        if (gameRoom.getCurrentPlayers() == 0) {
-            throw new IllegalStateException("Cannot join the room. No players in the room: " + roomUrl);
+        // WAITING 상태에서만 참가 인원 감소
+        if (room.getStatus() == RoomStatus.WAITING) {
+            if (room.getCurrentPlayers() > 0) {
+                room.setCurrentPlayers(room.getCurrentPlayers() - 1);
+                room.setUpdatedAt(LocalDateTime.now());
+                gameRoomRepository.save(room);
+            } else {
+                throw new IllegalStateException("참가자가 없는 방에서 나갈 수 없습니다.");
+            }
         }
+        // RUNNING 또는 END 상태에서는 참가 인원을 줄이지 않음
     }
 }

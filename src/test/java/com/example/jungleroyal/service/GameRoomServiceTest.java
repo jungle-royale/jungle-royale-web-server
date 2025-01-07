@@ -6,7 +6,9 @@ import com.example.jungleroyal.common.types.GameRoomStatus;
 import com.example.jungleroyal.common.types.RoomStatus;
 import com.example.jungleroyal.domain.gameroom.GameRoomDto;
 import com.example.jungleroyal.infrastructure.GameRoomJpaEntity;
+import com.example.jungleroyal.infrastructure.UserJpaEntity;
 import com.example.jungleroyal.service.repository.GameRoomRepository;
+import com.example.jungleroyal.service.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,6 +33,9 @@ public class GameRoomServiceTest {
 
     @Mock
     private GameRoomRepository gameRoomRepository;
+
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private GameRoomService gameRoomService;
@@ -203,11 +208,20 @@ public class GameRoomServiceTest {
         mockRoom.setStatus(RoomStatus.WAITING);
         mockRoom.setCurrentPlayers(3);
         mockRoom.setMaxPlayers(5);
+        mockRoom.setGameUrl("testGameUrl"); // gameUrl 설정
+
+
+        UserJpaEntity mockUser = new UserJpaEntity();
+        mockUser.setId(1L);
+        mockUser.setUsername("testUser");
+        mockUser.setCurrentGameUrl("testGameUrl"); // 유저의 currentGameUrl 설정
 
         when(gameRoomRepository.findById(1L)).thenReturn(Optional.of(mockRoom));
 
+        when(userRepository.findById(1L)).thenReturn(Optional.of(mockUser));
+
         // When
-        GameRoomStatus result = gameRoomService.checkRoomAvailability(1L);
+        GameRoomStatus result = gameRoomService.checkRoomAvailability(1L, "1");
 
         // Then
         assertThat(result).isEqualTo(GameRoomStatus.GAME_JOIN_AVAILABLE);
@@ -219,8 +233,9 @@ public class GameRoomServiceTest {
         // Given
         when(gameRoomRepository.findById(1L)).thenReturn(Optional.empty());
 
+
         // When & Then
-        assertThatThrownBy(() -> gameRoomService.checkRoomAvailability(1L))
+        assertThatThrownBy(() -> gameRoomService.checkRoomAvailability(1L, "1"))
                 .isInstanceOf(GameRoomException.class)
                 .hasMessageContaining("존재하지 않는 방입니다.");
     }
@@ -232,11 +247,19 @@ public class GameRoomServiceTest {
         GameRoomJpaEntity mockRoom = new GameRoomJpaEntity();
         mockRoom.setId(1L);
         mockRoom.setStatus(RoomStatus.RUNNING);
+        mockRoom.setGameUrl("testGameUrl"); // gameUrl 설정
+
+        UserJpaEntity mockUser = new UserJpaEntity();
+        mockUser.setId(1L);
+        mockUser.setUsername("testUser");
+        mockUser.setCurrentGameUrl("testGameUrl"); // 유저의 currentGameUrl 설정
 
         when(gameRoomRepository.findById(1L)).thenReturn(Optional.of(mockRoom));
 
+        when(userRepository.findById(1L)).thenReturn(Optional.of(mockUser));
+
         // When & Then
-        assertThatThrownBy(() -> gameRoomService.checkRoomAvailability(1L))
+        assertThatThrownBy(() -> gameRoomService.checkRoomAvailability(1L, "1"))
                 .isInstanceOf(GameRoomException.class)
                 .hasMessageContaining("게임이 이미 시작되었습니다.");
     }
@@ -251,11 +274,60 @@ public class GameRoomServiceTest {
         mockRoom.setCurrentPlayers(5);
         mockRoom.setMaxPlayers(5);
 
+        UserJpaEntity mockUser = new UserJpaEntity();
+        mockUser.setId(1L);
+        mockUser.setUsername("testUser");
+
         when(gameRoomRepository.findById(1L)).thenReturn(Optional.of(mockRoom));
 
+        // Mock 설정: 유저 정보
+        when(userRepository.findById(1L)).thenReturn(Optional.of(mockUser));
+
         // When & Then
-        assertThatThrownBy(() -> gameRoomService.checkRoomAvailability(1L))
+        assertThatThrownBy(() -> gameRoomService.checkRoomAvailability(1L,"1"))
                 .isInstanceOf(GameRoomException.class)
                 .hasMessageContaining("방 정원이 초과되었습니다.");
+    }
+
+    @Test
+    void 대기방에서_나가면_참가인원이_줄어든다() {
+        // given
+        String gameUrl = "room123";
+        GameRoomJpaEntity room = GameRoomJpaEntity.builder()
+                .gameUrl(gameUrl)
+                .currentPlayers(5)
+                .maxPlayers(10)
+                .status(RoomStatus.WAITING)
+                .build();
+
+        when(gameRoomRepository.findByGameUrl(gameUrl)).thenReturn(Optional.of(room));
+
+        // when
+        gameRoomService.handlePlayerLeave(gameUrl);
+
+        // then
+        assertThat(room.getCurrentPlayers()).isEqualTo(4);
+        verify(gameRoomRepository, times(1)).save(room);
+    }
+
+    @Test
+    void 게임이_시작된_상태에서_나가도_참가인원이_변경되지_않는다() {
+        // given
+        String gameUrl = "room123";
+        GameRoomJpaEntity room = GameRoomJpaEntity.builder()
+                .gameUrl(gameUrl)
+                .currentPlayers(5)
+                .maxPlayers(10)
+                .status(RoomStatus.RUNNING) // 게임 시작 상태
+                .build();
+
+        when(gameRoomRepository.findByGameUrl(gameUrl)).thenReturn(Optional.of(room));
+
+        // when
+        gameRoomService.handlePlayerLeave(gameUrl);
+
+        // then
+        assertThat(room.getCurrentPlayers()).isEqualTo(5); // 참가 인원 유지
+        verify(gameRoomRepository, never()).save(room); // DB 저장 안 함
     }
 }
