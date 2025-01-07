@@ -10,6 +10,7 @@ import com.example.jungleroyal.common.types.RoomStatus;
 import com.example.jungleroyal.common.types.UserStatus;
 import com.example.jungleroyal.common.util.EncryptionUtil;
 import com.example.jungleroyal.common.util.HashUtil;
+import com.example.jungleroyal.common.util.SecurityUtil;
 import com.example.jungleroyal.domain.gameroom.GameRoomDto;
 import com.example.jungleroyal.infrastructure.GameRoomJpaEntity;
 import com.example.jungleroyal.infrastructure.UserJpaEntity;
@@ -35,6 +36,7 @@ public class GameRoomService {
     private final GameRoomRepository gameRoomRepository;
     private final RedissonClient redissonClient;
     private final UserRepository userRepository;
+    private final SecurityUtil securityUtil;
 
     @Transactional
     public GameRoomDto createRoom(GameRoomDto gameRoomDto) {
@@ -44,8 +46,10 @@ public class GameRoomService {
             // 락을 획득. 최대 대기 시간 5초, 락 보유 시간 10초
             if (lock.tryLock(3, 5, TimeUnit.SECONDS)) {
 
-                // TODO: 호스트 중복을 확인할 게 아니라, 현재 호스트가 참여했던 게임이 끝났는지를 확인해야 함
-
+                // 방 상태가 WAITING인데 유저 상태가 IN_GAME인 경우 예외 처리
+//                if (user.getStatus() == UserStatus.IN_GAME) {
+//                    throw new GameRoomException("INVALID_USER_STATE", "방이 대기중이나 유저가 현재 [IN_GAME] 상태입니다.");
+//                }
                 // 방 생성
                 String gameUrl = HashUtil.encryptWithUUIDAndHash();
                 gameRoomDto.setGameUrl(gameUrl);
@@ -224,5 +228,16 @@ public class GameRoomService {
             }
         }
         // RUNNING 또는 END 상태에서는 참가 인원을 줄이지 않음
+    }
+
+    /**
+     *
+     * @return
+     */
+    public GameRoomDto getRoomByGameUrl(String gameUrl) {
+        GameRoomJpaEntity room = gameRoomRepository.findByGameUrl(gameUrl)
+                .orElseThrow(() -> new GameRoomException("ROOM_NOT_FOUND", "존재하지 않는 방입니다."));
+
+        return GameRoomDto.fromGameRoomJpaEntity(room);
     }
 }
