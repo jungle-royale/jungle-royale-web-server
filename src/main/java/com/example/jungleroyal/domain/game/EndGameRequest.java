@@ -10,5 +10,5 @@ import java.util.List;
 @Builder
 public class EndGameRequest {
     private String roomId;
-    private EndGameUserInfo users;
+    private List<EndGameUserInfo> users;
 }
