@@ -24,6 +24,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable()) // CSRF 비활성화
             .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 설정 추가
             .authorizeHttpRequests(auth -> auth
+                    .requestMatchers("/api/game/**").permitAll()
                 .anyRequest().permitAll() // 모든 요청 인증 없이 허용
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // 필터 추가;

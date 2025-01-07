@@ -25,8 +25,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtService jwtService;
+
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
+        String requestUri = request.getRequestURI();
+
+        // /api/game/** 경로는 필터 검증을 우회
+        if (requestUri.startsWith("/api/game/")) {
+            filterChain.doFilter(request, response); // 다음 필터로 진행
+            return;
+        }
 
         if (HttpMethod.OPTIONS.name().equalsIgnoreCase(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK);
