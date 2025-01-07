@@ -14,7 +14,7 @@ public class GameRoomListResponse {
     private int maxPlayers;
     private String gameUrl;
     private RoomStatus status;
-    private int currentPlayers;
+    private int minPlayers;
     // TODO : 추후 프론트엔드에서 필요하면 보냄
 //    private Boolean secret;
 //    private String map;
@@ -27,7 +27,7 @@ public class GameRoomListResponse {
                 .maxPlayers(gameRoomDto.getMaxPlayers())
 //                .maxGameTime(gameRoomDto.getMaxGameTime())
 //                .map(gameRoomDto.getMap())
-                .currentPlayers(gameRoomDto.getCurrentPlayers())
+                .minPlayers(gameRoomDto.getMinPlayers())
 //                .secret(gameRoomDto.getSecret())
                 .status(gameRoomDto.getStatus())
                 .gameUrl(gameRoomDto.getGameUrl())
