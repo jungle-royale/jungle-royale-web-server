@@ -54,7 +54,7 @@ public class UserJpaEntity {
     private UserStatus status;  // 현재 유저 상태 : WAITING || IN_GAME
 
     // 게임머니 필드 추가
-    @Column(nullable = false)
+    @Column
     private Integer gameMoney = 100000000; // 기본값 0
 
     public static UserJpaEntity createGueutUser(String randomNickname){
