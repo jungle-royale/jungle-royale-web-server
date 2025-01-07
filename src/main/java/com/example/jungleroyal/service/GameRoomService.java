@@ -6,8 +6,8 @@ import com.example.jungleroyal.common.exception.RoomByGameUrlFoundException;
 import com.example.jungleroyal.common.exception.RoomNotFoundException;
 import com.example.jungleroyal.common.types.GameRoomStatus;
 import com.example.jungleroyal.common.types.RoomStatus;
-import com.example.jungleroyal.common.types.UserStatus;
 import com.example.jungleroyal.common.util.HashUtil;
+import com.example.jungleroyal.common.util.RoomValidator;
 import com.example.jungleroyal.common.util.SecurityUtil;
 import com.example.jungleroyal.domain.gameroom.GameRoomDto;
 import com.example.jungleroyal.infrastructure.GameRoomJpaEntity;
@@ -124,35 +124,17 @@ public class GameRoomService {
         UserJpaEntity user = userRepository.findById(Long.parseLong(userId))
                 .orElseThrow(() -> new IllegalArgumentException("존재하지않는 유저입니다."));
 
-        // 방 상태가 종료된 경우 예외 처리
-        if (room.getStatus() == RoomStatus.END) {
-            throw new GameRoomException("GAME_ROOM_ENDED", "이미 종료된 방입니다.");
-        }
+        RoomValidator.validateRoomNotEnded(room);
 
         // 방 상태가 RUNNING인 경우 같은 방에서 나왔으면 입장 가능
         if (room.getStatus() == RoomStatus.RUNNING && room.getGameUrl().equals(user.getCurrentGameUrl()) && room.getCurrentPlayers() != 0 && room.getCurrentPlayers() < room.getMaxPlayers()) {
             return GameRoomStatus.GAME_JOIN_AVAILABLE;
         }
 
-        // 방 상태가 WAITING인데 유저 상태가 IN_GAME인 경우 예외 처리
-        if (room.getStatus() == RoomStatus.WAITING && user.getStatus() == UserStatus.IN_GAME) {
-            throw new GameRoomException("INVALID_USER_STATE", "방이 대기중이나 유저가 현재 [IN_GAME] 상태입니다.");
-        }
-
-        // 방 상태가 RUNNING인 경우 예외 처리
-        if (room.getStatus() == RoomStatus.RUNNING) {
-            throw new GameRoomException("GAME_ALREADY_STARTED", "게임이 이미 시작되었습니다.");
-        }
-
-        // 방 정원이 초과된 경우 예외 처리
-        if (room.getCurrentPlayers() >= room.getMaxPlayers()) {
-            throw new GameRoomException("GAME_ROOM_FULL", "방 정원이 초과되었습니다.");
-        }
-
-        // 방에 현재 플레이어가 없을 경우 예외 처리
-        if (room.getCurrentPlayers() == 0) {
-            throw new GameRoomException("NO_PLAYERS_IN_ROOM", "방에 플레이어가 없어 입장할 수 없습니다.");
-        }
+        RoomValidator.validateUserNotInGameDuringWaiting(room, user);
+        RoomValidator.validateRoomNotRunning(room);
+        RoomValidator.validateRoomCapacity(room);
+        RoomValidator.validateRoomNotEmpty(room);
         // 입장 가능
         return GameRoomStatus.GAME_JOIN_AVAILABLE;
     }

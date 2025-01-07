@@ -134,7 +134,7 @@ public class GameRoomServiceTest {
         when(gameRoomRepository.findAll()).thenReturn(List.of(room1, room2));
 
         // When
-        List<GameRoomDto> result = gameRoomService.listAllRooms();
+        List<GameRoomDto> result = gameRoomService.listOfShowableRoom();
 
         // Then
         assertThat(result).hasSize(2);
