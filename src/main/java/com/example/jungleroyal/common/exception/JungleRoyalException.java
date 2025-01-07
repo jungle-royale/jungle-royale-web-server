@@ -1,4 +1,4 @@
-package com.example.jungleroyal.common.exceptions;
+package com.example.jungleroyal.common.exception;
 
 public class JungleRoyalException extends RuntimeException{
     public JungleRoyalException(String message) {

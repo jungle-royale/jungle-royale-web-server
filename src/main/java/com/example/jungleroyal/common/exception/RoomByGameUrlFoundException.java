@@ -1,4 +1,4 @@
-package com.example.jungleroyal.common.exceptions;
+package com.example.jungleroyal.common.exception;
 
 public class RoomByGameUrlFoundException extends GameServerException {
     public RoomByGameUrlFoundException(String gameUrl){

@@ -1,4 +1,4 @@
-package com.example.jungleroyal.common.exceptions;
+package com.example.jungleroyal.common.exception;
 
 public class MoneyInsufficientException extends GameServerException {
     public MoneyInsufficientException(Long userId, int currentBalance, int itemPrice) {

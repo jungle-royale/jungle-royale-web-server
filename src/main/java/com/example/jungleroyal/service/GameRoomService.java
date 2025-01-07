@@ -1,14 +1,12 @@
 package com.example.jungleroyal.service;
 
 
-import com.example.jungleroyal.common.exceptions.DuplicateRoomException;
-import com.example.jungleroyal.common.exceptions.GameRoomException;
-import com.example.jungleroyal.common.exceptions.RoomByGameUrlFoundException;
-import com.example.jungleroyal.common.exceptions.RoomNotFoundException;
+import com.example.jungleroyal.common.exception.GameRoomException;
+import com.example.jungleroyal.common.exception.RoomByGameUrlFoundException;
+import com.example.jungleroyal.common.exception.RoomNotFoundException;
 import com.example.jungleroyal.common.types.GameRoomStatus;
 import com.example.jungleroyal.common.types.RoomStatus;
 import com.example.jungleroyal.common.types.UserStatus;
-import com.example.jungleroyal.common.util.EncryptionUtil;
 import com.example.jungleroyal.common.util.HashUtil;
 import com.example.jungleroyal.common.util.SecurityUtil;
 import com.example.jungleroyal.domain.gameroom.GameRoomDto;
@@ -26,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Service

@@ -1,7 +1,7 @@
 package com.example.jungleroyal.service;
 
-import com.example.jungleroyal.common.exceptions.GameRoomException;
-import com.example.jungleroyal.common.exceptions.UserAlreadyInGameException;
+import com.example.jungleroyal.common.exception.GameRoomException;
+import com.example.jungleroyal.common.exception.UserAlreadyInGameException;
 import com.example.jungleroyal.common.types.UserStatus;
 import com.example.jungleroyal.common.util.HashUtil;
 import com.example.jungleroyal.common.util.RandomNicknameGenerator;

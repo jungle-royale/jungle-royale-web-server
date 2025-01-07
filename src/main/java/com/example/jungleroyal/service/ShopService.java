@@ -1,6 +1,6 @@
 package com.example.jungleroyal.service;
 
-import com.example.jungleroyal.common.exceptions.MoneyInsufficientException;
+import com.example.jungleroyal.common.exception.MoneyInsufficientException;
 import com.example.jungleroyal.common.util.JungleFileUtils;
 import com.example.jungleroyal.common.util.JwtTokenProvider;
 import com.example.jungleroyal.domain.inventory.InventoryShopPageResponse;

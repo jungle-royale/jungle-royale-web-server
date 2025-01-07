@@ -1,4 +1,4 @@
-package com.example.jungleroyal.common.exceptions;
+package com.example.jungleroyal.common.exception;
 
 public class DuplicateRoomException extends GameServerException{
     public DuplicateRoomException(String message){

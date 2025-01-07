@@ -1,8 +1,7 @@
 package com.example.jungleroyal.controller;
 
-import com.example.jungleroyal.common.exceptions.BlacklistTokenException;
-import com.example.jungleroyal.common.exceptions.TokenExpiredException;
-import com.example.jungleroyal.common.types.UserRole;
+import com.example.jungleroyal.common.exception.BlacklistTokenException;
+import com.example.jungleroyal.common.exception.TokenExpiredException;
 import com.example.jungleroyal.common.util.JwtTokenProvider;
 import com.example.jungleroyal.domain.auth.JwtReissueResponse;
 import com.example.jungleroyal.domain.dto.JwtTokenUserInfoDto;
@@ -11,7 +10,6 @@ import com.example.jungleroyal.service.JwtService;
 import com.example.jungleroyal.service.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;

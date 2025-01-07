@@ -1,7 +1,6 @@
 package com.example.jungleroyal.controller;
 
-import com.example.jungleroyal.common.exceptions.GameRoomException;
-import com.example.jungleroyal.common.types.GameRoomStatus;
+import com.example.jungleroyal.common.exception.GameRoomException;
 import com.example.jungleroyal.common.types.RoomStatus;
 import com.example.jungleroyal.common.types.UserStatus;
 import com.example.jungleroyal.common.util.JwtTokenProvider;

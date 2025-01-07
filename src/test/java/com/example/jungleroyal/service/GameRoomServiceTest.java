@@ -1,7 +1,7 @@
 package com.example.jungleroyal.service;
 
-import com.example.jungleroyal.common.exceptions.GameRoomException;
-import com.example.jungleroyal.common.exceptions.RoomNotFoundException;
+import com.example.jungleroyal.common.exception.GameRoomException;
+import com.example.jungleroyal.common.exception.RoomNotFoundException;
 import com.example.jungleroyal.common.types.GameRoomStatus;
 import com.example.jungleroyal.common.types.RoomStatus;
 import com.example.jungleroyal.domain.gameroom.GameRoomDto;

@@ -1,11 +1,10 @@
 package com.example.jungleroyal.controller;
 
-import com.example.jungleroyal.common.exceptions.GameRoomException;
+import com.example.jungleroyal.common.exception.GameRoomException;
 import com.example.jungleroyal.common.types.GameRoomStatus;
 import com.example.jungleroyal.common.types.RoomStatus;
 import com.example.jungleroyal.common.types.UserStatus;
 import com.example.jungleroyal.common.util.GameServerClient;
-import com.example.jungleroyal.common.util.JwtTokenProvider;
 import com.example.jungleroyal.common.util.SecurityUtil;
 import com.example.jungleroyal.domain.game.GameServerNotificationRequest;
 import com.example.jungleroyal.domain.game.GameServerNotificationResponse;
@@ -18,7 +17,6 @@ import com.example.jungleroyal.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
