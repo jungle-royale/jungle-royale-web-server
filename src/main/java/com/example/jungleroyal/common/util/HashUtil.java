@@ -17,8 +17,8 @@ public class HashUtil {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(input.getBytes());
-            String base64Hash = Base64.getEncoder().encodeToString(hash);
-            return base64Hash.replace("/", "_");
+            // URL-safe Base64 인코딩
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException("SHA-256 Algorithm not found", e);
         }
