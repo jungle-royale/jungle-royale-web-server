@@ -2,20 +2,16 @@ package com.example.jungleroyal.service;
 
 import com.example.jungleroyal.common.exceptions.GameRoomException;
 import com.example.jungleroyal.common.exceptions.UserAlreadyInGameException;
-import com.example.jungleroyal.common.types.GameRoomStatus;
-import com.example.jungleroyal.common.types.RoomStatus;
 import com.example.jungleroyal.common.types.UserStatus;
 import com.example.jungleroyal.common.util.HashUtil;
-import com.example.jungleroyal.common.util.JwtTokenProvider;
 import com.example.jungleroyal.common.util.RandomNicknameGenerator;
 import com.example.jungleroyal.common.util.TimeUtils;
-import com.example.jungleroyal.domain.*;
-import com.example.jungleroyal.infrastructure.RefreshToken;
 import com.example.jungleroyal.domain.user.UserDto;
-import com.example.jungleroyal.infrastructure.*;
+import com.example.jungleroyal.infrastructure.GameRoomJpaEntity;
+import com.example.jungleroyal.infrastructure.InventoryJpaEntity;
+import com.example.jungleroyal.infrastructure.UserJpaEntity;
 import com.example.jungleroyal.service.repository.GameRoomRepository;
 import com.example.jungleroyal.service.repository.InventoryRepository;
-import com.example.jungleroyal.service.repository.RefreshTokenRepository;
 import com.example.jungleroyal.service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,17 +20,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class UserService {
     private final UserRepository userRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
     private final RandomNicknameGenerator randomNicknameGenerator;
     private final InventoryRepository inventoryRepository;
-    private final JwtTokenProvider jwtTokenProvider;
     private final GameRoomRepository gameRoomRepository;
 
     public UserJpaEntity getUserJpaEntityById(Long userId){

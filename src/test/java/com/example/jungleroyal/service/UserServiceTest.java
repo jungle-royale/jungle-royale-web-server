@@ -6,6 +6,8 @@ import com.example.jungleroyal.common.types.UserStatus;
 import com.example.jungleroyal.common.util.RandomNicknameGenerator;
 import com.example.jungleroyal.domain.user.UserDto;
 import com.example.jungleroyal.infrastructure.UserJpaEntity;
+import com.example.jungleroyal.service.repository.GameRoomRepository;
+import com.example.jungleroyal.service.repository.InventoryRepository;
 import com.example.jungleroyal.service.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,13 +26,15 @@ public class UserServiceTest {
 
     private UserService userService;
     private UserRepository userRepository;
+    private InventoryRepository inventoryRepository;
+    private GameRoomRepository gameRoomRepository;
     private RandomNicknameGenerator randomNicknameGenerator;
 
     @BeforeEach
     void setUp() {
         userRepository = mock(UserRepository.class);
         randomNicknameGenerator = mock(RandomNicknameGenerator.class);
-        userService = new UserService(userRepository, null, randomNicknameGenerator, null, null);
+        userService = new UserService(userRepository, randomNicknameGenerator, inventoryRepository, gameRoomRepository);
     }
 
     @Test
