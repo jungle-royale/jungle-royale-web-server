@@ -37,27 +37,15 @@ public class GameController {
     }
 
     /**
-     * 게임에서 나온 유저 정보 업데이트 api
-     * @param clientId
-     * @return
-     */
-    @PostMapping("/api/game/user/exit")
-    public ResponseEntity<String> exitUser(@RequestParam String clientId) {
-        // TODO: 유저 정보 업데이트
-
-        return ResponseEntity.ok("ok");
-    }
-
-    /**
      * 게임 종료 업데이트 api
      * @param endGameRequest
      * @return
      */
     @PostMapping("/api/game/end")
-    public ResponseEntity<String> endGame(@RequestBody EndGameRequest endGameRequest) {
-        String roomId = endGameRequest.getRoomId(); // roomId 추출
-
-        gameService.endGame(roomId, endGameRequest.getRankings());
+    public ResponseEntity<String> endGame(@RequestBody(required = false) EndGameRequest endGameRequest) {
+//        String roomId = endGameRequest.getRoomId(); // roomId 추출
+//
+//        gameService.endGame(roomId, endGameRequest.getRankings());
 
         return ResponseEntity.ok("ok");
     }
