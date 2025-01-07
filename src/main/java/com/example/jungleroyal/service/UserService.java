@@ -145,6 +145,41 @@ public class UserService {
     }
 
     /**
+     * 유저의 clientId와 - 방 생성시
+     *
+     * @param userId       갱신할 유저의 ID
+     * @param clientId     새로 설정할 clientId
+     * @param gameRoomUrl  새로 설정할 gameRoomUrl
+     * @exception UserAlreadyInGameException 유저가 이미 게임중이거나 참여한 게임이 아직 끝나지 않았다.
+     */
+    @Transactional
+    public void updateUserConnectionDetailsAtCreateRoom(long userId, String gameRoomUrl, String clientId) {
+        UserJpaEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
+
+        GameRoomJpaEntity room = gameRoomRepository.findByGameUrl(gameRoomUrl)
+                .orElseThrow(() -> new GameRoomException("ROOM_NOT_FOUND", "존재하지 않는 방입니다."));
+
+        // 유저 상태 확인
+        if (user.getStatus() == UserStatus.IN_GAME) {
+            throw new UserAlreadyInGameException("User is already in a game. Game URL: " + user.getCurrentGameUrl());
+        }
+
+        // 방 정원이 초과되지 않았는지 확인
+        if (room.getCurrentPlayers() >= room.getMaxPlayers()) {
+            throw new GameRoomException("GAME_ROOM_FULL", "방 정원이 초과되었습니다.");
+        }
+
+        // 필드값 갱신
+        user.setUpdatedAt(TimeUtils.createUtc());
+        user.setCurrentGameUrl(gameRoomUrl);
+        user.setClientId(clientId);
+
+        userRepository.save(user);
+
+    }
+
+    /**
      * 게임 시작 시 유저 상태를 IN_GAME으로 변경
      *
      * @param clientIds 게임에 참가할 유저 ID 목록
