@@ -5,9 +5,10 @@ import lombok.Data;
 
 import java.util.List;
 
+
 @Data
 @Builder
 public class EndGameRequest {
     private String roomId;
-    private List<String> rankings;
+    private EndGameUserInfo users;
 }
