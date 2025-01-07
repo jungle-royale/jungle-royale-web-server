@@ -187,7 +187,7 @@ public class GameRoomService {
     /**
      * 1시간마다 currentPlayers가 0이고 RoomStatus가 WAITING인 방을 삭제
      */
-    @Scheduled(fixedRate = 1000 * 60 * 60) // 1시간 간격
+    @Scheduled(fixedRate = 1000 * 60 * 60 * 24) // 1일 간격
     @Transactional
     public void cleanUpEmptyRooms() {
         log.info("빈 방을 조회중...");
