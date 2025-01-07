@@ -46,10 +46,7 @@ public class GameRoomService {
             // 락을 획득. 최대 대기 시간 5초, 락 보유 시간 10초
             if (lock.tryLock(3, 5, TimeUnit.SECONDS)) {
 
-                // 방 상태가 WAITING인데 유저 상태가 IN_GAME인 경우 예외 처리
-//                if (user.getStatus() == UserStatus.IN_GAME) {
-//                    throw new GameRoomException("INVALID_USER_STATE", "방이 대기중이나 유저가 현재 [IN_GAME] 상태입니다.");
-//                }
+
                 // 방 생성
                 String gameUrl = HashUtil.encryptWithUUIDAndHash();
                 gameRoomDto.setGameUrl(gameUrl);
