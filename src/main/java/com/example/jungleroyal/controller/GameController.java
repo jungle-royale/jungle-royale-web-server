@@ -37,18 +37,6 @@ public class GameController {
     }
 
     /**
-     * 게임에서 나온 유저 정보 업데이트 api
-     * @param clientId
-     * @return
-     */
-    @PostMapping("/api/game/user/exit")
-    public ResponseEntity<String> exitUser(@RequestParam String clientId) {
-        // TODO: 유저 정보 업데이트
-
-        return ResponseEntity.ok("ok");
-    }
-
-    /**
      * 게임 종료 업데이트 api
      * @param endGameRequest
      * @return
