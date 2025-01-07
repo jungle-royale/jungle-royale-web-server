@@ -101,15 +101,17 @@ public class UserService {
         return HashUtil.hash(key);
     }
     /**
-     * 유저의 clientId와 gameRoomUrl을 갱신
+     * 유저의 clientId와 gameRoomUrl을 갱신합니다.
      *
      * @param userId       갱신할 유저의 ID
-     * @param clientId     새로 설정할 clientId
      * @param gameRoomUrl  새로 설정할 gameRoomUrl
-     * @exception UserAlreadyInGameException 유저가 이미 게임중이거나 참여한 게임이 아직 끝나지 않았다.
+     * @param clientId     새로 설정할 clientId
+     * @param isCreatingRoom 방 생성 여부 (true: 방 생성 시 처리, false: 일반 입장 시 처리)
+     * @exception UserAlreadyInGameException 유저가 이미 게임중이거나 참여한 게임이 아직 끝나지 않았을 때 발생
+     * @exception GameRoomException 방이 존재하지 않거나 정원이 초과된 경우 발생
      */
     @Transactional
-    public void updateUserConnectionDetails(long userId, String gameRoomUrl, String clientId) {
+    public void updateUserConnectionDetails(long userId, String gameRoomUrl, String clientId, boolean isCreatingRoom) {
         UserJpaEntity user = userRepository.findById(userId)
             .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
 
@@ -127,47 +129,12 @@ public class UserService {
         }
 
         // 방 상태가 RUNNING인 경우 같은 방에서 나왔으면 입장 가능
-        if (!room.getGameUrl().equals(user.getCurrentGameUrl())) {
+        if (!isCreatingRoom && !room.getGameUrl().equals(user.getCurrentGameUrl())) {
             room.setCurrentPlayers(room.getCurrentPlayers() + 1);
             room.setUpdatedAt(TimeUtils.createUtc());
 
             // 업데이트된 방 저장
             gameRoomRepository.save(room);
-        }
-
-        // 필드값 갱신
-        user.setUpdatedAt(TimeUtils.createUtc());
-        user.setCurrentGameUrl(gameRoomUrl);
-        user.setClientId(clientId);
-
-        userRepository.save(user);
-
-    }
-
-    /**
-     * 유저의 clientId와 - 방 생성시
-     *
-     * @param userId       갱신할 유저의 ID
-     * @param clientId     새로 설정할 clientId
-     * @param gameRoomUrl  새로 설정할 gameRoomUrl
-     * @exception UserAlreadyInGameException 유저가 이미 게임중이거나 참여한 게임이 아직 끝나지 않았다.
-     */
-    @Transactional
-    public void updateUserConnectionDetailsAtCreateRoom(long userId, String gameRoomUrl, String clientId) {
-        UserJpaEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
-
-        GameRoomJpaEntity room = gameRoomRepository.findByGameUrl(gameRoomUrl)
-                .orElseThrow(() -> new GameRoomException("ROOM_NOT_FOUND", "존재하지 않는 방입니다."));
-
-        // 유저 상태 확인
-        if (user.getStatus() == UserStatus.IN_GAME) {
-            throw new UserAlreadyInGameException("User is already in a game. Game URL: " + user.getCurrentGameUrl());
-        }
-
-        // 방 정원이 초과되지 않았는지 확인
-        if (room.getCurrentPlayers() >= room.getMaxPlayers()) {
-            throw new GameRoomException("GAME_ROOM_FULL", "방 정원이 초과되었습니다.");
         }
 
         // 필드값 갱신

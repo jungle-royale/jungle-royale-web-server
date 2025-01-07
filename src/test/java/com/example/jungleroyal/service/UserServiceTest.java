@@ -51,7 +51,7 @@ public class UserServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
         // when & then
-        assertThatThrownBy(() -> userService.updateUserConnectionDetails(userId, newClientId, newGameRoomUrl))
+        assertThatThrownBy(() -> userService.updateUserConnectionDetails(userId, newClientId, newGameRoomUrl, false))
                 .isInstanceOf(UserAlreadyInGameException.class)
                 .hasMessageContaining("User is already in a game");
     }
