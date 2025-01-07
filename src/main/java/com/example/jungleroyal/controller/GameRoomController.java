@@ -132,13 +132,19 @@ public class GameRoomController {
 
     @PostMapping("/api/rooms/{roomId}/join")
     public ResponseEntity<GameRoomJoinReponse> joinGameRoom(
-            @RequestHeader("Authorization") String jwt,
+            @RequestHeader(value = "Authorization", required = false) String jwt,
             @PathVariable Long roomId) {
 
-        String userId = securityUtil.getUserId();
-        UserDto user = userService.getUserDtoById(Long.parseLong(userId));
+        String userId;
 
-        userService.getUserJpaEntityById(Long.parseLong(userId));
+        if(jwt == null){
+            UserJpaEntity userJpaEntity = userService.registerGuest();
+            userId = String.valueOf(userJpaEntity.getId());
+        } else {
+            userId = securityUtil.getUserId();
+        }
+
+        UserDto user = userService.getUserDtoById(Long.parseLong(userId));
 
         // 게임 접속 가능 여부
         gameRoomService.checkRoomAvailability(roomId,userId);

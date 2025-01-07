@@ -40,4 +40,9 @@ public class UserRepositoryImpl implements UserRepository {
     public List<UserJpaEntity> findAllByClientIds(List<String> clientIds) {
         return userJpaRepository.findAllByClientIdIn(clientIds);
     }
+
+    @Override
+    public void delete(long userId) {
+        userJpaRepository.deleteById(userId);
+    }
 }
