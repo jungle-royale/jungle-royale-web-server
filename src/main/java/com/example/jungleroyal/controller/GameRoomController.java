@@ -158,7 +158,7 @@ public class GameRoomController {
         String clientId = user.getClientId(); // 기본값은 기존 clientId 유지
 
         // 같은 방이 아닌 경우에만 clientId 갱신
-        if (user.getCurrentGameUrl() == null || !user.getCurrentGameUrl().equals(roomUrl)) {
+        if (!roomUrl.equals(user.getCurrentGameUrl())) {
             clientId = userService.getClientId(); // 새로운 clientId 생성
             userService.updateUserConnectionDetails(Long.parseLong(userId), roomUrl, clientId, false);
         }
@@ -170,7 +170,4 @@ public class GameRoomController {
 
         return ResponseEntity.ok(response);
     }
-
-
-
 }
