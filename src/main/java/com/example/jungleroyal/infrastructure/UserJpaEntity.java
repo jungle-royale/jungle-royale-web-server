@@ -54,7 +54,7 @@ public class UserJpaEntity {
     private UserStatus status;  // 현재 유저 상태 : WAITING || IN_GAME
 
     // 게임머니 필드 추가
-    @Column
+    @Column(nullable = false)
     private Integer gameMoney = 100000000; // 기본값 0
 
     public static UserJpaEntity createGueutUser(String randomNickname){
@@ -82,7 +82,7 @@ public class UserJpaEntity {
                 .clientId(userJpaEntity.getClientId())
                 .createdAt(userJpaEntity.createdAt)
                 .updatedAt(userJpaEntity.updatedAt)
-                .gameMoney(100000000)
+                .gameMoney(userJpaEntity.getGameMoney())
                 .lastLoginAt(userJpaEntity.lastLoginAt)
                 .build();
     }
@@ -92,6 +92,7 @@ public class UserJpaEntity {
                 .kakaoId(kakaoId)
                 .username(username)
                 .role(UserRole.MEMBER)
+                .gameMoney(100000000)
                 .status(UserStatus.WAITING)
                 .createdAt(TimeUtils.createUtc())
                 .updatedAt(TimeUtils.createUtc())
