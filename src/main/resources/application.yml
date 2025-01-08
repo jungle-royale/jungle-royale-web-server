@@ -14,6 +14,12 @@ spring:
 ## 비밀키 생성 방법 : io.jsonwebtoken.security.Keys.secretKeyFor() 사용하여 HS512에 맞는 키 생성
 jwt:
   secret-key: j5ZeFFn6lVIEnpuLFNa8aao/nLy1ZRLFppPB98cBvowj8RDNepK+Swe33cHLOVWeM7VZkb2HqCdU2CBOk11b4A==
+  # jwt 필터 우회 경로
+  bypass:
+    urls:
+      - /api/game/**
+      - /api/posts/list
+
 
 logging:
   level:
@@ -31,6 +37,7 @@ upload:
 secret:
   hash:
     key: "jungleroyale"
+
 
 springdoc:
   swagger-ui:
