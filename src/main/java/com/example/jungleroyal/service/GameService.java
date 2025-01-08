@@ -42,16 +42,16 @@ public class GameService {
         GameRoomJpaEntity gameRoom = gameRoomRepository.findByGameUrl(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("Room not found: " + roomId));
 
+        if (gameRoom.isEnd()) {
+            throw new IllegalStateException("이미 종료 처리된 방입니다.");
+        }
+
         // 2. 유저 정보 조회
         List<String> clientIds = users.stream()
                 .map(EndGameUserInfo::getClientId)
                 .collect(Collectors.toList());
 
         List<UserJpaEntity> participants = userRepository.findAllByClientIds(clientIds);
-
-        if (participants.isEmpty()) {
-            throw new IllegalStateException("게임에 참여한 사람이 없습니다. 게임 참가인원 : " + clientIds.size());
-        }
 
         // 3. 게임머니 지급 및 상태 초기화
         Map<String, Integer> clientIdToRank = users.stream()
@@ -97,21 +97,16 @@ public class GameService {
         GameRoomJpaEntity room = gameRoomRepository.findByGameUrl(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("Room not found: " + roomId));
 
-        // 2. 방 상태 검증
-        if (room.getStatus() != RoomStatus.WAITING) {
-            throw new IllegalStateException("방 상태가 WAITING이 아닙니다. 상태: " + room.getStatus());
-        }
-
-        // 3. 유저 조회
+        // 2. 유저 조회
         UserJpaEntity user = userRepository.findByClientId(clientId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found for clientId: " + clientId));
 
-        // 4. 유저가 해당 방에 속해 있는지 확인
+        // 3. 유저가 해당 방에 속해 있는지 확인
         if (!room.getGameUrl().equals(user.getCurrentGameUrl())) {
             throw new IllegalStateException("유저가 해당 방에 속해 있지 않습니다.");
         }
 
-        // 5. 참여 인원 감소 및 상태 초기화
+        // 4. 참여 인원 감소 및 상태 초기화
         if (room.getCurrentPlayers() > 0) {
             room.setCurrentPlayers(room.getCurrentPlayers() - 1);
             room.setUpdatedAt(TimeUtils.createUtc());
