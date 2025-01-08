@@ -25,9 +25,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final JwtService jwtService;
     private final BypassUrlConfig bypassUrlConfig;
-
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -40,25 +38,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        if (HttpMethod.OPTIONS.name().equalsIgnoreCase(request.getMethod())) {
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.setHeader("Access-Control-Allow-Origin", "*");
-            response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-            response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
-            return;
-        }
-
         String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String jwtToken = authorizationHeader.substring(7);
             try{
                 if (jwtTokenProvider.isValidToken(jwtToken)) {
-                    if (jwtService.isBlacklisted(jwtToken)) {
-                        log.warn("Token is blacklisted");
-                        handleInvalidToken(response, "BLACKLISTED_TOKEN", "Token is blacklisted");
-                        return;
-                    }
-
                     Long userId = Long.valueOf(jwtTokenProvider.extractSubject(jwtToken));
                     String username = jwtTokenProvider.extractUsername(jwtToken);
                     UserRole userRole = jwtTokenProvider.extractUserRole(jwtToken);
@@ -85,6 +69,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 handleInvalidToken(response, "EXPIRED_TOKEN", "JWT token has expired");
                 return;
             } catch (Exception e) {
+                log.error("Unexpected error with JWT token", e);
                 handleInvalidToken(response, "UNKNOWN_ERROR", "Unexpected error with JWT token");
                 return;
             }
