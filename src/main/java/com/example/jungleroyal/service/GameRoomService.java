@@ -10,6 +10,8 @@ import com.example.jungleroyal.common.util.HashUtil;
 import com.example.jungleroyal.common.util.RoomValidator;
 import com.example.jungleroyal.common.util.SecurityUtil;
 import com.example.jungleroyal.domain.gameroom.GameRoomDto;
+import com.example.jungleroyal.domain.gameroom.GameRoomJoinReponse;
+import com.example.jungleroyal.domain.user.UserDto;
 import com.example.jungleroyal.infrastructure.GameRoomJpaEntity;
 import com.example.jungleroyal.infrastructure.UserJpaEntity;
 import com.example.jungleroyal.service.repository.GameRoomRepository;
@@ -34,6 +36,62 @@ public class GameRoomService {
     private final RedissonClient redissonClient;
     private final UserRepository userRepository;
     private final SecurityUtil securityUtil;
+    private final UserService userService;
+
+    @Transactional
+    public GameRoomJoinReponse joinGameRoom(Long roomId, String jwt) {
+        String userId;
+
+        // 유저 확인 (JWT 또는 게스트)
+        if (jwt == null) {
+            UserJpaEntity guestUser = userService.registerGuest();
+            userId = String.valueOf(guestUser.getId());
+        } else {
+            userId = securityUtil.getUserId();
+        }
+
+        UserDto user = userService.getUserDtoById(Long.parseLong(userId));
+
+        // 락 생성 (방 ID를 키로 사용)
+        String lockKey = "gameRoom:join:" + roomId;
+        RLock lock = redissonClient.getLock(lockKey);
+
+        try {
+            if (lock.tryLock(5, 10, TimeUnit.SECONDS)) { // 락 대기 시간 5초, 보유 시간 10초
+                // 방 정보 확인 및 검증
+                GameRoomJpaEntity room = gameRoomRepository.findById(roomId)
+                        .orElseThrow(() -> new GameRoomException("ROOM_NOT_FOUND", "존재하지 않는 방입니다."));
+
+                RoomValidator.validateRoomCapacity(room); // 방 정원 초과 확인
+                RoomValidator.validateRoomNotEnded(room); // 방 종료 여부 확인
+
+                // 유저 정보 업데이트
+                String roomUrl = room.getGameUrl();
+                String clientId = user.getClientId();
+
+                // 같은 방이 아닌 경우 clientId 갱신
+                if (!roomUrl.equals(user.getCurrentGameUrl())) {
+                    clientId = userService.getClientId(); // 새로운 clientId 생성
+                    userService.updateUserConnectionDetails(Long.parseLong(userId), roomUrl, clientId, false);
+                }
+
+                // 응답 생성
+                return GameRoomJoinReponse.builder()
+                        .roomId(roomUrl)
+                        .clientId(clientId)
+                        .build();
+            } else {
+                throw new IllegalStateException("다른 요청이 이미 처리 중입니다. 잠시 후 다시 시도해주세요.");
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("락 처리 중 인터럽트 발생", e);
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
+    }
 
     @Transactional
     public GameRoomDto createRoom(GameRoomDto gameRoomDto) {
@@ -216,4 +274,6 @@ public class GameRoomService {
 
         return GameRoomDto.fromGameRoomJpaEntity(room);
     }
+
+
 }
