@@ -19,4 +19,6 @@ public interface UserRepository {
     List<UserJpaEntity> findAllByClientIds(List<String> clientIds);
 
     void delete(long userId);
+
+    Optional<UserJpaEntity> findByClientId(String clientId);
 }

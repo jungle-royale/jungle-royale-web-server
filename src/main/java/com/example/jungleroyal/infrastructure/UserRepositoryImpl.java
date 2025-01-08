@@ -45,4 +45,9 @@ public class UserRepositoryImpl implements UserRepository {
     public void delete(long userId) {
         userJpaRepository.deleteById(userId);
     }
+
+    @Override
+    public Optional<UserJpaEntity> findByClientId(String clientId) {
+        return userJpaRepository.findByClientId(clientId);
+    }
 }
