@@ -39,9 +39,13 @@ public class GameController {
      */
     @PostMapping("/api/game/start")
     public ResponseEntity<String> startGame(@RequestBody StartGameRequest startGameRequest) {
+        log.info("🔥게임 시작 요청 - roomId: {}, clientIds: {}", startGameRequest.getRoomId(), startGameRequest.getClientIds());
+
         String roomId = startGameRequest.getRoomId();
         gameRoomService.updateRoomStatusByRoomUrl(roomId, RoomStatus.RUNNING);
         userService.updateUsersToInGame(startGameRequest.getClientIds());
+
+        log.info("🔥게임 시작 완료 - roomId: {}", roomId);
         return ResponseEntity.ok("ok");
     }
 
@@ -52,8 +56,11 @@ public class GameController {
      */
     @PostMapping("/api/game/end")
     public ResponseEntity<String> endGame(@RequestBody(required = false) EndGameRequest endGameRequest) {
+        log.info("🔥게임 종료 요청 - roomId: {}", (endGameRequest != null ? endGameRequest.getRoomId() : "null"));
+
         gameService.endGame(endGameRequest);
 
+        log.info("🔥게임 종료 처리 완료 - roomId: {}", (endGameRequest != null ? endGameRequest.getRoomId() : "null"));
         return ResponseEntity.ok("ok");
     }
 
@@ -64,7 +71,11 @@ public class GameController {
      */
     @PostMapping("/api/game/leave")
     public ResponseEntity<String> leave(@RequestBody LeaveRoomRequest leaveRoomRequest) {
+        log.info("🔥유저 방 나가기 요청 - roomId: {}, clientId: {}", leaveRoomRequest.getRoomId(), leaveRoomRequest.getClientId());
+
         gameService.leaveRoom(leaveRoomRequest);
+        log.info("🔥유저 방 나가기 처리 완료 - roomId: {}, clientId: {}", leaveRoomRequest.getRoomId(), leaveRoomRequest.getClientId());
+
         return ResponseEntity.ok("해당 유저가 방을 나갔습니다.");
     }
 
@@ -76,7 +87,11 @@ public class GameController {
      */
     @PostMapping("/api/game/failure-signal")
     public ResponseEntity<String> handleGameFailureSignal(@RequestBody List<String> clientIds) {
+        log.info("🔥게임 실패 신호 처리 요청 - clientIds: {}", clientIds);
+
         userService.revertUsersToWaitingByClientIds(clientIds);
+        log.info("🔥게임 실패 신호 처리 완료 - 복구된 clientIds: {}", clientIds);
+
         return ResponseEntity.ok("Users reverted to WAITING");
     }
 
@@ -87,6 +102,8 @@ public class GameController {
      */
     @PostMapping("/api/game/return")
     public ResponseEntity<GameReturnResponse> returnGame(@RequestHeader("Authorization") String jwt) {
+        log.info("🔥게임 되돌아가기 요청 - JWT: {}", jwt);
+
         String jwtToken = jwt.substring(7);
         String userId = jwtTokenProvider.extractSubject(jwtToken);
         UserDto user = userService.getUserDtoById(Long.parseLong(userId));
@@ -102,6 +119,7 @@ public class GameController {
         gameRoomService.isRoomEnd(gameRoomDto);
 
         GameReturnResponse response = GameReturnResponse.create(currentGameUrl, user.getClientId());
+        log.info("🔥게임 되돌아가기 처리 완료 - roomUrl: {}, clientId: {}", currentGameUrl, user.getClientId());
 
         return ResponseEntity.ok(response);
     }
