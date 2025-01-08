@@ -7,6 +7,7 @@ import com.example.jungleroyal.common.util.JwtTokenProvider;
 import com.example.jungleroyal.common.util.SecurityUtil;
 import com.example.jungleroyal.domain.game.EndGameRequest;
 import com.example.jungleroyal.domain.game.GameReturnResponse;
+import com.example.jungleroyal.domain.game.LeaveRoomRequest;
 import com.example.jungleroyal.domain.game.StartGameRequest;
 import com.example.jungleroyal.domain.gameroom.GameRoomDto;
 import com.example.jungleroyal.domain.user.UserDto;
@@ -54,6 +55,17 @@ public class GameController {
         gameService.endGame(endGameRequest);
 
         return ResponseEntity.ok("ok");
+    }
+
+    /**
+     * 게임 대기 방에서 유저가 나온 경우 로직 처리
+     *
+     *
+     */
+    @PostMapping("/api/game/leave")
+    public ResponseEntity<String> leave(@RequestBody LeaveRoomRequest leaveRoomRequest) {
+        gameService.leaveRoom(leaveRoomRequest);
+        return ResponseEntity.ok("해당 유저가 방을 나갔습니다.");
     }
 
     /**
