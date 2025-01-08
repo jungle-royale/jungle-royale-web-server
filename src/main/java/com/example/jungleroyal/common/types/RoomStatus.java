@@ -11,4 +11,8 @@ public enum RoomStatus {
         // 게임 중인건 reconnection이 가능하기 때문에 보여야 한다.
         return this != END;
     }
+
+    public boolean isEnd() {
+        return this == END;
+    }
 }
