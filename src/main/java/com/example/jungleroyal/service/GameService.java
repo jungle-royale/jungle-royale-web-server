@@ -5,6 +5,7 @@ import com.example.jungleroyal.common.types.UserStatus;
 import com.example.jungleroyal.common.util.TimeUtils;
 import com.example.jungleroyal.domain.game.EndGameRequest;
 import com.example.jungleroyal.domain.game.EndGameUserInfo;
+import com.example.jungleroyal.domain.game.LeaveRoomRequest;
 import com.example.jungleroyal.infrastructure.GameRoomJpaEntity;
 import com.example.jungleroyal.infrastructure.UserJpaEntity;
 import com.example.jungleroyal.common.types.UserRole;
@@ -84,6 +85,43 @@ public class GameService {
             System.out.println("Member user " + userJpaEntity.getUsername() + " has joined the game!");
         } else {
             System.out.println("Guest user " + userJpaEntity.getUsername() + " has joined the game!");
+        }
+    }
+
+    @Transactional
+    public void leaveRoom(LeaveRoomRequest leaveRoomRequest) {
+        String roomId = leaveRoomRequest.getRoomId();
+        String clientId = leaveRoomRequest.getClientId();
+
+        // 1. 방 조회
+        GameRoomJpaEntity room = gameRoomRepository.findByGameUrl(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("Room not found: " + roomId));
+
+        // 2. 방 상태 검증
+        if (room.getStatus() != RoomStatus.WAITING) {
+            throw new IllegalStateException("방 상태가 WAITING이 아닙니다. 상태: " + room.getStatus());
+        }
+
+        // 3. 유저 조회
+        UserJpaEntity user = userRepository.findByClientId(clientId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found for clientId: " + clientId));
+
+        // 4. 유저가 해당 방에 속해 있는지 확인
+        if (!room.getGameUrl().equals(user.getCurrentGameUrl())) {
+            throw new IllegalStateException("유저가 해당 방에 속해 있지 않습니다.");
+        }
+
+        // 5. 참여 인원 감소 및 상태 초기화
+        if (room.getCurrentPlayers() > 0) {
+            room.setCurrentPlayers(room.getCurrentPlayers() - 1);
+            room.setUpdatedAt(TimeUtils.createUtc());
+
+            // 방 참여 인원이 0명이 된 경우 상태를 END로 변경
+            if (room.getCurrentPlayers() == 0) {
+                room.setStatus(RoomStatus.END);
+            }
+
+            gameRoomRepository.save(room);
         }
     }
 }
