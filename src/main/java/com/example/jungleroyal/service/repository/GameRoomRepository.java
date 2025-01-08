@@ -3,6 +3,7 @@ package com.example.jungleroyal.service.repository;
 import com.example.jungleroyal.common.types.RoomStatus;
 import com.example.jungleroyal.infrastructure.GameRoomJpaEntity;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +19,7 @@ public interface GameRoomRepository {
 
     void delete(GameRoomJpaEntity room);
 
+    List<GameRoomJpaEntity> findByUpdatedAtBeforeAndCurrentPlayers(LocalDateTime thresholdTime, int currentPlayers);
 
     String getGameUrlById(Long roomId);
 
