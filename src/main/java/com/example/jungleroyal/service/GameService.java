@@ -115,12 +115,6 @@ public class GameService {
         if (room.getCurrentPlayers() > 0) {
             room.setCurrentPlayers(room.getCurrentPlayers() - 1);
             room.setUpdatedAt(TimeUtils.createUtc());
-
-            // 방 참여 인원이 0명이 된 경우 상태를 END로 변경
-            if (room.getCurrentPlayers() == 0) {
-                room.setStatus(RoomStatus.END);
-            }
-
             gameRoomRepository.save(room);
         }
     }

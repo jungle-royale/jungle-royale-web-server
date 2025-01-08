@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,6 +38,11 @@ public class GameRoomRepositoryImpl implements GameRoomRepository {
     @Override
     public void delete(GameRoomJpaEntity room) {
         gameRoomJpaRepository.delete(room);
+    }
+
+    @Override
+    public List<GameRoomJpaEntity> findByUpdatedAtBeforeAndCurrentPlayers(LocalDateTime thresholdTime, int currentPlayers) {
+        return gameRoomJpaRepository.findByUpdatedAtBeforeAndCurrentPlayers(thresholdTime, currentPlayers);
     }
 
     @Override
