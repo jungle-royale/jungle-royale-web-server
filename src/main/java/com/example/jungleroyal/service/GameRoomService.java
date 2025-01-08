@@ -276,4 +276,9 @@ public class GameRoomService {
     }
 
 
+    public void isRoomEnd(GameRoomDto gameRoomDto) {
+        if (gameRoomDto.getStatus() == RoomStatus.END) {
+            throw new GameRoomException("GAME_ROOM_ENDED", "이미 종료된 방입니다.");
+        }
+    }
 }
