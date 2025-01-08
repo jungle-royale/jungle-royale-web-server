@@ -19,7 +19,8 @@ jwt:
     urls:
       - /api/game/**
       - /api/posts/list
-
+      - /api/auth/kakao/login
+      - /api/auth/refresh
 
 logging:
   level:
@@ -37,7 +38,6 @@ upload:
 secret:
   hash:
     key: "jungleroyale"
-
 
 springdoc:
   swagger-ui:

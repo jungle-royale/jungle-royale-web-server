@@ -40,12 +40,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        // /api/game/** 경로는 필터 검증을 우회
-        if (requestUri.startsWith("/api/game/") || requestUri.startsWith("/api/posts/list")) {
-            filterChain.doFilter(request, response); // 다음 필터로 진행
-            return;
-        }
-
         if (HttpMethod.OPTIONS.name().equalsIgnoreCase(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK);
             response.setHeader("Access-Control-Allow-Origin", "*");
