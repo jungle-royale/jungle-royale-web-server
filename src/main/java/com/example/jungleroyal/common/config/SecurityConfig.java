@@ -18,15 +18,17 @@ import org.springframework.web.filter.CorsFilter;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final BypassUrlConfig bypassUrlConfig;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable()) // CSRF 비활성화
             .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 설정 추가
-            .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/api/game/**").permitAll()
-                .anyRequest().permitAll() // 모든 요청 인증 없이 허용
-            )
+            .authorizeHttpRequests(auth -> {
+                bypassUrlConfig.getBypassUrls().forEach(url -> auth.requestMatchers(url).permitAll());
+                auth.anyRequest().authenticated();
+            })
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // 필터 추가;
 
         return http.build();

@@ -4,6 +4,7 @@ import com.example.jungleroyal.common.exception.GameRoomException;
 import com.example.jungleroyal.common.types.RoomStatus;
 import com.example.jungleroyal.common.types.UserStatus;
 import com.example.jungleroyal.common.util.JwtTokenProvider;
+import com.example.jungleroyal.common.util.SecurityUtil;
 import com.example.jungleroyal.domain.game.EndGameRequest;
 import com.example.jungleroyal.domain.game.GameReturnResponse;
 import com.example.jungleroyal.domain.game.StartGameRequest;
@@ -28,6 +29,7 @@ public class GameController {
     private final UserService userService;
     private final GameService gameService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final SecurityUtil securityUtil;
 
     /**
      * 게임 시작 api
@@ -75,8 +77,8 @@ public class GameController {
     public ResponseEntity<GameReturnResponse> returnGame(@RequestHeader("Authorization") String jwt) {
         String jwtToken = jwt.substring(7);
         String userId = jwtTokenProvider.extractSubject(jwtToken);
-
         UserDto user = userService.getUserDtoById(Long.parseLong(userId));
+
         if (user.getUserStatus() != UserStatus.IN_GAME) {
             throw new GameRoomException("USER_NOT_IN_GAME", "유저가 게임에 참여 중이 아니므로 다시 돌아갈 수 없습니다.");
         }
@@ -84,13 +86,10 @@ public class GameController {
         String currentGameUrl = user.getCurrentGameUrl();
 
         GameRoomDto gameRoomDto  = gameRoomService.getRoomByGameUrl(currentGameUrl);
-        if (gameRoomDto.getStatus() == RoomStatus.END) {
-            throw new GameRoomException("GAME_ROOM_ENDED", "이미 종료된 방입니다.");
-        }
 
-        String clientId = user.getClientId();
+        gameRoomService.isRoomEnd(gameRoomDto);
 
-        GameReturnResponse response = GameReturnResponse.create(currentGameUrl, clientId);
+        GameReturnResponse response = GameReturnResponse.create(currentGameUrl, user.getClientId());
 
         return ResponseEntity.ok(response);
     }

@@ -1,5 +1,6 @@
 package com.example.jungleroyal.common.util;
 
+import com.example.jungleroyal.common.config.BypassUrlConfig;
 import com.example.jungleroyal.common.types.UserRole;
 import com.example.jungleroyal.service.JwtService;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -25,6 +26,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtService jwtService;
+    private final BypassUrlConfig bypassUrlConfig;
 
 
     @Override
@@ -32,8 +34,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String requestUri = request.getRequestURI();
 
+        // 필터 우회 경로 확인
+        if (bypassUrlConfig.isBypassUrl(requestUri)) {
+            filterChain.doFilter(request, response); // 다음 필터로 진행
+            return;
+        }
+
         // /api/game/** 경로는 필터 검증을 우회
-        if (requestUri.startsWith("/api/game/")) {
+        if (requestUri.startsWith("/api/game/") || requestUri.startsWith("/api/posts/list")) {
             filterChain.doFilter(request, response); // 다음 필터로 진행
             return;
         }

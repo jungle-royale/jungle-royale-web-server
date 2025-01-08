@@ -49,7 +49,8 @@ public class GameRoomController {
         String roomUrl = gameRoomService.getRoomUrlById(room.getId());
 
         int minPlayers = room.getMinPlayers();
-        int maxPlayTime = room.getMaxGameTime();
+        // 게임서버로 전송시 분을 초로 변경
+        int maxPlayTime = room.getMaxGameTime() * 60;
 
         // 게임 서버와 통신
         GameServerNotificationRequest gameServerNotificationRequest
