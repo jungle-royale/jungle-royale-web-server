@@ -26,8 +26,9 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable()) // CSRF 비활성화
             .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 설정 추가
             .authorizeHttpRequests(auth -> {
-                bypassUrlConfig.getBypassUrls().forEach(url -> auth.requestMatchers(url).permitAll());
-                auth.anyRequest().authenticated();
+//                bypassUrlConfig.getBypassUrls().forEach(url -> auth.requestMatchers(url).permitAll());
+                auth.anyRequest().permitAll();
+//                auth.anyRequest().authenticated();
             })
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // 필터 추가;
 
