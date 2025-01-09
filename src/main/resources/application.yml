@@ -22,6 +22,7 @@ jwt:
       - /api/auth/kakao/login
       - /api/auth/refresh
       - /api/auth/guest/login
+      - /api/uploads
 
 
 scheduler:
