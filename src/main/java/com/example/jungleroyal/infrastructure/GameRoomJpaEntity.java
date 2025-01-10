@@ -102,4 +102,8 @@ public class GameRoomJpaEntity {
         return status.canShow();
     }
 
+    public boolean isEnd() {
+        return status.isEnd();
+    }
+
 }
