@@ -83,7 +83,6 @@ public class GameRoomController {
     public ResponseEntity<String> updateRoom(
             @PathVariable Long roomId,
             @RequestBody GameRoomRequest gameRoomRequest) {
-        System.out.println("방 수정 로직 호출");
         GameRoomDto gameRoomDto = GameRoomDto.updateRoomFromRequest(gameRoomRequest, roomId);
         gameRoomService.updateRoom(gameRoomDto);
 
@@ -106,12 +105,15 @@ public class GameRoomController {
 
     @GetMapping("/api/rooms/list")
     public ResponseEntity<GameRoomListWithUserReponse> listAllRooms() {
-        UserInfoUsingRoomListResponse userInfoUsingRoomListResponse = UserInfoUsingRoomListResponse.createUserInfoUsingRoomListResponse(securityUtil.getUsername());
+        long userId = Long.parseLong(securityUtil.getUserId());
+        UserJpaEntity userJpaEntityById = userService.getUserJpaEntityById(userId);
+
+        UserInfoUsingRoomListResponse userInfoUsingRoomListResponse = UserInfoUsingRoomListResponse.create(userJpaEntityById.getUsername(), userJpaEntityById.getStatus());
         List<GameRoomListResponse> responseList = gameRoomService.listOfShowableRoom()
                 .stream()
                 .map(GameRoomListResponse::fromDto) // GameRoomDto → GameRoomResponse 변환
                 .toList();
-        GameRoomListWithUserReponse gameRoomListWithUserReponse = GameRoomListWithUserReponse.createGameRoomListWithUserReponse(userInfoUsingRoomListResponse, responseList);
+        GameRoomListWithUserReponse gameRoomListWithUserReponse = GameRoomListWithUserReponse.create(userInfoUsingRoomListResponse, responseList);
         return ResponseEntity.ok(gameRoomListWithUserReponse);
     }
 
@@ -130,7 +132,6 @@ public class GameRoomController {
     @PostMapping("/api/rooms/{roomId}/check")
     public ResponseEntity<GameRoomStatus> checkRoomAvailability(@PathVariable Long roomId) {
         String userId = securityUtil.getUserId();
-        System.out.println("게임 입장 가능여부 확인 roomId = " + roomId);
         GameRoomStatus status = gameRoomService.checkRoomAvailability(roomId,userId);
         return ResponseEntity.ok(status);
     }

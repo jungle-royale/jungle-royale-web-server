@@ -12,8 +12,7 @@ public class GameRoomListWithUserReponse {
     private UserInfoUsingRoomListResponse userInfo; // 사용자 정보
     private List<GameRoomListResponse> gameRooms; // 게임 방 리스트
 
-
-    public static GameRoomListWithUserReponse createGameRoomListWithUserReponse(
+    public static GameRoomListWithUserReponse create(
             UserInfoUsingRoomListResponse userInfo,
             List<GameRoomListResponse> gameRooms
     ){
