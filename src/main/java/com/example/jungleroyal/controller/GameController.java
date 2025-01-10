@@ -104,22 +104,9 @@ public class GameController {
     public ResponseEntity<GameReturnResponse> returnGame(@RequestHeader("Authorization") String jwt) {
         log.info("🔥게임 되돌아가기 요청 - JWT: {}", jwt);
 
-        String jwtToken = jwt.substring(7);
-        String userId = jwtTokenProvider.extractSubject(jwtToken);
-        UserDto user = userService.getUserDtoById(Long.parseLong(userId));
+        GameReturnResponse response = gameRoomService.returnGame(jwt);
 
-        if (user.getUserStatus() != UserStatus.IN_GAME) {
-            throw new GameRoomException("USER_NOT_IN_GAME", "유저가 게임에 참여 중이 아니므로 다시 돌아갈 수 없습니다.");
-        }
-
-        String currentGameUrl = user.getCurrentGameUrl();
-
-        GameRoomDto gameRoomDto  = gameRoomService.getRoomByGameUrl(currentGameUrl);
-
-        gameRoomService.isRoomEnd(gameRoomDto);
-
-        GameReturnResponse response = GameReturnResponse.create(currentGameUrl, user.getClientId());
-        log.info("🔥게임 되돌아가기 처리 완료 - roomUrl: {}, clientId: {}", currentGameUrl, user.getClientId());
+        log.info("🔥게임 되돌아가기 처리 완료 - roomUrl: {}, clientId: {}", response.getRoomId(), response.getClientId());
 
         return ResponseEntity.ok(response);
     }
