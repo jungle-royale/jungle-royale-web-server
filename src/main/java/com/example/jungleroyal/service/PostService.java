@@ -51,8 +51,6 @@ public class PostService {
                 .toList();
     }
 
-
-    
     @Transactional
     public void updatePost(Long postId, PostUpdateRequest postUpdateRequest) {
         // 게시글 존재 여부 확인
@@ -87,7 +85,7 @@ public class PostService {
 
     
     @Transactional
-    public void deletePost(Long postId) throws IOException {
+    public void deletePost(Long postId) {
         // 게시글 존재 여부 확인
         PostJpaEntity postJpaEntity = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다."));
