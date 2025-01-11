@@ -121,7 +121,6 @@ public class JwtTokenProvider {
 
     public UserRole extractUserRole(String token) {
         String role = parseClaims(token).get("role", String.class);
-        System.out.println("role = " + role);
         return UserRole.valueOf(role); // 문자열을 Enum으로 변환
     }
 

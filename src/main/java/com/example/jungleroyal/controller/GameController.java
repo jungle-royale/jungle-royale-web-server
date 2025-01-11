@@ -64,6 +64,9 @@ public class GameController {
      */
     @PostMapping("/api/game/leave")
     public ResponseEntity<String> leave(@RequestBody LeaveRoomRequest leaveRoomRequest) {
+        log.info("[{}] 유저가 방을 떠났습니다. roomId : [{}] ", leaveRoomRequest.getClientId(), leaveRoomRequest.getRoomId());
+
+        System.out.println("leaveRoomRequest = " + leaveRoomRequest);
         gameService.leaveRoom(leaveRoomRequest);
         return ResponseEntity.ok("해당 유저가 방을 나갔습니다.");
     }
