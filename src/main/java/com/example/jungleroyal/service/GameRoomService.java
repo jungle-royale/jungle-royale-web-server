@@ -6,9 +6,12 @@ import com.example.jungleroyal.common.exception.RoomByGameUrlFoundException;
 import com.example.jungleroyal.common.exception.RoomNotFoundException;
 import com.example.jungleroyal.common.types.GameRoomStatus;
 import com.example.jungleroyal.common.types.RoomStatus;
+import com.example.jungleroyal.common.types.UserStatus;
 import com.example.jungleroyal.common.util.HashUtil;
+import com.example.jungleroyal.common.util.JwtTokenProvider;
 import com.example.jungleroyal.common.util.RoomValidator;
 import com.example.jungleroyal.common.util.SecurityUtil;
+import com.example.jungleroyal.domain.game.GameReturnResponse;
 import com.example.jungleroyal.domain.gameroom.GameRoomDto;
 import com.example.jungleroyal.domain.gameroom.GameRoomJoinReponse;
 import com.example.jungleroyal.domain.user.UserDto;
@@ -34,6 +37,7 @@ public class GameRoomService {
     private final UserRepository userRepository;
     private final SecurityUtil securityUtil;
     private final UserService userService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
     public GameRoomJoinReponse joinGameRoom(Long roomId, String jwt) {
@@ -244,5 +248,26 @@ public class GameRoomService {
         if (gameRoomDto.getStatus() == RoomStatus.END) {
             throw new GameRoomException("GAME_ROOM_ENDED", "이미 종료된 방입니다.");
         }
+    }
+
+    public GameReturnResponse returnGame(String jwt) {
+
+        String jwtToken = jwt.substring(7);
+        String userId = jwtTokenProvider.extractSubject(jwtToken);
+
+        UserDto user = userService.getUserDtoById(Long.parseLong(userId));
+
+        if (user.getUserStatus() != UserStatus.IN_GAME) {
+            throw new GameRoomException("USER_NOT_IN_GAME", "유저가 게임에 참여 중이 아니므로 다시 돌아갈 수 없습니다.");
+        }
+
+        String currentGameUrl = user.getCurrentGameUrl();
+
+        GameRoomDto gameRoomDto  = getRoomByGameUrl(currentGameUrl);
+
+        isRoomEnd(gameRoomDto);
+
+        return GameReturnResponse.create(currentGameUrl, user.getClientId());
+
     }
 }
