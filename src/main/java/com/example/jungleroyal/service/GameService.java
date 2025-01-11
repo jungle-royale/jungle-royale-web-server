@@ -27,12 +27,6 @@ public class GameService {
     private final GameRoomRepository gameRoomRepository;
     private final UserRepository userRepository;
 
-//    /**
-//     * 게임 종료 처리
-//     *
-//     * @param roomUrl  종료할 방 URL
-//     * @param rankings 게임 참여자들의 순위 및 clientId 리스트
-//     */
     @Transactional
     public void endGame(EndGameRequest endGameRequest) {
         String roomId = endGameRequest.getRoomId();
@@ -77,15 +71,6 @@ public class GameService {
         gameRoom.setUpdatedAt(TimeUtils.createUtc());
 
         gameRoomRepository.save(gameRoom);
-    }
-
-
-    public void participateInGame(UserJpaEntity userJpaEntity){
-        if (userJpaEntity.getRole() == UserRole.MEMBER){
-            System.out.println("Member user " + userJpaEntity.getUsername() + " has joined the game!");
-        } else {
-            System.out.println("Guest user " + userJpaEntity.getUsername() + " has joined the game!");
-        }
     }
 
     @Transactional

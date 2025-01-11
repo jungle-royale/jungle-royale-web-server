@@ -46,12 +46,7 @@ public class KakaoAuthService {
     public String getKakaoIdUsingToken(OAuthKakaoToken oAuthKakaoToken) {
         String kakaoId = authKakaoTokenUtils.getKakaoIdUsingToken(oAuthKakaoToken);
         // 회원번호 뽑아내기
-        System.out.println("kakaoId = " + kakaoId);
         return kakaoId;
-    }
-
-    public void logoutFromKakao(String accessToken) {
-        authKakaoTokenUtils.logout(accessToken);
     }
 
     // TODO: login 관련 추상화 필요
@@ -98,9 +93,4 @@ public class KakaoAuthService {
         return authRefreshTokenRepositoty.save(authRefreshTokenJpaEntity);
     }
 
-    public AuthTokensDto getAuthTokens(String userId) {
-        AuthRefreshTokenJpaEntity authTokensById = authRefreshTokenRepositoty.getAuthTokensById(Long.parseLong(userId));
-        return authTokensById.toTokensDto();
-
-    }
 }

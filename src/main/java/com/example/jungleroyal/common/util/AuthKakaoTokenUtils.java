@@ -182,7 +182,6 @@ public class AuthKakaoTokenUtils {
 
             // 4. 페이로드 추출
             String payload2 = jwsObject.getPayload().toString();
-            System.out.println("Decoded Payload: " + payload2);
 
             // 5. 회원 번호 추출
             ObjectMapper mapper = new ObjectMapper();
