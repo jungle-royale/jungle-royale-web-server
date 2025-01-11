@@ -21,8 +21,6 @@ import com.example.jungleroyal.service.repository.GameRoomRepository;
 import com.example.jungleroyal.service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +34,6 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class GameRoomService {
     private final GameRoomRepository gameRoomRepository;
-    private final RedissonClient redissonClient;
     private final UserRepository userRepository;
     private final SecurityUtil securityUtil;
     private final UserService userService;
@@ -54,91 +51,46 @@ public class GameRoomService {
             userId = securityUtil.getUserId();
         }
 
+        UserDto user = userService.getUserDtoById(Long.parseLong(userId));
+
+        // 방 정보 확인 및 검증
         GameRoomJpaEntity room = gameRoomRepository.findById(roomId)
                 .orElseThrow(() -> new GameRoomException("ROOM_NOT_FOUND", "존재하지 않는 방입니다."));
 
-        UserDto user = userService.getUserDtoById(Long.parseLong(userId));
+        RoomValidator.validateRoomCapacity(room); // 방 정원 초과 확인
+        RoomValidator.validateRoomNotEnded(room); // 방 종료 여부 확인
 
-        // 유저 상태 및 현재 게임 URL 검증
-        if (user.getUserStatus() == UserStatus.IN_GAME) {
-            if (!room.getGameUrl().equals(user.getCurrentGameUrl())) {
-                throw new GameRoomException("USER_ALREADY_IN_DIFFERENT_GAME",
-                        "유저가 이미 다른 게임에 참여 중입니다. 현재 게임 URL: " + user.getCurrentGameUrl());
-            } else {
-                return GameRoomJoinReponse.create(user.getCurrentGameUrl(), user.getClientId());
-            }
+        // 유저 정보 업데이트
+        String roomUrl = room.getGameUrl();
+        String clientId = user.getClientId();
+
+        // 같은 방이 아닌 경우 clientId 갱신
+        if (!roomUrl.equals(user.getCurrentGameUrl())) {
+            clientId = userService.getClientId(); // 새로운 clientId 생성
+            userService.updateUserConnectionDetails(Long.parseLong(userId), roomUrl, clientId, false);
         }
 
-        // 락 생성 (방 ID를 키로 사용)
-        String lockKey = "gameRoom:join:" + roomId;
-        RLock lock = redissonClient.getLock(lockKey);
+        // 응답 생성
+        return GameRoomJoinReponse.builder()
+                .roomId(roomUrl)
+                .clientId(clientId)
+                .build();
 
-        try {
-            if (lock.tryLock(5, 10, TimeUnit.SECONDS)) { // 락 대기 시간 5초, 보유 시간 10초
-                // 방 정보 확인 및 검증
-
-
-                RoomValidator.validateRoomCapacity(room); // 방 정원 초과 확인
-                RoomValidator.validateRoomNotEnded(room); // 방 종료 여부 확인
-
-                // 유저 정보 업데이트
-                String roomUrl = room.getGameUrl();
-                String clientId = user.getClientId();
-
-                // 같은 방이 아닌 경우 clientId 갱신
-                if (!roomUrl.equals(user.getCurrentGameUrl())) {
-                    clientId = userService.getClientId(); // 새로운 clientId 생성
-                    userService.updateUserConnectionDetails(Long.parseLong(userId), roomUrl, clientId, false);
-                }
-
-                // 응답 생성
-                return GameRoomJoinReponse.builder()
-                        .roomId(roomUrl)
-                        .clientId(clientId)
-                        .build();
-            } else {
-                throw new IllegalStateException("다른 요청이 이미 처리 중입니다. 잠시 후 다시 시도해주세요.");
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException("락 처리 중 인터럽트 발생", e);
-        } finally {
-            if (lock.isHeldByCurrentThread()) {
-                lock.unlock();
-            }
-        }
     }
 
     @Transactional
     public GameRoomDto createRoom(GameRoomDto gameRoomDto) {
-        String lockKey = "host:" + gameRoomDto.getHostId();
-        RLock lock = redissonClient.getLock(lockKey);
-        try {
-            // 락을 획득. 최대 대기 시간 5초, 락 보유 시간 10초
-            if (lock.tryLock(3, 5, TimeUnit.SECONDS)) {
-
-
-                // 방 생성
-                String gameUrl = HashUtil.encryptWithUUIDAndHash();
-                gameRoomDto.setGameUrl(gameUrl);
-                // TODO : gameRoomJpaEntity 의 세팅 메소드 생성 필요
-                GameRoomJpaEntity gameRoomJpaEntity = GameRoomJpaEntity.fromDto(gameRoomDto);
-                gameRoomJpaEntity.setCurrentPlayers(1);
-                gameRoomJpaEntity.setCreatedAt(LocalDateTime.now());
-                gameRoomJpaEntity.setUpdatedAt(LocalDateTime.now());
-                gameRoomJpaEntity.setStatus(RoomStatus.WAITING);
-                GameRoomJpaEntity savedRoom = gameRoomRepository.save(gameRoomJpaEntity);
-                return GameRoomDto.fromGameRoomJpaEntity(savedRoom);
-            } else {
-                throw new IllegalStateException("락 획득 실패. 다른 요청이 이미 처리 중입니다.");
-            }
-        } catch (InterruptedException e) {
-            throw new IllegalStateException("락 처리 중 인터럽트 발생", e);
-        } finally {
-            if (lock.isHeldByCurrentThread()) {
-                lock.unlock(); // 락 해제
-            }
-        }
+        // 방 생성
+        String gameUrl = HashUtil.encryptWithUUIDAndHash();
+        gameRoomDto.setGameUrl(gameUrl);
+        // TODO : gameRoomJpaEntity 의 세팅 메소드 생성 필요
+        GameRoomJpaEntity gameRoomJpaEntity = GameRoomJpaEntity.fromDto(gameRoomDto);
+        gameRoomJpaEntity.setCurrentPlayers(1);
+        gameRoomJpaEntity.setCreatedAt(LocalDateTime.now());
+        gameRoomJpaEntity.setUpdatedAt(LocalDateTime.now());
+        gameRoomJpaEntity.setStatus(RoomStatus.WAITING);
+        GameRoomJpaEntity savedRoom = gameRoomRepository.save(gameRoomJpaEntity);
+        return GameRoomDto.fromGameRoomJpaEntity(savedRoom);
 
     }
 
