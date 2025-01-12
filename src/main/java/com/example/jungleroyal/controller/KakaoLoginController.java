@@ -6,6 +6,7 @@ import com.example.jungleroyal.service.KakaoAuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +20,7 @@ import java.util.Map;
 @RequestMapping("")
 @Tag(name = "kakaoLogin", description = "kakaoLogin API")
 @RequiredArgsConstructor
+@Slf4j
 public class KakaoLoginController {
 
     private final KakaoAuthService kakaoAuthService;
@@ -34,9 +36,11 @@ public class KakaoLoginController {
     @Operation(summary = "kakao Login", description = "카카오 로그인, 회원가입, jwt발행")
     public ResponseEntity<KakaoLoginResponse> kakaoLogin(@RequestBody Map<String, String> payload) {
         String code = payload.get("code"); // 클라이언트에서 전송한 인가코드
+
+        log.info("✅전송 받은 카카오 code = {}" , code);
         // TODO: 에러메시지 클라이언트에게 전송하기
         KakaoLoginResponse kakaoLoginResponse = kakaoAuthService.loginWithKakao(code);
-
+        log.info("✅카카오 로그인 성공");
         return ResponseEntity.ok(kakaoLoginResponse);
     }
 

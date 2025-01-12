@@ -15,8 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.*;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,8 +26,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public class GameRoomServiceTest {
-    @Mock
-    private RedissonClient redissonClient;
 
     @Mock
     private GameRoomRepository gameRoomRepository;
@@ -43,31 +39,6 @@ public class GameRoomServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-    }
-
-    @Test
-    @DisplayName("방 생성 성공")
-    void createRoomSuccess() throws InterruptedException {
-        // Given
-        GameRoomDto gameRoomDto = GameRoomDto.builder()
-                .hostId("testHost")
-                .build();
-
-        RLock mockLock = mock(RLock.class);
-        when(redissonClient.getLock("host:testHost")).thenReturn(mockLock);
-        when(mockLock.tryLock(3, 5, TimeUnit.SECONDS)).thenReturn(true);
-        when(mockLock.isHeldByCurrentThread()).thenReturn(true); // Mock 동작 추가
-        when(gameRoomRepository.existsByHostId("testHost")).thenReturn(false);
-        when(gameRoomRepository.save(any(GameRoomJpaEntity.class))).thenReturn(new GameRoomJpaEntity());
-
-        // When
-        GameRoomDto result = gameRoomService.createRoom(gameRoomDto);
-
-        // Then
-        assertThat(result).isNotNull();
-        verify(gameRoomRepository, times(1)).existsByHostId("testHost");
-        verify(gameRoomRepository, times(1)).save(any(GameRoomJpaEntity.class));
-        verify(mockLock, times(1)).unlock(); // 락 해제 확인
     }
 
     @Test

@@ -27,7 +27,7 @@ public class GuestLoginController {
 
     @PostMapping("/api/auth/guest/login")
     public ResponseEntity<UserGuestLoginResponse> guestLogin() {
-
+        log.info("✅비회원 로그인 요청");
         // 1. 비회원 유저 생성
         UserJpaEntity guestUserJpaEntity = userService.registerGuest();
         Long id = guestUserJpaEntity.getId();
@@ -43,7 +43,7 @@ public class GuestLoginController {
         UserGuestLoginResponse response = UserGuestLoginResponse.createUserGuestLoginResponse(jwt, refreshToken.getRefreshToken());
 
         jwtService.saveJwtRefreshToken(refreshToken);
-
+        log.info("✅비회원 로그인 성공 ");
         return ResponseEntity.ok(response);
     }
 }
