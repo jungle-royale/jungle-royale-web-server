@@ -8,4 +8,5 @@ import lombok.Data;
 public class GameRoomCreateReponse {
     private String roomId;
     private String clientId;
+    private String username;
 }
