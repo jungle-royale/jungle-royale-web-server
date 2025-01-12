@@ -40,7 +40,7 @@ public class GameRoomController {
 
         // 방 상태가 WAITING인데 유저 상태가 IN_GAME인 경우 예외 처리
         if (user.getUserStatus() == UserStatus.IN_GAME) {
-            throw new GameRoomException("INVALID_USER_STATE", "유저가 현재 다른 게임에 참여중입니다.");
+            throw new GameRoomException("INVALID_USER_STATE", "❌유저가 현재 다른 게임에 참여중입니다.");
         }
 
         GameRoomDto room = gameRoomService.createRoom(GameRoomDto.fromRequest(gameRoomRequest, userId));
@@ -54,7 +54,7 @@ public class GameRoomController {
 
         // 게임 서버와 통신
         GameServerNotificationRequest gameServerNotificationRequest
-                = new GameServerNotificationRequest(roomUrl, minPlayers, maxPlayTime);
+                = new GameServerNotificationRequest(roomUrl, minPlayers, maxPlayTime, user.getUsername());
         log.info("🍎request:" + gameServerNotificationRequest.toString());
         GameServerNotificationResponse gameServerResponse
                 = gameServerClient.notifyGameServer(gameServerNotificationRequest, userId);
@@ -74,6 +74,7 @@ public class GameRoomController {
         GameRoomCreateReponse response = GameRoomCreateReponse.builder()
                 .roomId(roomUrl)
                 .clientId(clientId)
+                .username(user.getUsername())
                 .build();
 
         return ResponseEntity.ok(response);
@@ -142,6 +143,7 @@ public class GameRoomController {
             @PathVariable Long roomId) {
 
         GameRoomJoinReponse response = gameRoomService.joinGameRoom(roomId, jwt);
+        log.info("✅접속한 방 = {}, 접속 유저 닉네임= {}", roomId, response.getUsername());
         return ResponseEntity.ok(response);
     }
 }
