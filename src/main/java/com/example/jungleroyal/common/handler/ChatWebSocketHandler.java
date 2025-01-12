@@ -16,15 +16,11 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        System.out.println("[+] afterConnectionEstablished :: " + session.getId());
         clientSession.put(session.getId(), session);
     }
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        System.out.println("[+] handleTextMessage :: " + session);
-        System.out.println("[+] handleTextMessage :: " + message.getPayload());
-
         clientSession.forEach((key, value) -> {
             if (value.isOpen()) { // 세션이 열려 있는지 확인
                 if (!key.equals(session.getId())) {  //같은 아이디가 아니면 메시지를 전달합니다.
@@ -44,6 +40,5 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws IOException {
         clientSession.remove(session.getId());
-        System.out.println("[+] afterConnectionClosed - Session: " + session.getId() + ", CloseStatus: " + status);
     }
 }

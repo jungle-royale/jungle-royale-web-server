@@ -19,7 +19,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
      */
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        System.out.println("[+] 최초 WebSocket 연결");
         registry.addHandler(chatWebSocketHandler, "ws-stomp")
                 .setAllowedOrigins("*");
     }

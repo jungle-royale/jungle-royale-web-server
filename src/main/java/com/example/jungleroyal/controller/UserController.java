@@ -29,7 +29,6 @@ public class UserController {
     private final JwtTokenProvider jwtTokenProvider;
     @PostMapping("/api/users/register")
     public ResponseEntity<String> registerUser(@RequestBody UserJpaEntity userJpaEntity) {
-        System.out.println("user = " + userJpaEntity.toString());
         userRepository.save(userJpaEntity);
         return ResponseEntity.ok("User registered successfully!");
     }
@@ -50,7 +49,6 @@ public class UserController {
         String userId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Map<String, Object> response = new HashMap<>();
 
-        System.out.println("userId = " + userId);
         response.put("userId", userId);
         return ResponseEntity.ok(response);
     }
@@ -90,7 +88,6 @@ public class UserController {
     public ResponseEntity<String> editMyPage(
             @RequestHeader("Authorization") String jwt,
             @RequestBody UserEditMyPageRequest userEditMyPageRequest){
-        System.out.println("userEditMyPageRequest = " + userEditMyPageRequest);
         String jwtToken = jwt.substring(7);
         String userId = jwtTokenProvider.extractSubject(jwtToken);
 
