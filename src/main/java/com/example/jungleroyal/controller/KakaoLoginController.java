@@ -48,7 +48,6 @@ public class KakaoLoginController {
     public ResponseEntity<Map<String, Object>> verifyJwt(@RequestBody Map<String, String> payload) {
         String jwtToken = payload.get("jwt_token");
 
-        System.out.println("여기가 jwt 검증구간입니다.");
         jwtTokenProvider.isValidToken(jwtToken);
         Map<String, Object> responseBody = new HashMap<>();
 

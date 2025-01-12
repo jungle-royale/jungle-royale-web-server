@@ -87,7 +87,13 @@ public class UserService {
         return userRepository.findUsernameById(Long.parseLong(userId));
     }
 
+    @Transactional
     public void updateNickName(UserDto userDto) {
+        // 닉네임 중복 확인
+        if (userRepository.existsByUsername(userDto.getUsername())) {
+            throw new GameRoomException("USERNAME_DUPLICATE", "이미 사용 중인 닉네임입니다: " + userDto.getUsername());
+        }
+
         // 사용자 정보 조회
         UserJpaEntity userJpaEntity = getUserJpaEntityById(userDto.getId());
 

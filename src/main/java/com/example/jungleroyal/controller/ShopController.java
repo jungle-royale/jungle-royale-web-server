@@ -23,7 +23,6 @@ public class ShopController {
     @GetMapping("/api/shops/items")
     public ResponseEntity<ShopPageResponse> getShopPage(@RequestHeader("Authorization") String jwt) {
         ShopPageResponse response = shopService.getShopPage(jwt);
-        System.out.println("response = " + response);
         return ResponseEntity.ok(response);
     }
 
