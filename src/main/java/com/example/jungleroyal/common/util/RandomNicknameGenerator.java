@@ -1,6 +1,7 @@
 package com.example.jungleroyal.common.util;
 
 
+import com.example.jungleroyal.service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -10,6 +11,8 @@ import java.util.Random;
 @Component
 @RequiredArgsConstructor
 public class RandomNicknameGenerator {
+
+    private final UserRepository userRepository;
 
     // 형용사 배열
     private final String[] ADJECTIVES =  {
@@ -45,12 +48,24 @@ public class RandomNicknameGenerator {
     private final Random RANDOM = new Random();
 
     public String generate(){
-        // 랜덤 형용사
-        String adjective = ADJECTIVES[RANDOM.nextInt(ADJECTIVES.length)];
-        // 랜덤 명사
-        String nouns = NOUNS[RANDOM.nextInt(NOUNS.length)];
+        int attempts = 0;
+        final int maxAttempts = 10; // 닉네임 생성 시도 횟수 제한
 
+        String nickname;
+        do {
+            // 랜덤 형용사와 명사 조합
+            String adjective = ADJECTIVES[RANDOM.nextInt(ADJECTIVES.length)];
+            String noun = NOUNS[RANDOM.nextInt(NOUNS.length)];
+            nickname = MessageFormat.format("{0}{1}", adjective, noun);
 
-        return MessageFormat.format("{0}{1}", adjective, nouns);
+            // 중복 체크
+            if (!userRepository.existsByUsername(nickname)) {
+                return nickname; // 중복되지 않으면 반환
+            }
+
+            attempts++;
+        } while (attempts < maxAttempts);
+
+        throw new IllegalStateException("닉네임 생성 실패: 중복된 닉네임이 너무 많습니다.");
     }
 }

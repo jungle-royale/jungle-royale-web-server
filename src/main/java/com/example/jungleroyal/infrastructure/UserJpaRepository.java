@@ -16,4 +16,6 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, Long> {
     List<UserJpaEntity> findAllByClientIdIn(List<String> clientIds);
 
     Optional<UserJpaEntity> findByClientId(String clientId);
+
+    boolean existsByUsername(String username);
 }
