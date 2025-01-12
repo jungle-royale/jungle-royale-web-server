@@ -9,11 +9,13 @@ import lombok.Data;
 public class GameRoomJoinReponse {
     private String roomId;
     private String clientId;
+    private String username;
 
-    public static GameRoomJoinReponse create(String currentGameUrl, String clientId) {
+    public static GameRoomJoinReponse create(String currentGameUrl, String clientId, String username) {
         return GameRoomJoinReponse.builder()
                 .roomId(currentGameUrl)
                 .clientId(clientId)
+                .username(username)
                 .build();
 
     }

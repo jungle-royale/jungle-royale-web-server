@@ -11,4 +11,5 @@ public class GameServerNotificationRequest {
     private String roomId;
     private int minPlayers;
     private int maxPlayTime; // seconds
+    private String username;
 }

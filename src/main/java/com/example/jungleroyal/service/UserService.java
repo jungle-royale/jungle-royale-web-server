@@ -60,9 +60,10 @@ public class UserService {
      * @return
      */
     public UserJpaEntity registerGuest() {
+
         String randomNickname = randomNicknameGenerator.generate();
         UserJpaEntity gueutUserJpaEntity = UserJpaEntity.createGueutUser(randomNickname);
-
+        log.info("✅비회원 가입 완료, 가입 유저 닉네임 : {}", randomNickname);
         return userRepository.save(gueutUserJpaEntity);
     }
 

@@ -19,10 +19,12 @@ import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URL;
@@ -31,6 +33,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class KakaoAuthService {
     private final AuthKakaoTokenUtils authKakaoTokenUtils;
     private final UserService userService;
@@ -50,6 +53,7 @@ public class KakaoAuthService {
     }
 
     // TODO: login 관련 추상화 필요
+    @Transactional
     public KakaoLoginResponse loginWithKakao(String code) {
         // 카카오 토큰 받기
         OAuthKakaoToken oAuthKakaoToken = getKakaoTokenUsingAccessCode(code);
@@ -75,6 +79,8 @@ public class KakaoAuthService {
 
         // 카카오 리프레시 토큰 생성 및 저장
         AuthRefreshTokenJpaEntity authRefreshTokenJpaEntity = saveAuthRefeshToken(oAuthKakaoToken, user.getId(), AuthType.KAKAO);
+
+        log.info("✅ 카카오 로그인 성공, 접속한 유저 닉네임 : {}", username);
 
         return KakaoLoginResponse.createKakaoLoginResponse(jwtToken, refreshToken.getRefreshToken(), authRefreshTokenJpaEntity.getRefreshToken());
     }

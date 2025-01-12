@@ -7,10 +7,7 @@ import com.example.jungleroyal.common.exception.RoomNotFoundException;
 import com.example.jungleroyal.common.types.GameRoomStatus;
 import com.example.jungleroyal.common.types.RoomStatus;
 import com.example.jungleroyal.common.types.UserStatus;
-import com.example.jungleroyal.common.util.HashUtil;
-import com.example.jungleroyal.common.util.JwtTokenProvider;
-import com.example.jungleroyal.common.util.RoomValidator;
-import com.example.jungleroyal.common.util.SecurityUtil;
+import com.example.jungleroyal.common.util.*;
 import com.example.jungleroyal.domain.game.GameReturnResponse;
 import com.example.jungleroyal.domain.gameroom.GameRoomDto;
 import com.example.jungleroyal.domain.gameroom.GameRoomJoinReponse;
@@ -74,6 +71,7 @@ public class GameRoomService {
         return GameRoomJoinReponse.builder()
                 .roomId(roomUrl)
                 .clientId(clientId)
+                .username(user.getUsername())
                 .build();
 
     }
@@ -86,8 +84,8 @@ public class GameRoomService {
         // TODO : gameRoomJpaEntity 의 세팅 메소드 생성 필요
         GameRoomJpaEntity gameRoomJpaEntity = GameRoomJpaEntity.fromDto(gameRoomDto);
         gameRoomJpaEntity.setCurrentPlayers(1);
-        gameRoomJpaEntity.setCreatedAt(LocalDateTime.now());
-        gameRoomJpaEntity.setUpdatedAt(LocalDateTime.now());
+        gameRoomJpaEntity.setCreatedAt(TimeUtils.createUtc());
+        gameRoomJpaEntity.setUpdatedAt(TimeUtils.createUtc());
         gameRoomJpaEntity.setStatus(RoomStatus.WAITING);
         GameRoomJpaEntity savedRoom = gameRoomRepository.save(gameRoomJpaEntity);
         return GameRoomDto.fromGameRoomJpaEntity(savedRoom);
@@ -110,9 +108,11 @@ public class GameRoomService {
     }
 
     public void deleteRoom(String gameUrl) {
+
         GameRoomJpaEntity room = gameRoomRepository.findByGameUrl(gameUrl)
                 .orElseThrow(() -> new RoomByGameUrlFoundException(gameUrl));
         gameRoomRepository.delete(room);
+        log.info("✅게임룸 삭제 완료 : {}" , gameUrl);
     }
 
     @Transactional

@@ -21,4 +21,6 @@ public interface UserRepository {
     void delete(long userId);
 
     Optional<UserJpaEntity> findByClientId(String clientId);
+
+    boolean existsByUsername(String nickname);
 }

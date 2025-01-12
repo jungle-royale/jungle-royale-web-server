@@ -50,4 +50,9 @@ public class UserRepositoryImpl implements UserRepository {
     public Optional<UserJpaEntity> findByClientId(String clientId) {
         return userJpaRepository.findByClientId(clientId);
     }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return userJpaRepository.existsByUsername(username);
+    }
 }
