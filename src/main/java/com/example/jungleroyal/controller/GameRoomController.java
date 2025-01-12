@@ -40,7 +40,7 @@ public class GameRoomController {
 
         // 방 상태가 WAITING인데 유저 상태가 IN_GAME인 경우 예외 처리
         if (user.getUserStatus() == UserStatus.IN_GAME) {
-            throw new GameRoomException("INVALID_USER_STATE", "❌유저가 현재 다른 게임에 참여중입니다.");
+            throw new GameRoomException("INVALID_USER_STATE", "유저가 현재 다른 게임에 참여중입니다.");
         }
 
         GameRoomDto room = gameRoomService.createRoom(GameRoomDto.fromRequest(gameRoomRequest, userId));
