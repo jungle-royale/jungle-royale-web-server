@@ -10,7 +10,7 @@ import com.example.jungleroyal.common.types.UserStatus;
 import com.example.jungleroyal.common.util.*;
 import com.example.jungleroyal.domain.game.GameReturnResponse;
 import com.example.jungleroyal.domain.gameroom.GameRoomDto;
-import com.example.jungleroyal.domain.gameroom.GameRoomJoinReponse;
+import com.example.jungleroyal.domain.gameroom.GameRoomJoinResponse;
 import com.example.jungleroyal.domain.user.UserDto;
 import com.example.jungleroyal.infrastructure.GameRoomJpaEntity;
 import com.example.jungleroyal.infrastructure.UserJpaEntity;
@@ -24,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +36,7 @@ public class GameRoomService {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public GameRoomJoinReponse joinGameRoom(Long roomId, String jwt) {
+    public GameRoomJoinResponse joinGameRoom(Long roomId, String jwt) {
         String userId;
 
         // 유저 확인 (JWT 또는 게스트)
@@ -68,8 +67,8 @@ public class GameRoomService {
         }
 
         // 응답 생성
-        return GameRoomJoinReponse.builder()
-                .roomId(roomUrl)
+        return GameRoomJoinResponse.builder()
+                .roomId(room.getId())
                 .clientId(clientId)
                 .username(user.getUsername())
                 .build();
@@ -176,11 +175,11 @@ public class GameRoomService {
         return gameRoomRepository.getGameUrlById(roomId);
     }
 
-    public void updateRoomStatusByRoomUrl(String roomId, RoomStatus roomStatus) {
-        GameRoomJpaEntity room = gameRoomRepository.findByGameUrl(roomId)
-            .orElseThrow(() -> new RoomNotFoundException("Room not found for URL: ",roomId));
+    public void updateRoomStatusByRoomUrl(Long roomId, RoomStatus roomStatus) { //😎 수정 대상
+        GameRoomJpaEntity room = gameRoomRepository.findById(roomId) //😎 수정 대상
+            .orElseThrow(() -> new RoomNotFoundException("Room not found for roomId: ",roomId));
         room.setStatus(roomStatus);
-        room.setUpdatedAt(LocalDateTime.now());
+        room.setUpdatedAt(TimeUtils.createUtc());
 
         gameRoomRepository.save(room);
     }
@@ -244,7 +243,7 @@ public class GameRoomService {
     }
 
 
-    public void isRoomEnd(GameRoomDto gameRoomDto) {
+    private void isRoomEnd(GameRoomDto gameRoomDto) {
         if (gameRoomDto.getStatus() == RoomStatus.END) {
             throw new GameRoomException("GAME_ROOM_ENDED", "이미 종료된 방입니다.");
         }
@@ -267,7 +266,7 @@ public class GameRoomService {
 
         isRoomEnd(gameRoomDto);
 
-        return GameReturnResponse.create(currentGameUrl, user.getClientId());
+        return GameReturnResponse.create(gameRoomDto.getId(), user.getClientId());
 
     }
 }

@@ -24,6 +24,7 @@ public class UserDto {
     private String currentGameUrl; // 현재 위치하고있는 게임룸 url
     private String clientId; // 방에 접속할 때 사용할 clientId
     private UserStatus userStatus; // 현재 유저 상태 : WAITING || IN_GAME
+    private String giftImageUrl;
 
     public static UserDto fromUserEditMyPageRequest(Long userId, UserEditMyPageRequest userEditMyPageRequest){
         return builder()

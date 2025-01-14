@@ -8,6 +8,6 @@ import java.util.List;
 @Data
 @Builder
 public class StartGameRequest {
-    private String roomId;
+    private String roomId; //😎 long으로 변경
     private List<String> clientIds;
 }

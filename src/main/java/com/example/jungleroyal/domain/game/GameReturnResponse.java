@@ -6,10 +6,10 @@ import lombok.Data;
 @Data
 @Builder
 public class GameReturnResponse {
-    private String roomId;
+    private Long roomId;
     private String clientId;
 
-    public static GameReturnResponse create(String roomId, String clientId){
+    public static GameReturnResponse create(Long roomId, String clientId){
         return GameReturnResponse.builder()
                 .roomId(roomId)
                 .clientId(clientId)

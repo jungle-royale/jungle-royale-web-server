@@ -31,7 +31,7 @@ public class GameRoomController {
     private final SecurityUtil securityUtil;
 
     @PostMapping("/api/rooms/create")
-    public ResponseEntity<GameRoomCreateReponse> createRoom(
+    public ResponseEntity<GameRoomCreateResponse> createRoom(
             @RequestBody GameRoomRequest gameRoomRequest,
             @RequestHeader("Authorization") String authorization
     ) {
@@ -46,7 +46,7 @@ public class GameRoomController {
         GameRoomDto room = gameRoomService.createRoom(GameRoomDto.fromRequest(gameRoomRequest, userId));
         log.info("room = " + room);
 
-        String roomUrl = gameRoomService.getRoomUrlById(room.getId());
+        String roomUrl = gameRoomService.getRoomUrlById(room.getId()); // 😎제거 대상
 
         int minPlayers = room.getMinPlayers();
         // 게임서버로 전송시 분을 초로 변경
@@ -54,7 +54,7 @@ public class GameRoomController {
 
         // 게임 서버와 통신
         GameServerNotificationRequest gameServerNotificationRequest
-                = new GameServerNotificationRequest(roomUrl, minPlayers, maxPlayTime, user.getUsername());
+                = new GameServerNotificationRequest(roomUrl, minPlayers, maxPlayTime, user.getUsername());  // 😎변경 대상
         log.info("🍎request:" + gameServerNotificationRequest.toString());
         GameServerNotificationResponse gameServerResponse
                 = gameServerClient.notifyGameServer(gameServerNotificationRequest, userId);
@@ -71,8 +71,8 @@ public class GameRoomController {
         String clientId = userService.getClientId(); // 새로운 clientId 생성
         userService.updateUserConnectionDetails(Long.parseLong(userId), roomUrl, clientId, true);
 
-        GameRoomCreateReponse response = GameRoomCreateReponse.builder()
-                .roomId(roomUrl)
+        GameRoomCreateResponse response = GameRoomCreateResponse.builder()
+                .roomId(room.getId())
                 .clientId(clientId)
                 .username(user.getUsername())
                 .build();
@@ -138,11 +138,11 @@ public class GameRoomController {
     }
 
     @PostMapping("/api/rooms/{roomId}/join")
-    public ResponseEntity<GameRoomJoinReponse> joinGameRoom(
+    public ResponseEntity<GameRoomJoinResponse> joinGameRoom(
             @RequestHeader(value = "Authorization", required = false) String jwt,
             @PathVariable Long roomId) {
 
-        GameRoomJoinReponse response = gameRoomService.joinGameRoom(roomId, jwt);
+        GameRoomJoinResponse response = gameRoomService.joinGameRoom(roomId, jwt);
         log.info("✅접속한 방 = {}, 접속 유저 닉네임= {}", roomId, response.getUsername());
         return ResponseEntity.ok(response);
     }

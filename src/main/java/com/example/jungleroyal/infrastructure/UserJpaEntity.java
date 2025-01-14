@@ -57,6 +57,9 @@ public class UserJpaEntity {
     @Column(nullable = false)
     private Integer gameMoney = 100000000; // 기본값 0
 
+    private String giftImageUrl;
+    private Integer score;
+
     public static UserJpaEntity createGueutUser(String randomNickname){
 
         return UserJpaEntity.builder()
@@ -84,6 +87,7 @@ public class UserJpaEntity {
                 .updatedAt(userJpaEntity.updatedAt)
                 .gameMoney(userJpaEntity.getGameMoney())
                 .lastLoginAt(userJpaEntity.lastLoginAt)
+                .giftImageUrl(userJpaEntity.getGiftImageUrl())
                 .build();
     }
 

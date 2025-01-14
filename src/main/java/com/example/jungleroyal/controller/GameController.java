@@ -41,8 +41,8 @@ public class GameController {
     public ResponseEntity<String> startGame(@RequestBody StartGameRequest startGameRequest) {
         log.info("🔥게임 시작 요청 - roomId: {}, clientIds: {}", startGameRequest.getRoomId(), startGameRequest.getClientIds());
 
-        String roomId = startGameRequest.getRoomId();
-        gameRoomService.updateRoomStatusByRoomUrl(roomId, RoomStatus.RUNNING);
+        String roomId = startGameRequest.getRoomId(); //😎 변경 대상
+        gameRoomService.updateRoomStatusByRoomUrl(Long.valueOf(roomId), RoomStatus.RUNNING); //😎 수정 대상
         userService.updateUsersToInGame(startGameRequest.getClientIds());
 
         log.info("🔥게임 시작 완료 - roomId: {}", roomId);

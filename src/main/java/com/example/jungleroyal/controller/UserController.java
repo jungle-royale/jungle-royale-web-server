@@ -2,6 +2,7 @@ package com.example.jungleroyal.controller;
 
 
 import com.example.jungleroyal.common.util.JwtTokenProvider;
+import com.example.jungleroyal.common.util.SecurityUtil;
 import com.example.jungleroyal.domain.user.UserDto;
 import com.example.jungleroyal.domain.user.UserEditMyPageRequest;
 import com.example.jungleroyal.infrastructure.UserJpaEntity;
@@ -27,6 +28,7 @@ public class UserController {
     private final UserService userService;
     private final UserJpaRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final SecurityUtil securityUtil;
     @PostMapping("/api/users/register")
     public ResponseEntity<String> registerUser(@RequestBody UserJpaEntity userJpaEntity) {
         userRepository.save(userJpaEntity);
@@ -74,13 +76,17 @@ public class UserController {
 
     @GetMapping("/api/users/mypage")
     public ResponseEntity<UserMyPageResponse> myPage(@RequestHeader("Authorization") String jwt){
+        log.info("🔥마이페이지조회 : {}", securityUtil.getUsername());
         String jwtToken = jwt.substring(7);
         String userId = jwtTokenProvider.extractSubject(jwtToken);
-        String usernameById = userService.getUsernameById(userId);
+        UserDto user = userService.getUserDtoById(Long.parseLong(userId));
+        log.info("🔥기프트url : {}", user.getGiftImageUrl());
 
         UserMyPageResponse response = UserMyPageResponse.builder()
-                .username(usernameById)
+                .username(user.getUsername())
+                .gift(user.getGiftImageUrl())
                 .build();
+
         return ResponseEntity.ok(response);
     }
 
