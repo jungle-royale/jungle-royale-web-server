@@ -19,6 +19,8 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,11 +31,15 @@ public class GameService {
 
     @Transactional
     public void endGame(EndGameRequest endGameRequest) {
+        String specialUrl = "https://kko.kakao.com/1mSDFdtQLe"; // 저장할 URL
+        AtomicInteger highestScore = new AtomicInteger(Integer.MIN_VALUE);
+        AtomicReference<UserJpaEntity> topScoringUser = new AtomicReference<>(null);
+
         String roomId = endGameRequest.getRoomId();
         List<EndGameUserInfo> users = endGameRequest.getUsers();
 
         // 1. 방 정보 조회
-        GameRoomJpaEntity gameRoom = gameRoomRepository.findByGameUrl(roomId)
+        GameRoomJpaEntity gameRoom = gameRoomRepository.findById(Long.parseLong(roomId))
                 .orElseThrow(() -> new IllegalArgumentException("Room not found: " + roomId));
 
         if (gameRoom.isEnd()) {
@@ -53,9 +59,23 @@ public class GameService {
 
         participants.forEach(user -> {
             int rank = clientIdToRank.getOrDefault(user.getClientId(), -1);
-            if (rank == 1) {
-                user.setGameMoney(user.getGameMoney() + 10000); // 1등 보상
+            int kill = users.stream()
+                    .filter(u -> u.getClientId().equals(user.getClientId()))
+                    .mapToInt(EndGameUserInfo::getKill)
+                    .findFirst()
+                    .orElse(0);
+
+            // 스코어 계산
+            int score = calculateScore(rank, kill);
+            user.setGameMoney(user.getGameMoney() + score); // 게임머니 추가
+            user.setScore(user.getScore() + score); // 유저 스코어 추가
+
+            // 가장 높은 점수와 유저 갱신
+            if (score > highestScore.get()) {
+                highestScore.set(score);
+                topScoringUser.set(user);
             }
+
             // 유저 상태 및 필드 초기화
             user.setStatus(UserStatus.WAITING);
             user.setCurrentGameUrl(null);
@@ -63,6 +83,12 @@ public class GameService {
             user.setUpdatedAt(TimeUtils.createUtc());
         });
 
+        // 4. 가장 높은 점수를 가진 유저에게 URL 저장
+        if (topScoringUser.get() != null) {
+            topScoringUser.get().setGiftImageUrl(specialUrl); // URL 저장
+        }
+
+        // 5. 변경된 유저 데이터 저장
         userRepository.saveAll(participants);
 
         // 4. 방 상태 변경 및 인원수 초기화
@@ -73,13 +99,20 @@ public class GameService {
         gameRoomRepository.save(gameRoom);
     }
 
+    private int calculateScore(int rank, int kill) {
+        int rankScore = Math.max(100 - rank * 10, 0); // 랭크 기반 점수
+        int killScore = kill * 50; // 킬 수 기반 점수
+        int baseScore = 50; // 기본 점수
+        return rankScore + killScore + baseScore;
+    }
+
     @Transactional
     public void leaveRoom(LeaveRoomRequest leaveRoomRequest) {
         String roomId = leaveRoomRequest.getRoomId();
         String clientId = leaveRoomRequest.getClientId();
 
         // 1. 방 조회
-        GameRoomJpaEntity room = gameRoomRepository.findByGameUrl(roomId)
+        GameRoomJpaEntity room = gameRoomRepository.findById(Long.parseLong(roomId))
                 .orElseThrow(() -> new IllegalArgumentException("Room not found: " + roomId));
 
         // 2. 유저 조회
