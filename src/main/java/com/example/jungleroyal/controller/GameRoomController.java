@@ -46,7 +46,7 @@ public class GameRoomController {
         GameRoomDto room = gameRoomService.createRoom(GameRoomDto.fromRequest(gameRoomRequest, userId));
         log.info("room = " + room);
 
-        String roomUrl = gameRoomService.getRoomUrlById(room.getId()); // 😎제거 대상
+        String roomUrl = gameRoomService.getRoomUrlById(room.getId());
 
         int minPlayers = room.getMinPlayers();
         // 게임서버로 전송시 분을 초로 변경
@@ -54,7 +54,7 @@ public class GameRoomController {
 
         // 게임 서버와 통신
         GameServerNotificationRequest gameServerNotificationRequest
-                = new GameServerNotificationRequest(roomUrl, minPlayers, maxPlayTime, user.getUsername());  // 😎변경 대상
+                = new GameServerNotificationRequest(String.valueOf(room.getId()), minPlayers, maxPlayTime, user.getUsername());
         log.info("🍎request:" + gameServerNotificationRequest.toString());
         GameServerNotificationResponse gameServerResponse
                 = gameServerClient.notifyGameServer(gameServerNotificationRequest, userId);
