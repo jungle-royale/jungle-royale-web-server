@@ -1,5 +1,6 @@
 package com.example.jungleroyal.common.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -9,6 +10,10 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketStompBrokerConfig implements WebSocketMessageBrokerConfigurer {
+
+    @Value("${websocket.allowed-origins}")
+    private String allowedOrigins;
+
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         // 구독(sub) : 접두사로 시작하는 메시지를 브로커가 처리하도록 설정합니다. 클라이언트는 이 접두사로 시작하는 주제를 구독하여 메시지를 받을 수 있습니다.
@@ -30,7 +35,7 @@ public class WebSocketStompBrokerConfig implements WebSocketMessageBrokerConfigu
                 // 클라이언트가 WebSocket에 연결하기 위한 엔드포인트를 "/ws-stomp"로 설정합니다.
                 .addEndpoint("/ws-stomp")
                 // 클라이언트의 origin을 명시적으로 지정
-                .setAllowedOrigins("<http://localhost:3000>")
+                .setAllowedOrigins(allowedOrigins)
                 // WebSocket을 지원하지 않는 브라우저에서도 SockJS를 통해 WebSocket 기능을 사용할 수 있게 합니다.
                 .withSockJS();
     }
