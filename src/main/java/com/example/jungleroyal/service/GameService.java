@@ -12,6 +12,7 @@ import com.example.jungleroyal.common.types.UserRole;
 import com.example.jungleroyal.service.repository.GameRoomRepository;
 import com.example.jungleroyal.service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,12 +26,14 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class GameService {
     private final GameRoomRepository gameRoomRepository;
     private final UserRepository userRepository;
 
     @Transactional
     public void endGame(EndGameRequest endGameRequest) {
+        log.info("😎 게임 종료 객체 정보  : {}", endGameRequest);
         String specialUrl = "https://kko.kakao.com/1mSDFdtQLe"; // 저장할 URL
         AtomicInteger highestScore = new AtomicInteger(Integer.MIN_VALUE);
         AtomicReference<UserJpaEntity> topScoringUser = new AtomicReference<>(null);
@@ -46,13 +49,14 @@ public class GameService {
             throw new IllegalStateException("이미 종료 처리된 방입니다.");
         }
 
+        log.info("😎 방 정보 : {}", gameRoom);
         // 2. 유저 정보 조회
         List<String> clientIds = users.stream()
                 .map(EndGameUserInfo::getClientId)
                 .collect(Collectors.toList());
 
         List<UserJpaEntity> participants = userRepository.findAllByClientIds(clientIds);
-
+        log.info("😎 유저 정보 : {}", participants);
         // 3. 게임머니 지급 및 상태 초기화
         Map<String, Integer> clientIdToRank = users.stream()
                 .collect(Collectors.toMap(EndGameUserInfo::getClientId, EndGameUserInfo::getRank));
@@ -84,10 +88,10 @@ public class GameService {
         });
 
         // 4. 가장 높은 점수를 가진 유저에게 URL 저장
-        if (topScoringUser.get() != null) {
+        if (topScoringUser.get() != null && gameRoom.getHostId().equals("3")) {
             topScoringUser.get().setGiftImageUrl(specialUrl); // URL 저장
         }
-
+        log.info("😎 1등 유저  : {}", topScoringUser);
         // 5. 변경된 유저 데이터 저장
         userRepository.saveAll(participants);
 
