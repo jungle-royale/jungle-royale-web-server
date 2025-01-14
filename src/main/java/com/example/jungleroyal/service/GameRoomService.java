@@ -10,7 +10,7 @@ import com.example.jungleroyal.common.types.UserStatus;
 import com.example.jungleroyal.common.util.*;
 import com.example.jungleroyal.domain.game.GameReturnResponse;
 import com.example.jungleroyal.domain.gameroom.GameRoomDto;
-import com.example.jungleroyal.domain.gameroom.GameRoomJoinReponse;
+import com.example.jungleroyal.domain.gameroom.GameRoomJoinResponse;
 import com.example.jungleroyal.domain.user.UserDto;
 import com.example.jungleroyal.infrastructure.GameRoomJpaEntity;
 import com.example.jungleroyal.infrastructure.UserJpaEntity;
@@ -24,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +36,7 @@ public class GameRoomService {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public GameRoomJoinReponse joinGameRoom(Long roomId, String jwt) {
+    public GameRoomJoinResponse joinGameRoom(Long roomId, String jwt) {
         String userId;
 
         // 유저 확인 (JWT 또는 게스트)
@@ -68,8 +67,8 @@ public class GameRoomService {
         }
 
         // 응답 생성
-        return GameRoomJoinReponse.builder()
-                .roomId(roomUrl)
+        return GameRoomJoinResponse.builder()
+                .roomId(room.getId())
                 .clientId(clientId)
                 .username(user.getUsername())
                 .build();

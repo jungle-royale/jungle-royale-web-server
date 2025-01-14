@@ -6,9 +6,6 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-/**
- * 게임 생성 response
- */
 @Data
 @Builder
 public class GameRoomResponse {

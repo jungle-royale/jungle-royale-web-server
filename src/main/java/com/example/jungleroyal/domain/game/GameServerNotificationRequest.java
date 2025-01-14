@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GameServerNotificationRequest {
-    private String roomId;
+    private String roomId; // 😎변경 대상
     private int minPlayers;
     private int maxPlayTime; // seconds
     private String username;
