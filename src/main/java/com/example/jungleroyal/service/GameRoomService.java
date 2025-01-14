@@ -175,11 +175,11 @@ public class GameRoomService {
         return gameRoomRepository.getGameUrlById(roomId);
     }
 
-    public void updateRoomStatusByRoomUrl(String roomId, RoomStatus roomStatus) {
-        GameRoomJpaEntity room = gameRoomRepository.findByGameUrl(roomId)
+    public void updateRoomStatusByRoomUrl(String roomId, RoomStatus roomStatus) { //😎 수정 대상
+        GameRoomJpaEntity room = gameRoomRepository.findByGameUrl(roomId) //😎 수정 대상
             .orElseThrow(() -> new RoomNotFoundException("Room not found for URL: ",roomId));
         room.setStatus(roomStatus);
-        room.setUpdatedAt(LocalDateTime.now());
+        room.setUpdatedAt(TimeUtils.createUtc());
 
         gameRoomRepository.save(room);
     }
@@ -243,7 +243,7 @@ public class GameRoomService {
     }
 
 
-    public void isRoomEnd(GameRoomDto gameRoomDto) {
+    private void isRoomEnd(GameRoomDto gameRoomDto) {
         if (gameRoomDto.getStatus() == RoomStatus.END) {
             throw new GameRoomException("GAME_ROOM_ENDED", "이미 종료된 방입니다.");
         }
@@ -266,7 +266,7 @@ public class GameRoomService {
 
         isRoomEnd(gameRoomDto);
 
-        return GameReturnResponse.create(currentGameUrl, user.getClientId());
+        return GameReturnResponse.create(gameRoomDto.getId(), user.getClientId());
 
     }
 }
