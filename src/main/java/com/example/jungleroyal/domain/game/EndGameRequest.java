@@ -9,6 +9,6 @@ import java.util.List;
 @Data
 @Builder
 public class EndGameRequest {
-    private String roomId;
+    private String roomId; //😎 수정 대상
     private List<EndGameUserInfo> users;
 }

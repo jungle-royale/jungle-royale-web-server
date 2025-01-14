@@ -175,9 +175,9 @@ public class GameRoomService {
         return gameRoomRepository.getGameUrlById(roomId);
     }
 
-    public void updateRoomStatusByRoomUrl(String roomId, RoomStatus roomStatus) { //😎 수정 대상
-        GameRoomJpaEntity room = gameRoomRepository.findByGameUrl(roomId) //😎 수정 대상
-            .orElseThrow(() -> new RoomNotFoundException("Room not found for URL: ",roomId));
+    public void updateRoomStatusByRoomUrl(Long roomId, RoomStatus roomStatus) { //😎 수정 대상
+        GameRoomJpaEntity room = gameRoomRepository.findById(roomId) //😎 수정 대상
+            .orElseThrow(() -> new RoomNotFoundException("Room not found for roomId: ",roomId));
         room.setStatus(roomStatus);
         room.setUpdatedAt(TimeUtils.createUtc());
 
