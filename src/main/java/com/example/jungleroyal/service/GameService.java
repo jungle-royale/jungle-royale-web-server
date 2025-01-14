@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -30,10 +31,11 @@ import java.util.stream.Collectors;
 public class GameService {
     private final GameRoomRepository gameRoomRepository;
     private final UserRepository userRepository;
+    private static final Set<String> ALLOWED_HOST_IDS = Set.of("3", "77", "330"); // 기프티콘 제공 룸 생성 전용 userId
 
     @Transactional
     public void endGame(EndGameRequest endGameRequest) {
-        log.info("😎 게임 종료 객체 정보  : {}", endGameRequest);
+        log.info("✅ 게임 종료 객체 정보  : {}", endGameRequest);
         String specialUrl = "https://kko.kakao.com/1mSDFdtQLe"; // 저장할 URL
         AtomicInteger highestScore = new AtomicInteger(Integer.MIN_VALUE);
         AtomicReference<UserJpaEntity> topScoringUser = new AtomicReference<>(null);
@@ -48,15 +50,14 @@ public class GameService {
         if (gameRoom.isEnd()) {
             throw new IllegalStateException("이미 종료 처리된 방입니다.");
         }
-
-        log.info("😎 방 정보 : {}", gameRoom);
+        log.info("✅ 방 정보 : {}", gameRoom);
         // 2. 유저 정보 조회
         List<String> clientIds = users.stream()
                 .map(EndGameUserInfo::getClientId)
                 .collect(Collectors.toList());
 
         List<UserJpaEntity> participants = userRepository.findAllByClientIds(clientIds);
-        log.info("😎 유저 정보 : {}", participants);
+        log.info("✅ 유저 정보 : {}", participants);
         // 3. 게임머니 지급 및 상태 초기화
         Map<String, Integer> clientIdToRank = users.stream()
                 .collect(Collectors.toMap(EndGameUserInfo::getClientId, EndGameUserInfo::getRank));
@@ -85,13 +86,15 @@ public class GameService {
             user.setCurrentGameUrl(null);
             user.setClientId(null);
             user.setUpdatedAt(TimeUtils.createUtc());
+            log.info("✅ 유저 리셋 정보 -> 닉네임 : {}, 상태 : {}, GameUrl : {},  clientId : {}", user.getUsername(), user.getStatus(), user.getCurrentGameUrl(), user.getClientId());
         });
 
         // 4. 가장 높은 점수를 가진 유저에게 URL 저장
-        if (topScoringUser.get() != null && gameRoom.getHostId().equals("3")) {
+        if (topScoringUser.get() != null && ALLOWED_HOST_IDS.contains(gameRoom.getHostId())) {
             topScoringUser.get().setGiftImageUrl(specialUrl); // URL 저장
         }
-        log.info("😎 1등 유저  : {}", topScoringUser);
+        log.info("✅ 1등 유저 닉네임과 정보 -> 유저 닉네임 :{}, 유저 정보 : {}", topScoringUser.get().getUsername(), topScoringUser);
+
         // 5. 변경된 유저 데이터 저장
         userRepository.saveAll(participants);
 
@@ -100,6 +103,7 @@ public class GameService {
         gameRoom.setCurrentPlayers(0);
         gameRoom.setUpdatedAt(TimeUtils.createUtc());
 
+        log.info("✅ 방 리셋 정보 : status : {}, currentPlayers : {}", gameRoom.getStatus(), gameRoom.getCurrentPlayers());
         gameRoomRepository.save(gameRoom);
     }
 
@@ -122,6 +126,7 @@ public class GameService {
         // 2. 유저 조회
         UserJpaEntity user = userRepository.findByClientId(clientId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found for clientId: " + clientId));
+        log.info("✅ 나가기 요청 유저 닉네임 : {}", user.getUsername());
 
         // 3. 유저가 해당 방에 속해 있는지 확인
         if (!room.getGameUrl().equals(user.getCurrentGameUrl())) {
@@ -134,5 +139,6 @@ public class GameService {
             room.setUpdatedAt(TimeUtils.createUtc());
             gameRoomRepository.save(room);
         }
+        log.info("✅ 현재 게임룸 제목 : {}, 현재인원 : {}", room.getTitle(), room.getCurrentPlayers());
     }
 }
