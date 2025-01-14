@@ -19,6 +19,9 @@ spring:
 #  redisson:
 #    address: redis://jungle-royale-redis-cache-001.bgoupc.0001.apn2.cache.amazonaws.com:6379
 
+websocket:
+  allowed-origins : "http://web-api.eternalsnowman.com:8080"
+
 game-server:
   base-url: "http://game-api.eternalsnowman.com:8080/api"
 
