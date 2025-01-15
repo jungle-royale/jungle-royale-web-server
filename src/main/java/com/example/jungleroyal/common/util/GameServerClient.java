@@ -8,7 +8,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
+
+import java.net.ConnectException;
+
 
 @Component
 @RequiredArgsConstructor
@@ -40,9 +44,20 @@ public class GameServerClient {
 
             log.info("Received response from game server: {}", response.getBody());
             return response.getBody();
+        } catch (ResourceAccessException e) {
+            // ResourceAccessException의 원인이 ConnectException인지 확인
+            if (e.getCause() instanceof ConnectException) {
+                log.error("🚫 게임 서버에 연결할 수 없습니다. URL: {}", gameServerUrl, e);
+                gameRoomService.deleteRoom(gameServerNotificationRequest.getRoomId());
+                throw new IllegalStateException("게임 서버에 연결할 수 없습니다. 네트워크 상태를 확인하세요.", e);
+            }
+            // 다른 ResourceAccessException 처리
+            log.error("🚨 게임 서버와 통신 중 문제가 발생했습니다. URL: {}", gameServerUrl, e);
+            throw new IllegalStateException("게임 서버와 통신 중 문제가 발생했습니다.", e);
+
         } catch (Exception e) {
             gameRoomService.deleteRoom(gameServerNotificationRequest.getRoomId());
-            log.error("Error while communicating with the game server", e);
+            log.error("🚨게임 서버와 통신 중 문제가 발생했습니다. URL: {}", gameServerUrl, e);
             throw new IllegalStateException("게임 서버와 통신 중 문제가 발생했습니다.", e);
         }
     }
