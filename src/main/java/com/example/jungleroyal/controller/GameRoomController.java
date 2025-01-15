@@ -140,9 +140,9 @@ public class GameRoomController {
     @PostMapping("/api/rooms/{roomId}/join")
     public ResponseEntity<GameRoomJoinResponse> joinGameRoom(
             @RequestHeader(value = "Authorization", required = false) String jwt,
-            @PathVariable Long roomId) {
+            @PathVariable String roomId) {
 
-        GameRoomJoinResponse response = gameRoomService.joinGameRoom(roomId, jwt);
+        GameRoomJoinResponse response = gameRoomService.joinGameRoom(Long.parseLong(roomId), jwt);
         log.info("✅접속한 방 = {}, 접속 유저 닉네임= {}", roomId, response.getUsername());
         return ResponseEntity.ok(response);
     }

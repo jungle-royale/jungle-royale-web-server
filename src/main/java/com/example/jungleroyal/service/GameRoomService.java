@@ -106,12 +106,12 @@ public class GameRoomService {
         gameRoomRepository.save(room);
     }
 
-    public void deleteRoom(String gameUrl) {
+    public void deleteRoom(String userId) {
 
-        GameRoomJpaEntity room = gameRoomRepository.findByGameUrl(gameUrl)
-                .orElseThrow(() -> new RoomByGameUrlFoundException(gameUrl));
+        GameRoomJpaEntity room = gameRoomRepository.findById(Long.parseLong(userId))
+                .orElseThrow(() -> new RoomByGameUrlFoundException(userId));
         gameRoomRepository.delete(room);
-        log.info("✅게임룸 삭제 완료 : {}" , gameUrl);
+        log.info("✅게임룸 삭제 완료 : {}" , userId);
     }
 
     @Transactional
