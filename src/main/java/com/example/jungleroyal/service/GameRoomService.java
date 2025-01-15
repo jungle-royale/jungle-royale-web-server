@@ -249,12 +249,11 @@ public class GameRoomService {
         }
     }
 
-    public GameReturnResponse returnGame(String jwt) {
-
-        String jwtToken = jwt.substring(7);
-        String userId = jwtTokenProvider.extractSubject(jwtToken);
+    public GameReturnResponse returnGame(String userId) {
 
         UserDto user = userService.getUserDtoById(Long.parseLong(userId));
+
+        log.info("✅ 리턴하는 유저 닉네임 : {}", user.getUsername());
 
         if (user.getUserStatus() != UserStatus.IN_GAME) {
             throw new GameRoomException("USER_NOT_IN_GAME", "유저가 게임에 참여 중이 아니므로 다시 돌아갈 수 없습니다.");
