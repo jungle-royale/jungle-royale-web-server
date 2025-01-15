@@ -55,4 +55,9 @@ public class UserRepositoryImpl implements UserRepository {
     public boolean existsByUsername(String username) {
         return userJpaRepository.existsByUsername(username);
     }
+
+    @Override
+    public List<UserJpaEntity> findAll() {
+        return userJpaRepository.findAll();
+    }
 }

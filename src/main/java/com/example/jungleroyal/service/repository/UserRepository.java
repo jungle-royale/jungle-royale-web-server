@@ -23,4 +23,6 @@ public interface UserRepository {
     Optional<UserJpaEntity> findByClientId(String clientId);
 
     boolean existsByUsername(String nickname);
+
+    List<UserJpaEntity> findAll();
 }

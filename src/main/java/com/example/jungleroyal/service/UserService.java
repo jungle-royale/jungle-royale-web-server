@@ -117,6 +117,7 @@ public class UserService {
      * @exception UserAlreadyInGameException 유저가 이미 게임중이거나 참여한 게임이 아직 끝나지 않았을 때 발생
      * @exception GameRoomException 방이 존재하지 않거나 정원이 초과된 경우 발생
      */
+
     @Transactional
     public void updateUserConnectionDetails(long userId, String gameRoomUrl, String clientId, boolean isCreatingRoom) {
         UserJpaEntity user = userRepository.findById(userId)
@@ -201,6 +202,40 @@ public class UserService {
 
         userRepository.saveAll(users);
         log.info("Reverted users to WAITING by clientIds: {}", clientIds);
+    }
+
+    public String calculateUserRank(Long userId) {
+        // 모든 유저를 가져와 점수 기준으로 정렬
+        List<UserJpaEntity> allUsers = userRepository.findAll();
+        allUsers.sort((u1, u2) -> u2.getScore().compareTo(u1.getScore())); // score 내림차순 정렬
+
+        // 유저의 등수를 계산
+        int rank = 1;
+        int previousScore = -1;
+        int actualRank = 1;
+
+        for (UserJpaEntity user : allUsers) {
+
+            // 점수가 0이면 "-"로 처리
+            if (user.getId().equals(userId) && user.getScore() == 0) {
+                return "-";
+            }
+
+            if (!user.getScore().equals(previousScore)) {
+                actualRank = rank; // 점수가 달라지면 실제 등수 갱신
+            }
+
+            if (user.getId().equals(userId)) {
+                // 100등 초과인 경우
+                return actualRank > 100 ? "100등 이외" : String.valueOf(actualRank);
+            }
+
+            previousScore = user.getScore();
+            rank++;
+        }
+
+        // 유저를 찾지 못한 경우
+        throw new IllegalArgumentException("User not found");
     }
 
     public UserDto getUserDtoById(long userId) {

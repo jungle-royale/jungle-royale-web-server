@@ -109,14 +109,28 @@ public class GameRoomController {
         long userId = Long.parseLong(securityUtil.getUserId());
         UserJpaEntity userJpaEntityById = userService.getUserJpaEntityById(userId);
 
-        UserInfoUsingRoomListResponse userInfoUsingRoomListResponse = UserInfoUsingRoomListResponse.create(userJpaEntityById.getUsername(), userJpaEntityById.getStatus());
+        String rank = userService.calculateUserRank(userId);
+
+        UserInfoUsingRoomListResponse userInfoUsingRoomListResponse = UserInfoUsingRoomListResponse.create(
+                userJpaEntityById.getUsername(),
+                userJpaEntityById.getStatus(),
+                userJpaEntityById.getScore(),
+                rank
+        );
+
         List<GameRoomListResponse> responseList = gameRoomService.listOfShowableRoom()
                 .stream()
                 .map(GameRoomListResponse::fromDto) // GameRoomDto → GameRoomResponse 변환
                 .toList();
-        GameRoomListWithUserReponse gameRoomListWithUserReponse = GameRoomListWithUserReponse.create(userInfoUsingRoomListResponse, responseList);
+
+        GameRoomListWithUserReponse gameRoomListWithUserReponse = GameRoomListWithUserReponse.create(
+                userInfoUsingRoomListResponse,
+                responseList
+        );
         return ResponseEntity.ok(gameRoomListWithUserReponse);
     }
+
+
 
     @GetMapping("/api/rooms/{roomId}")
     public ResponseEntity<GameRoomResponse> getRoomById(@PathVariable Long roomId) {
