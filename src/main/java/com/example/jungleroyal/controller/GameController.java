@@ -30,6 +30,7 @@ public class GameController {
     private final UserService userService;
     private final GameService gameService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final SecurityUtil securityUtil;
 
     /**
      * 게임 시작 api
@@ -98,10 +99,10 @@ public class GameController {
      * @return roomUrl, clientId
      */
     @PostMapping("/api/game/return")
-    public ResponseEntity<GameReturnResponse> returnGame(@RequestHeader("Authorization") String jwt) {
-        log.info("🔥게임 되돌아가기 요청 - JWT: {}", jwt);
-        log.info("🔥게임 되돌아가기 요청 - UserName: {}", jwtTokenProvider.extractUsername(jwt));
-        GameReturnResponse response = gameRoomService.returnGame(jwt);
+    public ResponseEntity<GameReturnResponse> returnGame(@RequestHeader(value = "Authorization", required = false) String jwt) {
+        String jwtToken = jwt.substring(7);
+        String userId = jwtTokenProvider.extractSubject(jwtToken);
+        GameReturnResponse response = gameRoomService.returnGame(userId);
 
         log.info("🔥게임 되돌아가기 처리 완료 - roomUrl: {}, clientId: {}", response.getRoomId(), response.getClientId());
 
