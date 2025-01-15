@@ -50,7 +50,15 @@ public class GameService {
         if (gameRoom.isEnd()) {
             throw new IllegalStateException("이미 종료 처리된 방입니다.");
         }
-        log.info("✅ 방 정보 : {}", gameRoom);
+
+        // 4. 방 상태 변경 및 인원수 초기화
+        gameRoom.setStatus(RoomStatus.END);
+        gameRoom.setCurrentPlayers(0);
+        gameRoom.setUpdatedAt(TimeUtils.createUtc());
+
+        log.info("✅ 방 리셋 정보 : status : {}, currentPlayers : {}", gameRoom.getStatus(), gameRoom.getCurrentPlayers());
+        gameRoomRepository.save(gameRoom);
+
         // 2. 유저 정보 조회
         List<String> clientIds = users.stream()
                 .map(EndGameUserInfo::getClientId)
@@ -101,14 +109,6 @@ public class GameService {
 
         // 5. 변경된 유저 데이터 저장
         userRepository.saveAll(participants);
-
-        // 4. 방 상태 변경 및 인원수 초기화
-        gameRoom.setStatus(RoomStatus.END);
-        gameRoom.setCurrentPlayers(0);
-        gameRoom.setUpdatedAt(TimeUtils.createUtc());
-
-        log.info("✅ 방 리셋 정보 : status : {}, currentPlayers : {}", gameRoom.getStatus(), gameRoom.getCurrentPlayers());
-        gameRoomRepository.save(gameRoom);
     }
 
     private int calculateScore(int rank, int kill) {
