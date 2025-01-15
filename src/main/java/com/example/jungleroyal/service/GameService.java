@@ -89,11 +89,15 @@ public class GameService {
             log.info("✅ 유저 리셋 정보 -> 닉네임 : {}, 상태 : {}, GameUrl : {},  clientId : {}", user.getUsername(), user.getStatus(), user.getCurrentGameUrl(), user.getClientId());
         });
 
+
         // 4. 가장 높은 점수를 가진 유저에게 URL 저장
         if (topScoringUser.get() != null && ALLOWED_HOST_IDS.contains(gameRoom.getHostId())) {
             topScoringUser.get().setGiftImageUrl(specialUrl); // URL 저장
         }
-        log.info("✅ 1등 유저 닉네임과 정보 -> 유저 닉네임 :{}, 유저 정보 : {}", topScoringUser.get().getUsername(), topScoringUser);
+
+        if (topScoringUser.get() != null){
+            log.info("✅ 1등 유저 닉네임과 정보 -> 유저 닉네임 :{}, 유저 정보 : {}", topScoringUser.get().getUsername(), topScoringUser);
+        }
 
         // 5. 변경된 유저 데이터 저장
         userRepository.saveAll(participants);
