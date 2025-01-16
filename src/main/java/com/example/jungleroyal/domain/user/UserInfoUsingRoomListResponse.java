@@ -11,13 +11,18 @@ public class UserInfoUsingRoomListResponse {
     private UserStatus userStatus;
     private Integer score;
     private String rank;
+    private String tier;
+//    private String tierImageUrl; // 티어 이미지 URL 추가
 
-    public static UserInfoUsingRoomListResponse create(String username, UserStatus userStatus, Integer score, String rank){
+
+    public static UserInfoUsingRoomListResponse create(String username, UserStatus userStatus, Integer score, String rank, String tier){
         return UserInfoUsingRoomListResponse.builder()
                 .userStatus(userStatus)
                 .username(username)
                 .score(score)
                 .rank(rank)
+                .tier(tier)
+//                .tierImageUrl(tierImageUrl)
                 .build();
     }
 }
