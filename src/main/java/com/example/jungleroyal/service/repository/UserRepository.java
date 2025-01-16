@@ -25,4 +25,6 @@ public interface UserRepository {
     boolean existsByUsername(String nickname);
 
     List<UserJpaEntity> findAll();
+
+    List<UserJpaEntity> findTop100ByScoreExcludeAdmins(List<Long> adminIds);
 }
