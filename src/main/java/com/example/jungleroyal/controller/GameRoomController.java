@@ -1,11 +1,13 @@
 package com.example.jungleroyal.controller;
 
+import com.example.jungleroyal.common.config.TierConfig;
 import com.example.jungleroyal.common.exception.GameRoomException;
 import com.example.jungleroyal.common.types.GameRoomStatus;
 import com.example.jungleroyal.common.types.RoomStatus;
 import com.example.jungleroyal.common.types.UserStatus;
 import com.example.jungleroyal.common.util.GameServerClient;
 import com.example.jungleroyal.common.util.SecurityUtil;
+import com.example.jungleroyal.domain.dto.TierDto;
 import com.example.jungleroyal.domain.game.GameServerNotificationRequest;
 import com.example.jungleroyal.domain.game.GameServerNotificationResponse;
 import com.example.jungleroyal.domain.gameroom.*;
@@ -13,6 +15,7 @@ import com.example.jungleroyal.domain.user.UserDto;
 import com.example.jungleroyal.domain.user.UserInfoUsingRoomListResponse;
 import com.example.jungleroyal.infrastructure.UserJpaEntity;
 import com.example.jungleroyal.service.GameRoomService;
+import com.example.jungleroyal.service.TierService;
 import com.example.jungleroyal.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +32,7 @@ public class GameRoomController {
     private final UserService userService;
     private final GameServerClient gameServerClient;
     private final SecurityUtil securityUtil;
+    private final TierService tierService;
 
     @PostMapping("/api/rooms/create")
     public ResponseEntity<GameRoomCreateResponse> createRoom(
@@ -111,11 +115,15 @@ public class GameRoomController {
 
         String rank = userService.calculateUserRank(userId);
 
+        // 티어계산
+        TierDto tier = tierService.getTierByScore(userJpaEntityById.getScore());
+
         UserInfoUsingRoomListResponse userInfoUsingRoomListResponse = UserInfoUsingRoomListResponse.create(
                 userJpaEntityById.getUsername(),
                 userJpaEntityById.getStatus(),
                 userJpaEntityById.getScore(),
-                rank
+                rank,
+                tier.getName()
         );
 
         List<GameRoomListResponse> responseList = gameRoomService.listOfShowableRoom()
