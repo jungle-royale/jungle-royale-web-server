@@ -23,6 +23,7 @@ jwt:
       - /api/auth/refresh
       - /api/auth/guest/login
       - /api/uploads
+      - /ws-stomp
 
 
 scheduler:
