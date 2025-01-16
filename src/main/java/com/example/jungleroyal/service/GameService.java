@@ -83,6 +83,14 @@ public class GameService {
             user.setGameMoney(user.getGameMoney() + score); // 게임머니 추가
             user.setScore(user.getScore() + score); // 유저 스코어 추가
 
+            // 누적 킬 수 업데이트
+            user.setTotalKills(user.getTotalKills() + kill);
+
+            // 1등 횟수 업데이트
+            if (rank == 1) {
+                user.setTotalFirstPlace(user.getTotalFirstPlace() + 1);
+            }
+
             // 가장 높은 점수와 유저 갱신
             if (score > highestScore.get()) {
                 highestScore.set(score);

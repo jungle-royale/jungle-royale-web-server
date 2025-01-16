@@ -57,6 +57,12 @@ public class UserJpaEntity {
     @Column(nullable = false)
     private Integer gameMoney = 100000000; // 기본값 0
 
+    @Column(name = "total_kills", nullable = false)
+    private int totalKills; // 누적 킬 수
+
+    @Column(name = "total_first_place", nullable = false)
+    private int totalFirstPlace; // 누적 1등 횟수
+
     private String giftImageUrl;
     private Integer score;
 
@@ -69,6 +75,8 @@ public class UserJpaEntity {
                 .status(UserStatus.WAITING)
                 .gameMoney(100000000)
                 .score(0)
+                .totalKills(0)
+                .totalFirstPlace(0)
                 .createdAt(TimeUtils.createUtc())
                 .updatedAt(TimeUtils.createUtc())
                 .lastLoginAt(TimeUtils.createUtc())
@@ -86,6 +94,8 @@ public class UserJpaEntity {
                 .clientId(userJpaEntity.getClientId())
                 .createdAt(userJpaEntity.createdAt)
                 .updatedAt(userJpaEntity.updatedAt)
+                .totalKills(userJpaEntity.getTotalKills())
+                .totalFirstPlace(userJpaEntity.getTotalFirstPlace())
                 .gameMoney(userJpaEntity.getGameMoney())
                 .lastLoginAt(userJpaEntity.lastLoginAt)
                 .giftImageUrl(userJpaEntity.getGiftImageUrl())
@@ -100,6 +110,8 @@ public class UserJpaEntity {
                 .gameMoney(100000000)
                 .status(UserStatus.WAITING)
                 .score(0)
+                .totalKills(0)
+                .totalFirstPlace(0)
                 .createdAt(TimeUtils.createUtc())
                 .updatedAt(TimeUtils.createUtc())
                 .lastLoginAt(TimeUtils.createUtc())
