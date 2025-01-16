@@ -60,4 +60,9 @@ public class UserRepositoryImpl implements UserRepository {
     public List<UserJpaEntity> findAll() {
         return userJpaRepository.findAll();
     }
+
+    @Override
+    public List<UserJpaEntity> findTop100ByScoreExcludeAdmins(List<Long> adminIds) {
+        return userJpaRepository.findTop100ByScoreExcludeAdmins(adminIds);
+    }
 }

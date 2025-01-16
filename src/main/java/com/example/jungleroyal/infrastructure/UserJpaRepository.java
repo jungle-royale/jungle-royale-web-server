@@ -18,4 +18,7 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, Long> {
     Optional<UserJpaEntity> findByClientId(String clientId);
 
     boolean existsByUsername(String username);
+
+    @Query("SELECT u FROM UserJpaEntity u WHERE u.score > 0 AND u.id NOT IN :adminIds ORDER BY u.score DESC, u.username ASC")
+    List<UserJpaEntity> findTop100ByScoreExcludeAdmins(@Param("adminIds") List<Long> adminIds);
 }

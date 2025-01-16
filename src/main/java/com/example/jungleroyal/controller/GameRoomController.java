@@ -1,6 +1,5 @@
 package com.example.jungleroyal.controller;
 
-import com.example.jungleroyal.common.config.TierConfig;
 import com.example.jungleroyal.common.exception.GameRoomException;
 import com.example.jungleroyal.common.types.GameRoomStatus;
 import com.example.jungleroyal.common.types.RoomStatus;

@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 public class GameService {
     private final GameRoomRepository gameRoomRepository;
     private final UserRepository userRepository;
-    private static final Set<String> ALLOWED_HOST_IDS = Set.of("3", "77", "330"); // 기프티콘 제공 룸 생성 전용 userId
+    private static final Set<String> ALLOWED_HOST_IDS = Set.of("3", "77", "330", "336", "847"); // 기프티콘 제공 룸 생성 전용 userId
 
     @Transactional
     public void endGame(EndGameRequest endGameRequest) {
@@ -82,6 +82,14 @@ public class GameService {
             int score = calculateScore(rank, kill);
             user.setGameMoney(user.getGameMoney() + score); // 게임머니 추가
             user.setScore(user.getScore() + score); // 유저 스코어 추가
+
+            // 누적 킬 수 업데이트
+            user.setTotalKills(user.getTotalKills() + kill);
+
+            // 1등 횟수 업데이트
+            if (rank == 1) {
+                user.setTotalFirstPlace(user.getTotalFirstPlace() + 1);
+            }
 
             // 가장 높은 점수와 유저 갱신
             if (score > highestScore.get()) {

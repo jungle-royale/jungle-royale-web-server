@@ -6,6 +6,8 @@ import com.example.jungleroyal.common.types.UserStatus;
 import com.example.jungleroyal.common.util.HashUtil;
 import com.example.jungleroyal.common.util.RandomNicknameGenerator;
 import com.example.jungleroyal.common.util.TimeUtils;
+import com.example.jungleroyal.domain.dto.RankingResponseDTO;
+import com.example.jungleroyal.domain.dto.TierDto;
 import com.example.jungleroyal.domain.user.UserDto;
 import com.example.jungleroyal.infrastructure.GameRoomJpaEntity;
 import com.example.jungleroyal.infrastructure.InventoryJpaEntity;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +32,7 @@ public class UserService {
     private final RandomNicknameGenerator randomNicknameGenerator;
     private final InventoryRepository inventoryRepository;
     private final GameRoomRepository gameRoomRepository;
+    private final TierService tierService;
 
     public UserJpaEntity getUserJpaEntityById(Long userId){
         // UserJpaEntity 조회
@@ -236,6 +240,26 @@ public class UserService {
 
         // 유저를 찾지 못한 경우
         throw new IllegalArgumentException("User not found");
+    }
+
+    @Transactional(readOnly = true)
+    public List<RankingResponseDTO> getTop50Ranking() {
+//        List<Long> adminIds = List.of(3L, 77L, 330L, 336L, 847L);
+        List<Long> adminIds = List.of(307L);
+
+        // Fetch top 100 users excluding admins
+        List<UserJpaEntity> users = userRepository.findTop100ByScoreExcludeAdmins(adminIds);
+
+        // Filter out users with score 0 and limit to 100
+        return userRepository.findTop100ByScoreExcludeAdmins(adminIds)
+                .stream()
+                .filter(user -> user.getScore() > 0) // 추가적인 0점 필터링
+                .limit(50)
+                .map(user -> {
+                    TierDto tier = tierService.getTierByScore(user.getScore());
+                    return RankingResponseDTO.from(user, tier.getName());
+                })
+                .collect(Collectors.toList());
     }
 
     public UserDto getUserDtoById(long userId) {

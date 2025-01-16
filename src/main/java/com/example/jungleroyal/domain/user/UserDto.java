@@ -25,6 +25,8 @@ public class UserDto {
     private String clientId; // 방에 접속할 때 사용할 clientId
     private UserStatus userStatus; // 현재 유저 상태 : WAITING || IN_GAME
     private String giftImageUrl;
+    private int totalKills; // 누적 킬 수
+    private int totalFirstPlace; // 누적 1등 횟수
 
     public static UserDto fromUserEditMyPageRequest(Long userId, UserEditMyPageRequest userEditMyPageRequest){
         return builder()

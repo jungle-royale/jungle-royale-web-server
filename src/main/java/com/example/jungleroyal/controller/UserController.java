@@ -3,6 +3,7 @@ package com.example.jungleroyal.controller;
 
 import com.example.jungleroyal.common.util.JwtTokenProvider;
 import com.example.jungleroyal.common.util.SecurityUtil;
+import com.example.jungleroyal.domain.dto.RankingResponseDTO;
 import com.example.jungleroyal.domain.user.UserDto;
 import com.example.jungleroyal.domain.user.UserEditMyPageRequest;
 import com.example.jungleroyal.infrastructure.UserJpaEntity;
@@ -18,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -101,6 +103,12 @@ public class UserController {
         userService.updateNickName(userDto);
 
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/api/users/ranking/top50")
+    public ResponseEntity<List<RankingResponseDTO>> getTop100Ranking(){
+        List<RankingResponseDTO> ranking = userService.getTop50Ranking();
+        return ResponseEntity.ok(ranking);
     }
 
 }
