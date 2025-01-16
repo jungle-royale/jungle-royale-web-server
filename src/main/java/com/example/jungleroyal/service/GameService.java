@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 public class GameService {
     private final GameRoomRepository gameRoomRepository;
     private final UserRepository userRepository;
-    private static final Set<String> ALLOWED_HOST_IDS = Set.of("3", "77", "330"); // 기프티콘 제공 룸 생성 전용 userId
+    private static final Set<String> ALLOWED_HOST_IDS = Set.of("3", "77", "330", "336", "847"); // 기프티콘 제공 룸 생성 전용 userId
 
     @Transactional
     public void endGame(EndGameRequest endGameRequest) {
