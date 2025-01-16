@@ -50,7 +50,6 @@ public class RandomNicknameGenerator {
     public String generate(){
         int attempts = 0;
         final int maxAttempts = 10; // 닉네임 생성 시도 횟수 제한
-        final long timestamp = System.currentTimeMillis(); // 현재 timestamp를 가져옴
 
         String nickname;
         do {
@@ -58,12 +57,6 @@ public class RandomNicknameGenerator {
             String adjective = ADJECTIVES[RANDOM.nextInt(ADJECTIVES.length)];
             String noun = NOUNS[RANDOM.nextInt(NOUNS.length)];
             nickname = MessageFormat.format("{0}{1}", adjective, noun);
-
-            // 6자리 숫자 생성 (timestamp에서 마지막 6자리 추출)
-            String uniqueSuffix = String.format("%06d", timestamp % 1000000);
-
-            // 닉네임 생성
-            nickname = MessageFormat.format("{0}{1}_{2}", adjective, noun, uniqueSuffix);
 
             // 중복 체크
             if (!userRepository.existsByUsername(nickname)) {
