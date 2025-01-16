@@ -265,7 +265,7 @@ public class GameRoomService {
 
         isRoomEnd(gameRoomDto);
 
-        return GameReturnResponse.create(gameRoomDto.getId(), user.getClientId());
+        return GameReturnResponse.create(gameRoomDto.getId(), user.getClientId(), user.getUsername());
 
     }
 }

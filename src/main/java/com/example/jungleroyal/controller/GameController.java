@@ -104,7 +104,7 @@ public class GameController {
         String userId = jwtTokenProvider.extractSubject(jwtToken);
         GameReturnResponse response = gameRoomService.returnGame(userId);
 
-        log.info("🔥게임 되돌아가기 처리 완료 - roomUrl: {}, clientId: {}", response.getRoomId(), response.getClientId());
+        log.info("🔥게임 되돌아가기 처리 완료 - roomUrl: {}, clientId: {}, username : {}", response.getRoomId(), response.getClientId(), response.getUsername());
 
         return ResponseEntity.ok(response);
     }
