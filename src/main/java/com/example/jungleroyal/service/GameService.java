@@ -36,7 +36,7 @@ public class GameService {
     @Transactional
     public void endGame(EndGameRequest endGameRequest) {
         log.info("✅ 게임 종료 객체 정보  : {}", endGameRequest);
-        String specialUrl = "https://kko.kakao.com/1mSDFdtQLe"; // 저장할 URL
+        String specialUrl = "https://kko.kakao.com/51DBEqtzbl"; // 저장할 URL
         AtomicInteger highestScore = new AtomicInteger(Integer.MIN_VALUE);
         AtomicReference<UserJpaEntity> topScoringUser = new AtomicReference<>(null);
 
