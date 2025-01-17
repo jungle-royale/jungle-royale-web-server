@@ -231,7 +231,7 @@ public class UserService {
 
             if (user.getId().equals(userId)) {
                 // 100등 초과인 경우
-                return actualRank > 100 ? "100등 이외" : String.valueOf(actualRank);
+                return actualRank > 100 ? "-" : String.valueOf(actualRank);
             }
 
             previousScore = user.getScore();
@@ -247,10 +247,6 @@ public class UserService {
 //        List<Long> adminIds = List.of(3L, 77L, 330L, 336L, 847L);
         List<Long> adminIds = List.of(307L);
 
-        // Fetch top 100 users excluding admins
-        List<UserJpaEntity> users = userRepository.findTop100ByScoreExcludeAdmins(adminIds);
-
-        // Filter out users with score 0 and limit to 100
         return userRepository.findTop100ByScoreExcludeAdmins(adminIds)
                 .stream()
                 .filter(user -> user.getScore() > 0) // 추가적인 0점 필터링
