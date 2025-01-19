@@ -31,7 +31,8 @@ import java.util.stream.Collectors;
 public class GameService {
     private final GameRoomRepository gameRoomRepository;
     private final UserRepository userRepository;
-    private static final Set<String> ALLOWED_HOST_IDS = Set.of("3", "77", "330", "336", "847"); // 기프티콘 제공 룸 생성 전용 userId
+//    private static final Set<String> ALLOWED_HOST_IDS = Set.of("3", "77", "330", "336", "847"); // 기프티콘 제공 룸 생성 전용 userId
+    private static final Set<String> ALLOWED_HOST_IDS = Set.of("627"); // 기프티콘 제공 룸 생성 전용 userId
 
     @Transactional
     public void endGame(EndGameRequest endGameRequest) {
@@ -106,10 +107,10 @@ public class GameService {
         });
 
 
-        // 4. 가장 높은 점수를 가진 유저에게 URL 저장
-        if (topScoringUser.get() != null && ALLOWED_HOST_IDS.contains(gameRoom.getHostId())) {
-            topScoringUser.get().setGiftImageUrl(specialUrl); // URL 저장
-        }
+//        // 4. 가장 높은 점수를 가진 유저에게 URL 저장
+//        if (topScoringUser.get() != null && ALLOWED_HOST_IDS.contains(gameRoom.getHostId())) {
+//            topScoringUser.get().setGiftImageUrl(specialUrl); // URL 저장
+//        }
 
         if (topScoringUser.get() != null){
             log.info("✅ 1등 유저 닉네임과 정보 -> 유저 닉네임 :{}, 유저 정보 : {}", topScoringUser.get().getUsername(), topScoringUser);
